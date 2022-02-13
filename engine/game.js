@@ -1,15 +1,25 @@
 import {Job} from './job.js';
+import {removeItems} from '../utils/array.js';
 
 export class Game {
   #activeJobs;
-  #startJob;
+  #resolveNextTick;
+  #resolveStopped;
 
-  constructor({container, viewScale=1, run}) {
-    this.drawing = new Drawing({container, viewScale});
-    this.collision = new Collision();
+  constructor({container, run, viewScale=1, maxClampedTimeDelta=1/30, collisionBranchSize=10}) {
+    this.time = performance.now() / 1000;
+    this.timeDelta = 0;
+    this.clampedTimeDelta = 0;
+    this.maxClampedTimeDelta = maxClampedTimeDelta;
+    this.nextTick = new Promise(resolve => this.#resolveNextTick = resolve);
+
+    // this.drawing = new Drawing({container, viewScale});
+    // this.collision = new Collision();
+
     this.#activeJobs = [];
+    this.stopped = new Promise(resolve => this.#resolveStopped = resolve);
 
-    this.do(run);
+    this.#startGame(run);
   }
 
   get width() { return this.drawing.width; }
@@ -30,8 +40,37 @@ export class Game {
   #startJob(job, run) {
     this.#activeJobs.push(job);
     (async () => {
-      await run();
-      job.cleanUp();
+      try {
+        await run();
+      } catch (error) {
+        if (error !== Job.StopSignal) {
+          throw error;
+        }
+      }
+      job.stop();
     })();
+  }
+
+  async #startGame(run) {
+    this.do(run);
+
+    while (true) {
+      const newTime = await new Promise(requestAnimationFrame) / 1000;
+      this.timeDelta = newTime - this.time;
+      this.clampedTimeDelta = Math.min(this.timeDelta, this.maxClampedTimeDelta);
+      this.time = newTime;
+
+
+      const resolveNextTick = this.#resolveNextTick;
+      this.nextTick = new Promise(resolve => this.#resolveNextTick = resolve);
+      resolveNextTick();
+
+      removeItems(this.#activeJobs, job => job.isStopped());
+
+      if (this.#activeJobs.length === 0) {
+        break;
+      }
+    }
+    this.#resolveStopped();
   }
 }
