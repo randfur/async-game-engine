@@ -2,12 +2,14 @@ export class Job {
   static StopSignal = Symbol('StopSignal');
 
   #cleanUpFuncs;
+  #resolveStopped;
 
   constructor(game, parentJob) {
     this.game = game;
     this.parentJob = parentJob;
     this.#cleanUpFuncs = [];
     this.isSelfStopped = false;
+    this.stopped = new Promise(resolve => this.#resolveStopped = resolve);
   }
 
   do(run) {
@@ -18,20 +20,28 @@ export class Job {
     return this.game.create(EntityType, args, this);
   }
 
+  async tick() {
+    await this.game.nextTick;
+    if (this.isStopped()) {
+      throw Job.StopSignal;
+    }
+  }
+
   async sleep(seconds) {
     const startTime = this.game.time;
     while (true) {
-      await this.game.nextTick;
-      if (this.isStopped()) {
-        throw Job.StopSignal;
-      }
+      await this.tick();
       if (this.game.time - startTime >= seconds) {
         break;
       }
     }
   }
 
-  register(cleanUpFunc) {
+  forever() {
+    return this.sleep(Infinity);
+  }
+
+  registerCleanUp(cleanUpFunc) {
     this.#cleanUpFuncs.push(cleanUpFunc);
   }
 
@@ -40,10 +50,12 @@ export class Job {
   }
 
   stop() {
+    if (this.isSelfStopped) {
+      return;
+    }
     this.isSelfStopped = true;
-    const cleanUpFuncs = this.#cleanUpFuncs;
-    this.#cleanUpFuncs = null;
-    for (let cleanUpFunc of cleanUpFuncs) {
+    this.#resolveStopped();
+    for (let cleanUpFunc of this.#cleanUpFuncs) {
       cleanUpFunc();
     }
   }

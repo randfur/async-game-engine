@@ -1,3 +1,4 @@
+import {Drawing} from './drawing.js';
 import {Job} from './job.js';
 import {removeItems} from '../utils/array.js';
 
@@ -6,14 +7,14 @@ export class Game {
   #resolveNextTick;
   #resolveStopped;
 
-  constructor({container, run, viewScale=1, maxClampedTimeDelta=1/30, collisionBranchSize=10}) {
+  constructor({container, run, viewScale=1, clearFrames=true, maxClampedTimeDelta=1/30, collisionBranchSize=10}) {
     this.time = performance.now() / 1000;
     this.timeDelta = 0;
     this.clampedTimeDelta = 0;
     this.maxClampedTimeDelta = maxClampedTimeDelta;
     this.nextTick = new Promise(resolve => this.#resolveNextTick = resolve);
 
-    // this.drawing = new Drawing({container, viewScale});
+    this.drawing = new Drawing({container, viewScale, clearFrames});
     // this.collision = new Collision();
 
     this.#activeJobs = [];
@@ -33,7 +34,7 @@ export class Game {
 
   create(EntityType, args, parentJob=null) {
     const entity = new EntityType(this, parentJob);
-    this.#startJob(job, () => entity.run(args, this));
+    this.#startJob(entity, () => entity.run(args, this));
     return entity;
   }
 

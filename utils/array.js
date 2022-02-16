@@ -1,3 +1,10 @@
+export function removeItem(array, item) {
+  const index = array.indexOf(item);
+  if (index !== -1) {
+    array.splice(index, 1);
+  }
+}
+
 export function removeItems(array, predicate) {
   let length = array.length;
   for (let i = length; 0 <=-- i;) {
