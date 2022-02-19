@@ -1,3 +1,5 @@
+import {CreateResolveablePromise} from '../utils/promise.js';
+
 export class Job {
   static StopSignal = Symbol('StopSignal');
 
@@ -9,7 +11,7 @@ export class Job {
     this.parentJob = parentJob;
     this.#cleanUpFuncs = [];
     this.isSelfStopped = false;
-    this.stopped = new Promise(resolve => this.#resolveStopped = resolve);
+    this.stopped = CreateResolveablePromise();
   }
 
   do(run) {
@@ -54,7 +56,7 @@ export class Job {
       return;
     }
     this.isSelfStopped = true;
-    this.#resolveStopped();
+    this.stopped.resolve();
     for (let cleanUpFunc of this.#cleanUpFuncs) {
       cleanUpFunc();
     }

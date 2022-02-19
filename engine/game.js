@@ -1,24 +1,23 @@
 import {Drawing} from './drawing.js';
 import {Job} from './job.js';
 import {removeItems} from '../utils/array.js';
+import {CreateResolveablePromise} from '../utils/promise.js';
 
 export class Game {
   #activeJobs;
-  #resolveNextTick;
-  #resolveStopped;
 
   constructor({container, run, viewScale=1, clearFrames=true, maxClampedTimeDelta=1/30, collisionBranchSize=10}) {
     this.time = performance.now() / 1000;
     this.timeDelta = 0;
     this.clampedTimeDelta = 0;
     this.maxClampedTimeDelta = maxClampedTimeDelta;
-    this.nextTick = new Promise(resolve => this.#resolveNextTick = resolve);
+    this.nextTick = CreateResolveablePromise();
 
     this.drawing = new Drawing({container, viewScale, clearFrames});
     // this.collision = new Collision();
 
     this.#activeJobs = [];
-    this.stopped = new Promise(resolve => this.#resolveStopped = resolve);
+    this.stopped = CreateResolveablePromise();
 
     this.#startGame(run);
   }
@@ -32,7 +31,8 @@ export class Game {
     return job;
   }
 
-  create(EntityType, args, parentJob=null) {
+  static #emptyArgs = Object.freeze({});
+  create(EntityType, args=Game.#emptyArgs, parentJob=null) {
     const entity = new EntityType(this, parentJob);
     this.#startJob(entity, () => entity.run(args, this));
     return entity;
@@ -40,9 +40,10 @@ export class Game {
 
   #startJob(job, run) {
     this.#activeJobs.push(job);
+    const runComplete = run();
     (async () => {
       try {
-        await run();
+        await runComplete;
       } catch (error) {
         if (error !== Job.StopSignal) {
           throw error;
@@ -62,9 +63,9 @@ export class Game {
       this.time = newTime;
 
 
-      const resolveNextTick = this.#resolveNextTick;
-      this.nextTick = new Promise(resolve => this.#resolveNextTick = resolve);
-      resolveNextTick();
+      const oldTick = this.nextTick;
+      this.nextTick = CreateResolveablePromise();
+      oldTick.resolve();
 
       removeItems(this.#activeJobs, job => job.isStopped());
 
@@ -72,6 +73,6 @@ export class Game {
         break;
       }
     }
-    this.#resolveStopped();
+    this.stopped.resolve();
   }
 }
