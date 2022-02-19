@@ -1,6 +1,7 @@
 import {Game} from '../../engine/game.js';
 import {Entity} from '../../engine/entity.js';
 import {random} from '../../utils/random.js';
+import {CreateResolveablePromise} from '../../utils/promise.js';
 
 function main() {
   new Game({
@@ -49,7 +50,7 @@ class Picture extends Entity {
 
 class LinesFinder extends Entity {
   async run({maxLines}, game) {
-    this.foundLines = new Promise(resolve => this.resolveFoundLines = resolve);
+    this.foundLines = CreateResolveablePromise();
   }
 }
 
