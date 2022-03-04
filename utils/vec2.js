@@ -2,21 +2,15 @@ export class Vec2 {
   static #temps = [];
   static #reservedTemps = 0;
 
-  static withTemp(f) {
+  static getTemp() {
     ++this.#reservedTemps;
     if (this.#temps.length < this.#reservedTemps) {
       this.#temps.push(new Vec2());
     }
-    f(this.#temps[this.#reservedTemps - 1]);
-    --this.#reservedTemps;
+    return this.#temps[this.#reservedTemps - 1];
   }
 
-  static withTemps(n, f) {
-    this.#reservedTemps += n;
-    while (this.#temps.length < this.#reservedTemps) {
-      this.#temps.push(new Vec2());
-    }
-    f(...this.#temps.slice(this.#reservedTemps - n, this.#reservedTemps));
+  static releaseTemps(n) {
     this.#reservedTemps -= n;
   }
 
@@ -43,6 +37,24 @@ export class Vec2 {
   assignMulSum(ka, va, kb, vb) {
     this.x = ka * va.x + kb * vb.x;
     this.y = ka * va.y + kb * vb.y;
+  }
+
+  assignNormalLinesIntersection(lineA, lineB) {
+    const dirA = Vec2.getTemp();
+    dirA.assign(lineA.normal);
+    dirA.rotateCW();
+
+    const dirB = Vec2.getTemp();
+    dirB.assign(lineB.normal);
+    dirB.rotateCW();
+
+    this.assignIntersection(lineA.position, dirA, lineB.position, dirB);
+
+    Vec2.releaseTemps(2);
+  }
+
+  assignIntersection(startA, dirA, startB, dirB) {
+    
   }
 
   add(v) {
