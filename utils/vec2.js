@@ -54,7 +54,32 @@ export class Vec2 {
   }
 
   assignIntersection(startA, dirA, startB, dirB) {
-    
+    const a = startA.x;
+    const b = dirA.x;
+    const c = startB.x;
+    const d = dirB.x;
+    const e = startA.y;
+    const f = dirA.y;
+    const g = startB.y;
+    const h = dirB.y;
+    // a + bt1 = c + dt2
+    // e + ft1 = g + ht2
+    let t2;
+    if (Math.abs(b) > Math.abs(f)) {
+      // t1 = (c + dt2 - a)/b
+      // e + f/b*(c + dt2 - a) = g + ht2
+      // ht2 - fdt2/b = e + fc/b - fa/b - g
+      // t2 = (e + fc/b - fa/b - g)/(h - fd/b)
+      t2 = (e + f * c / b - f * a / b - g) / (h - f * d / b);
+    } else {
+      // t1 = (g + ht2 - e)/f
+      // a + b/f(g + ht2 - e) = c + dt2
+      // dt2 - bht2/f = a + dg/f - be/f - c 
+      // t2 = (a + dg/f - be/f - c)/(d - bh/f)
+      t2 = (a + d * g / f - b * e / f - c) / (d - b * h / f);
+    }
+    this.x = c + d * t2;
+    this.y = g + h * t2;
   }
 
   add(v) {

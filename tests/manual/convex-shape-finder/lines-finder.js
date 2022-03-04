@@ -37,6 +37,7 @@ export class LinesFinder extends Entity {
     }];
 
     this.activeLine = initialLines[0];
+    this.activeNextLine = initialLines[1];
 
     // for (const line of initialLines) {
     //   this.compress(line);
@@ -62,27 +63,18 @@ export class LinesFinder extends Entity {
   }
 
   onDraw(context, width, height) {
-    if (this.activeLine) {
-      const lineDir = Vec2.getTemp();
-      lineDir.assign(this.activeLine.normal);
-      lineDir.rotateCW();
-
+    if (this.activeLine && this.activeNextLine) {
       context.strokeStyle = 'yellow';
       context.beginPath();
-
-      const lineMid = Vec2.getTemp();
-      lineMid.set(this.picture.x, this.picture.y)
-      lineMid.add(this.activeLine.position);
-
-      const cursor = Vec2.getTemp();
-      cursor.assignMulSum(1, lineMid, -this.maxDistance, lineDir);
-      context.moveTo(cursor.x, cursor.y);
-      cursor.assignMulSum(1, lineMid, this.maxDistance, lineDir);
-      context.lineTo(cursor.x, cursor.y);
-
+      context.moveTo(
+        this.picture.x + this.activeLine.position.x,
+        this.picture.y + this.activeLine.position.y,
+      );
+      context.lineTo(
+        this.picture.x + this.activeNextLine.position.x,
+        this.picture.y + this.activeNextLine.position.y,
+      );
       context.stroke();
-
-      Vec2.releaseTemps(3);
     }
   }
 }
