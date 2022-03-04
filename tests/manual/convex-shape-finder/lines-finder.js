@@ -39,27 +39,35 @@ export class LinesFinder extends Entity {
     this.activeLine = initialLines[0];
     this.activeNextLine = initialLines[1];
 
+    await this.compress(initialLines[3], initialLines[0], initialLines[1]);
     // for (const line of initialLines) {
-    //   this.compress(line);
+    //   await this.compress(line);
     // }
 
     return initialLines;
   }
 
-  compress(line, boundaryA=null, boundaryB=null) {
-    while (this.lineIsClear(line, boundaryB)) {
+  async compress(lineBefore, line, lineAfter) {
+    while (this.lineIsClear(line, lineAfter)) {
+      await this.tick();
       line.position.add(line.normal);
-      if (boundaryA) {
-        line.position.assignNormalLinesIntersection(boundaryA, line);
+      if (lineBefore) {
+        line.position.assignNormalLinesIntersection(lineBefore, line);
       }
     }
-    if (boundaryB) {
-      boundaryB.assignNormalLinesIntersection(line, boundaryB);
+    if (lineAfter) {
+      lineAfter.assignNormalLinesIntersection(line, lineAfter);
     }
   }
 
-  lineIsClear(line, boundaryB=null) {
-
+  lineIsClear(line, lineAfter) {
+    const cursor = Vec2.getTemp();
+    cursor.assign(line.position);
+    const dir = Vec2.getTemp();
+    dir.assign(line.normal);
+    dir.rotateCCW();
+    // TODO
+    Vec2.releaseTemps(2);
   }
 
   onDraw(context, width, height) {

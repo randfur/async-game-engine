@@ -92,16 +92,18 @@ export class Vec2 {
     this.y += k * v.y;
   }
 
+  // Rotates 90 degrees clockwise in a right handed co-ordinate system.
   rotateCW() {
-    const x = this.x;
-    this.x = -this.y;
-    this.y = x;
-  }
-
-  rotateCCW() {
     const x = this.x;
     this.x = this.y;
     this.y = -x;
+  }
+
+  // Rotates 90 degrees counter clockwise in a right handed co-ordinate system.
+  rotateCCW() {
+    const x = this.x;
+    this.x = -this.y;
+    this.y = x;
   }
 
 
