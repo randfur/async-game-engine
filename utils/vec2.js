@@ -39,16 +39,16 @@ export class Vec2 {
     this.y = ka * va.y + kb * vb.y;
   }
 
-  assignNormalLinesIntersection(lineA, lineB) {
+  assignBoundariesIntersection(boundaryA, boundaryB) {
     const dirA = Vec2.getTemp();
-    dirA.assign(lineA.normal);
+    dirA.assign(boundaryA.normal);
     dirA.rotateCW();
 
     const dirB = Vec2.getTemp();
-    dirB.assign(lineB.normal);
+    dirB.assign(boundaryB.normal);
     dirB.rotateCW();
 
-    this.assignIntersection(lineA.position, dirA, lineB.position, dirB);
+    this.assignIntersection(boundaryA.position, dirA, boundaryB.position, dirB);
 
     Vec2.releaseTemps(2);
   }
@@ -95,15 +95,15 @@ export class Vec2 {
   // Rotates 90 degrees clockwise in a right handed co-ordinate system.
   rotateCW() {
     const x = this.x;
-    this.x = this.y;
-    this.y = -x;
+    this.x = -this.y;
+    this.y = x;
   }
 
   // Rotates 90 degrees counter clockwise in a right handed co-ordinate system.
   rotateCCW() {
     const x = this.x;
-    this.x = -this.y;
-    this.y = x;
+    this.x = this.y;
+    this.y = -x;
   }
 
 

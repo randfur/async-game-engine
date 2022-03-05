@@ -14,15 +14,13 @@ export class LinesFinder extends Entity {
     );
     this.maxDistance = distance(picture.width, picture.height) / 2;
 
-    this.lines = await this.buildInitialLines();
-    // while (this.lines.length < maxLines) {
-    //   this.addLine(this.lines);
-    // }
+    this.boundaries = await this.buildInitialBoundaries();
+    // TODO
     await this.forever();
   }
 
-  async buildInitialLines() {
-    const initialLines = [{
+  async buildInitialBoundaries() {
+    const initialBoundaries = [{
       position: new Vec2(0.5, 0.5),
       normal: new Vec2(0, 1),
     }, {
@@ -36,27 +34,27 @@ export class LinesFinder extends Entity {
       normal: new Vec2(1, 0),
     }];
 
-    this.activeLine = initialLines[0];
-    this.activeNextLine = initialLines[1];
+    this.activeBoundary = initialBoundaries[0];
+    this.activeNextBoundary = initialBoundaries[1];
 
-    await this.compress(initialLines[3], initialLines[0], initialLines[1]);
-    // for (const line of initialLines) {
-    //   await this.compress(line);
+    await this.advance(initialBoundaries[3], initialBoundaries[0], initialBoundaries[1]);
+    // for (const line of initialBoundaries) {
+    //   await this.advance(line);
     // }
 
-    return initialLines;
+    return initialBoundaries;
   }
 
-  async compress(lineBefore, line, lineAfter) {
-    while (this.lineIsClear(line, lineAfter)) {
+  async advance(boundaryBefore, boundary, boundaryAfter) {
+    while (this.boundaryIsClear(boundary, boundaryAfter)) {
       await this.tick();
-      line.position.add(line.normal);
-      if (lineBefore) {
-        line.position.assignNormalLinesIntersection(lineBefore, line);
+      boundary.position.add(boundary.normal);
+      if (boundaryBefore) {
+        boundary.position.assignBoundariesIntersection(boundaryBefore, boundary);
       }
     }
-    if (lineAfter) {
-      lineAfter.assignNormalLinesIntersection(line, lineAfter);
+    if (boundaryAfter) {
+      boundaryAfter.assignBoundariesIntersection(boundary, boundaryAfter);
     }
   }
 
@@ -66,21 +64,41 @@ export class LinesFinder extends Entity {
     const dir = Vec2.getTemp();
     dir.assign(line.normal);
     dir.rotateCCW();
-    // TODO
-    Vec2.releaseTemps(2);
+    const endDelta = Vec2.getTemp();
+    let hitOpaque = false;
+    if (Math.abs(dir.x) > Math.abs(dir.y)) {
+      const slope = dir.y / dir.x;
+      const step = Math.sign(dir.x);
+      while (true) {
+        if (this.pointIsOpaque(cursor)) {
+          hitOpaque = true;
+          break;
+        }
+        endDelta.assignSub(cursor, lineAfter.position);
+        if (endDelta.dot(lineAfter.normal) <= 0) {
+
+        }
+      // TODO
+    } else {
+      const slope = dir.x / dir.y;
+      const step = Math.sign(dir.y);
+      // TODO
+    }
+    Vec2.releaseTemps(3);
+    return !hitOpaque;
   }
 
   onDraw(context, width, height) {
-    if (this.activeLine && this.activeNextLine) {
+    if (this.activeBoundary && this.activeNextBoundary) {
       context.strokeStyle = 'yellow';
       context.beginPath();
       context.moveTo(
-        this.picture.x + this.activeLine.position.x,
-        this.picture.y + this.activeLine.position.y,
+        this.picture.x + this.activeBoundary.position.x,
+        this.picture.y + this.activeBoundary.position.y,
       );
       context.lineTo(
-        this.picture.x + this.activeNextLine.position.x,
-        this.picture.y + this.activeNextLine.position.y,
+        this.picture.x + this.activeNextBoundary.position.x,
+        this.picture.y + this.activeNextBoundary.position.y,
       );
       context.stroke();
     }
