@@ -1,5 +1,5 @@
 import {Entity} from '../../../engine/entity.js';
-import {distance} from '../../../utils/math.js';
+import {distance, indexWrapped} from '../../../utils/math.js';
 import {CreateResolveablePromise} from '../../../utils/promise.js';
 import {Vec2} from '../../../utils/vec2.js';
 
@@ -15,12 +15,14 @@ export class LinesFinder extends Entity {
     this.maxDistance = distance(picture.width, picture.height) / 2;
 
     this.boundaries = await this.buildInitialBoundaries();
-    // TODO
+    await this.advanceInitialBoundaries(this.boundaries);
+    // TODO: Add new boundaries at the corners and advance them.
+    this.foundLines.resolve();
     await this.forever();
   }
 
-  async buildInitialBoundaries() {
-    const initialBoundaries = [{
+  buildInitialBoundaries() {
+    return [{
       position: new Vec2(0.5, 0.5),
       normal: new Vec2(0, 1),
     }, {
@@ -33,16 +35,15 @@ export class LinesFinder extends Entity {
       position: new Vec2(0.5, this.picture.height - 0.5),
       normal: new Vec2(1, 0),
     }];
+  }
 
-    this.activeBoundary = initialBoundaries[0];
-    this.activeNextBoundary = initialBoundaries[1];
-
-    await this.advance(initialBoundaries[3], initialBoundaries[0], initialBoundaries[1]);
-    // for (const line of initialBoundaries) {
-    //   await this.advance(line);
-    // }
-
-    return initialBoundaries;
+  async advanceInitialBoundaries(initialBoundaries) {
+    for (let i = 0; i < initialBoundaries.length; ++i) {
+      await this.advance(
+         indexWrapped(initialBoundaries, i - 1),
+         indexWrapped(initialBoundaries, i),
+         indexWrapped(initialBoundaries, i + 1));
+    }
   }
 
   async advance(boundaryBefore, boundary, boundaryAfter) {
@@ -56,36 +57,31 @@ export class LinesFinder extends Entity {
 
   async boundaryIsClear(boundary, boundaryAfter) {
     const cursor = Vec2.getTemp();
-    this.activeCursor = cursor;
     cursor.assign(boundary.position);
     const dir = Vec2.getTemp();
     dir.assign(boundary.normal);
     dir.rotateCCW();
     const endDelta = Vec2.getTemp();
     let hitOpaque = false;
-    if (Math.abs(dir.x) > Math.abs(dir.y)) {
-      const slope = dir.y / dir.x;
-      const step = Math.sign(dir.x);
-      while (true) {
-        await this.tick();
-        if (this.pointIsOpaque(cursor)) {
-          hitOpaque = true;
-          break;
-        }
-        endDelta.assignSub(cursor, boundaryAfter.position);
-        const dot = endDelta.dot(boundaryAfter.normal);
-        if (endDelta.dot(boundaryAfter.normal) <= 0) {
-          break;
-        }
-        cursor.x += step;
+    const stepX = Math.abs(dir.x) > Math.abs(dir.y);
+    const slope = stepX ? dir.y / dir.x : dir.x / dir.y;
+    const step = stepX ? Math.sign(dir.x) : Math.sign(dir.y);
+    while (true) {
+      if (this.pointIsOpaque(cursor)) {
+        hitOpaque = true;
+        break;
       }
-      // TODO
-    } else {
-      const slope = dir.x / dir.y;
-      const step = Math.sign(dir.y);
-      // TODO
+      endDelta.assignSub(cursor, boundaryAfter.position);
+      const dot = endDelta.dot(boundaryAfter.normal);
+      if (endDelta.dot(boundaryAfter.normal) <= 0) {
+        break;
+      }
+      if (stepX) {
+        cursor.x += step;
+      } else {
+        cursor.y += step;
+      }
     }
-    this.activeCursor = null;
     Vec2.releaseTemps(3);
     return !hitOpaque;
   }
@@ -101,25 +97,21 @@ export class LinesFinder extends Entity {
   }
 
   onDraw(context, width, height) {
-    if (this.activeBoundary && this.activeNextBoundary) {
-      context.strokeStyle = 'yellow';
-      context.beginPath();
+    context.strokeStyle = 'yellow';
+    context.beginPath();
+    const intersection = Vec2.getTemp();
+    for (let i = 0; i < this.boundaries.length; ++i) {
+      const boundary = this.boundaries[i];
+      const boundaryAfter = indexWrapped(this.boundaries, i + 1);
       context.moveTo(
-          this.picture.x + this.activeBoundary.position.x,
-          this.picture.y + this.activeBoundary.position.y,
-      );
+          this.picture.x + boundary.position.x,
+          this.picture.y + boundary.position.y);
+      intersection.assignBoundariesIntersection(boundary, boundaryAfter);
       context.lineTo(
-          this.picture.x + this.activeNextBoundary.position.x,
-          this.picture.y + this.activeNextBoundary.position.y,
-      );
-      context.stroke();
+          this.picture.x + intersection.x,
+          this.picture.y + intersection.y);
     }
-    if (this.activeCursor) {
-      context.fillStyle = 'red';
-      context.fillRect(
-          this.picture.x + this.activeCursor.x - 0.5,
-          this.picture.y + this.activeCursor.y - 0.5,
-          1, 1);
-    }
+    Vec2.releaseTemps(1);
+    context.stroke();
   }
 }
