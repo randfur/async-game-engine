@@ -1,9 +1,10 @@
 import {Entity} from '../../../engine/entity.js';
 import {distance, indexWrapped} from '../../../utils/math.js';
+import {random} from '../../../utils/random.js';
 import {CreateResolveablePromise} from '../../../utils/promise.js';
 import {Vec2} from '../../../utils/vec2.js';
 
-export class LinesFinder extends Entity {
+export class ConvexBoundaryFinder extends Entity {
   async run({maxLines, picture}, game) {
     this.foundLines = CreateResolveablePromise();
     this.picture = picture;
@@ -16,7 +17,8 @@ export class LinesFinder extends Entity {
 
     this.boundaries = await this.buildInitialBoundaries();
     await this.advanceInitialBoundaries(this.boundaries);
-    // TODO: Add new boundaries at the corners and advance them.
+    await this.addMoreBoundaries(maxLines - this.boundaries.length);
+
     this.foundLines.resolve();
     await this.forever();
   }
@@ -39,23 +41,57 @@ export class LinesFinder extends Entity {
 
   async advanceInitialBoundaries(initialBoundaries) {
     for (let i = 0; i < initialBoundaries.length; ++i) {
-      await this.advance(
-         indexWrapped(initialBoundaries, i - 1),
-         indexWrapped(initialBoundaries, i),
-         indexWrapped(initialBoundaries, i + 1));
+      const boundaryBefore = indexWrapped(initialBoundaries, i - 1);
+      const boundary = indexWrapped(initialBoundaries, i);
+      const boundaryAfter = indexWrapped(initialBoundaries, i + 1);
+      await this.advance(boundaryBefore, boundary, boundaryAfter);
+      boundaryAfter.position.assignBoundariesIntersection(boundary, boundaryAfter);
     }
+  }
+
+  async addMoreBoundaries(boundariesToAddCount) {
+    let index = 0;
+    while (boundariesToAddCount > 0) {
+      const added = await this.maybeAddBoundaryAt(index);
+      if (added) {
+        --boundariesToAddCount;
+        ++index;
+      }
+      ++index;
+    }
+  }
+
+  async maybeAddBoundaryAt(index) {
+    const boundary = indexWrapped(this.boundaries, index);
+    const boundaryBefore = indexWrapped(this.boundaries, index - 1);
+    const newBoundary = {
+      position: new Vec2(),
+      normal: new Vec2(),
+    };
+    newBoundary.position.assign(boundary.position);
+    newBoundary.normal.assignSum(boundaryBefore.normal, boundary.normal);
+    newBoundary.normal.normalise();
+    const steps = await this.advance(boundaryBefore, newBoundary, boundary);
+    if (steps > 10) {
+      this.boundaries.splice(index, 0, newBoundary);
+      boundary.position.assignBoundariesIntersection(newBoundary, boundary);
+      return true;
+    }
+    return false;
   }
 
   async advance(boundaryBefore, boundary, boundaryAfter) {
-    while (await this.boundaryIsClear(boundary, boundaryAfter)) {
+    let steps = 0;
+    while (this.boundaryIsClear(boundary, boundaryAfter)) {
       await this.tick();
       boundary.position.add(boundary.normal);
       boundary.position.assignBoundariesIntersection(boundaryBefore, boundary);
+      ++steps;
     }
-    boundaryAfter.position.assignBoundariesIntersection(boundary, boundaryAfter);
+    return steps;
   }
 
-  async boundaryIsClear(boundary, boundaryAfter) {
+  boundaryIsClear(boundary, boundaryAfter) {
     const cursor = Vec2.getTemp();
     cursor.assign(boundary.position);
     const dir = Vec2.getTemp();
@@ -78,8 +114,10 @@ export class LinesFinder extends Entity {
       }
       if (stepX) {
         cursor.x += step;
+        cursor.y = boundary.position.y + (cursor.x - boundary.position.x) * slope;
       } else {
         cursor.y += step;
+        cursor.x = boundary.position.x + (cursor.y - boundary.position.y) * slope;
       }
     }
     Vec2.releaseTemps(3);

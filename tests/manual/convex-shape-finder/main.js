@@ -1,6 +1,6 @@
 import {Game} from '../../../engine/game.js';
 import {Picture} from './picture.js';
-import {LinesFinder} from './lines-finder.js';
+import {ConvexBoundaryFinder} from './convex-boundary-finder.js';
 
 function main() {
   new Game({
@@ -10,11 +10,11 @@ function main() {
       while (true) {
         await job.do(async job => {
           const picture = job.create(Picture);
-          const linesFinder = job.create(LinesFinder, {
-            maxLines: 20,
+          const convexBoundaryFinder = job.create(ConvexBoundaryFinder, {
+            maxLines: 10,
             picture,
           });
-          await linesFinder.foundLines;
+          await convexBoundaryFinder.foundLines;
           await job.sleep(1);
         }).stopped;
       }

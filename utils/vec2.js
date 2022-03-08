@@ -111,6 +111,12 @@ export class Vec2 {
     this.y = -x;
   }
 
+  normalise() {
+    const length = Math.sqrt(this.x * this.x + this.y * this.y);
+    this.x /= length;
+    this.y /= length;
+  }
+
   dot(v) {
     return this.x * v.x + this.y * v.y;
   }
