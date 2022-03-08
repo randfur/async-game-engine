@@ -46,23 +46,20 @@ export class LinesFinder extends Entity {
   }
 
   async advance(boundaryBefore, boundary, boundaryAfter) {
-    while (this.boundaryIsClear(boundary, boundaryAfter)) {
+    while (await this.boundaryIsClear(boundary, boundaryAfter)) {
       await this.tick();
       boundary.position.add(boundary.normal);
-      if (boundaryBefore) {
-        boundary.position.assignBoundariesIntersection(boundaryBefore, boundary);
-      }
+      boundary.position.assignBoundariesIntersection(boundaryBefore, boundary);
     }
-    if (boundaryAfter) {
-      boundaryAfter.assignBoundariesIntersection(boundary, boundaryAfter);
-    }
+    boundaryAfter.position.assignBoundariesIntersection(boundary, boundaryAfter);
   }
 
-  lineIsClear(line, lineAfter) {
+  async boundaryIsClear(boundary, boundaryAfter) {
     const cursor = Vec2.getTemp();
-    cursor.assign(line.position);
+    this.activeCursor = cursor;
+    cursor.assign(boundary.position);
     const dir = Vec2.getTemp();
-    dir.assign(line.normal);
+    dir.assign(boundary.normal);
     dir.rotateCCW();
     const endDelta = Vec2.getTemp();
     let hitOpaque = false;
@@ -70,22 +67,37 @@ export class LinesFinder extends Entity {
       const slope = dir.y / dir.x;
       const step = Math.sign(dir.x);
       while (true) {
+        await this.tick();
         if (this.pointIsOpaque(cursor)) {
           hitOpaque = true;
           break;
         }
-        endDelta.assignSub(cursor, lineAfter.position);
-        if (endDelta.dot(lineAfter.normal) <= 0) {
-
+        endDelta.assignSub(cursor, boundaryAfter.position);
+        const dot = endDelta.dot(boundaryAfter.normal);
+        if (endDelta.dot(boundaryAfter.normal) <= 0) {
+          break;
         }
+        cursor.x += step;
+      }
       // TODO
     } else {
       const slope = dir.x / dir.y;
       const step = Math.sign(dir.y);
       // TODO
     }
+    this.activeCursor = null;
     Vec2.releaseTemps(3);
     return !hitOpaque;
+  }
+
+  pointIsOpaque({x, y}) {
+    x = Math.floor(x);
+    y = Math.floor(y);
+    if (x < 0 || x >= this.picture.width || y < 0 || y >= this.picture.height) {
+      return false;
+    }
+    const imageData = this.picture.imageData;
+    return imageData.data[(imageData.width * y + x) * 4 + 3] > 0;
   }
 
   onDraw(context, width, height) {
@@ -93,14 +105,21 @@ export class LinesFinder extends Entity {
       context.strokeStyle = 'yellow';
       context.beginPath();
       context.moveTo(
-        this.picture.x + this.activeBoundary.position.x,
-        this.picture.y + this.activeBoundary.position.y,
+          this.picture.x + this.activeBoundary.position.x,
+          this.picture.y + this.activeBoundary.position.y,
       );
       context.lineTo(
-        this.picture.x + this.activeNextBoundary.position.x,
-        this.picture.y + this.activeNextBoundary.position.y,
+          this.picture.x + this.activeNextBoundary.position.x,
+          this.picture.y + this.activeNextBoundary.position.y,
       );
       context.stroke();
+    }
+    if (this.activeCursor) {
+      context.fillStyle = 'red';
+      context.fillRect(
+          this.picture.x + this.activeCursor.x - 0.5,
+          this.picture.y + this.activeCursor.y - 0.5,
+          1, 1);
     }
   }
 }

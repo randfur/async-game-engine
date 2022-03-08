@@ -34,6 +34,11 @@ export class Vec2 {
     this.y = va.y + vb.y;
   }
 
+  assignSub(va, vb) {
+    this.x = va.x - vb.x;
+    this.y = va.y - vb.y;
+  }
+
   assignMulSum(ka, va, kb, vb) {
     this.x = ka * va.x + kb * vb.x;
     this.y = ka * va.y + kb * vb.y;
@@ -74,9 +79,9 @@ export class Vec2 {
     } else {
       // t1 = (g + ht2 - e)/f
       // a + b/f(g + ht2 - e) = c + dt2
-      // dt2 - bht2/f = a + dg/f - be/f - c 
-      // t2 = (a + dg/f - be/f - c)/(d - bh/f)
-      t2 = (a + d * g / f - b * e / f - c) / (d - b * h / f);
+      // dt2 - bht2/f = a + bg/f - be/f - c 
+      // t2 = (a + bg/f - be/f - c)/(d - bh/f)
+      t2 = (a + b * g / f - b * e / f - c) / (d - b * h / f);
     }
     this.x = c + d * t2;
     this.y = g + h * t2;
@@ -106,5 +111,7 @@ export class Vec2 {
     this.y = -x;
   }
 
-
+  dot(v) {
+    return this.x * v.x + this.y * v.y;
+  }
 }
