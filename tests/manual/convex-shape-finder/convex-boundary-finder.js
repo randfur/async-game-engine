@@ -17,7 +17,7 @@ export class ConvexBoundaryFinder extends Entity {
 
     this.boundaries = await this.buildInitialBoundaries();
     await this.advanceInitialBoundaries(this.boundaries);
-    await this.addMoreBoundaries(maxLines - this.boundaries.length);
+    // await this.addMoreBoundaries(maxLines - this.boundaries.length);
 
     this.foundLines.resolve();
     await this.forever();
