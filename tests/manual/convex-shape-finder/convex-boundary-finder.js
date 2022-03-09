@@ -68,6 +68,10 @@ export class ConvexBoundaryFinder extends Entity {
       position: new Vec2(),
       normal: new Vec2(),
     };
+    this.addingBoundary = {
+      boundary: newBoundary,
+      boundaryAfter: boundary,
+    };
     newBoundary.position.assign(boundary.position);
     newBoundary.normal.assignSum(boundaryBefore.normal, boundary.normal);
     newBoundary.normal.normalise();
@@ -149,6 +153,18 @@ export class ConvexBoundaryFinder extends Entity {
           this.picture.x + intersection.x,
           this.picture.y + intersection.y);
     }
+
+    if (this.addingBoundary) {
+      const {boundary, boundaryAfter} = this.addingBoundary;
+      context.moveTo(
+          this.picture.x + boundary.position.x,
+          this.picture.y + boundary.position.y);
+      intersection.assignBoundariesIntersection(boundary, boundaryAfter);
+      context.lineTo(
+          this.picture.x + intersection.x,
+          this.picture.y + intersection.y);
+    }
+
     Vec2.releaseTemps(1);
     context.stroke();
   }

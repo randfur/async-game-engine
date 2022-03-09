@@ -5,7 +5,7 @@ import {ConvexBoundaryFinder} from './convex-boundary-finder.js';
 function main() {
   new Game({
     container: document.body,
-    viewScale: 3,
+    viewScale: 6,
     async run(job, game) {
       while (true) {
         await job.do(async job => {
