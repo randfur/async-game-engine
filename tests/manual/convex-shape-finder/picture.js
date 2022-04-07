@@ -1,7 +1,7 @@
-import {Entity} from '../../../engine/entity.js';
+import {BasicEntity} from '../../../engine/basic-entity.js';
 import {random} from '../../../utils/random.js';
 
-export class Picture extends Entity {
+export class Picture extends BasicEntity {
   async run(args, game) {
     this.width = 100;
     this.height = 100;

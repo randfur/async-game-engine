@@ -1,5 +1,5 @@
 import {Game} from '../../engine/game.js';
-import {Entity} from '../../engine/entity.js';
+import {BasicEntity} from '../../engine/basic-entity.js';
 import {random} from '../../utils/random.js';
 
 async function main() {
@@ -8,7 +8,7 @@ async function main() {
     viewScale: 2,
     async run(job, game) {
       for (let i = 0; i < 20; ++i) {
-        game.create(BasicEntity, {
+        game.create(TestBasicEntity, {
           x: random(game.width),
           y: random(game.height),
         });
@@ -17,7 +17,7 @@ async function main() {
   });
 }
 
-class BasicEntity extends Entity {
+class TestBasicEntity extends BasicEntity {
   async run({x, y}, game) {
     this.x = x;
     this.y = y;

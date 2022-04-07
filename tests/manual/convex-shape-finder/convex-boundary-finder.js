@@ -1,10 +1,10 @@
-import {Entity} from '../../../engine/entity.js';
+import {BasicEntity} from '../../../engine/basic-entity.js';
 import {distance, indexWrapped} from '../../../utils/math.js';
 import {random} from '../../../utils/random.js';
 import {CreateResolveablePromise} from '../../../utils/promise.js';
 import {Vec2} from '../../../utils/vec2.js';
 
-export class ConvexBoundaryFinder extends Entity {
+export class ConvexBoundaryFinder extends BasicEntity {
   async run({maxLines, picture}, game) {
     this.foundLines = CreateResolveablePromise();
     this.picture = picture;
