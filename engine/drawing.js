@@ -9,6 +9,9 @@ export class Drawing {
     container.style.padding = '0px';
     container.style.overflow = 'hidden';
     container.appendChild(this.canvas);
+    this.canvas.style.position = 'absolute';
+    this.canvas.style.top = '0px';
+    this.canvas.style.left = '0px';
     this.canvas.style.transformOrigin = '0px 0px';
     this.canvas.style.imageRendering = 'pixelated';
     this.canvas.style.transform = `scale(${viewScale})`;

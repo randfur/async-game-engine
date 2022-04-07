@@ -3,7 +3,7 @@ import {BasicEntity} from '../../engine/basic-entity.js';
 import {random} from '../../utils/random.js';
 
 async function main() {
-    new Game({
+  new Game({
     container: document.body,
     viewScale: 2,
     async run(job, game) {
