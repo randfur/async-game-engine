@@ -25,7 +25,6 @@ class TestBasicEntity extends BasicEntity {
   }
 
   async body() {
-    const size = this.size;
 
     let dx = deviate(4);
     let dy = deviate(4);
@@ -36,12 +35,11 @@ class TestBasicEntity extends BasicEntity {
       this.x += dx;
       this.y += dy;
 
-      dx *= 0.99;
-      dy *= 0.99;
+      const dampening = 0.99;
+      dx = dx * dampening + Math.sin(this.y);
+      dy = dy * dampening + Math.sin(this.x);
 
-      dx += Math.sin(this.y);
-      dy += Math.sin(this.x);
-
+      const size = this.size;
       if (this.x < -size) { this.x += width + size; }
       if (this.x > width) { this.x -= width + size; }
       if (this.y < -size) { this.y += height + size; }
