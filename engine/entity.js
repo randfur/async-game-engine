@@ -1,14 +1,17 @@
 import {Job} from './job.js';
 
 export class Entity extends Job {
-  constructor(game, parentJob) {
+  constructor(game, parentJob, args) {
     super(game, parentJob);
-    this.init();
+    this.initPreset();
+    this.init(args);
   }
 
-  init() {}
+  initPreset() {}
 
-  async run(args, game) {
+  init(args) {}
+
+  async body(args) {
     console.warn('async run() not implemented for:', this);
   }
 }

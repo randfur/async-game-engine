@@ -33,8 +33,8 @@ export class Game {
 
   static #emptyArgs = Object.freeze({});
   create(EntityType, args=Game.#emptyArgs, parentJob=null) {
-    const entity = new EntityType(this, parentJob);
-    this.#startJob(entity, () => entity.run(args, this));
+    const entity = new EntityType(this, parentJob, args);
+    this.#startJob(entity, () => entity.body(args));
     return entity;
   }
 

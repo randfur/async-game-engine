@@ -2,11 +2,11 @@ import {BasicEntity} from '../../../engine/basic-entity.js';
 import {random} from '../../../utils/random.js';
 
 export class Picture extends BasicEntity {
-  async run(args, game) {
+  async body() {
     this.width = 100;
     this.height = 100;
-    this.x = (game.width - this.width) / 2;
-    this.y = (game.height - this.height) / 2;
+    this.x = (this.game.width - this.width) / 2;
+    this.y = (this.game.height - this.height) / 2;
 
     this.canvas = new OffscreenCanvas(this.width, this.height);
     this.context = this.canvas.getContext('2d');

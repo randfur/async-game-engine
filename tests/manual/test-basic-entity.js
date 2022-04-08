@@ -1,6 +1,6 @@
 import {Game} from '../../engine/game.js';
 import {BasicEntity} from '../../engine/basic-entity.js';
-import {random} from '../../utils/random.js';
+import {random, deviate} from '../../utils/random.js';
 
 async function main() {
   new Game({
@@ -18,18 +18,34 @@ async function main() {
 }
 
 class TestBasicEntity extends BasicEntity {
-  async run({x, y}, game) {
+  init({x, y}) {
     this.x = x;
     this.y = y;
     this.size = 10;
+  }
+
+  async body() {
+    const size = this.size;
+
+    let dx = deviate(4);
+    let dy = deviate(4);
 
     while (true) {
+      const {width, height} = this.game;
       await this.tick();
-      this.x += 4;
-      this.y += this.x / 30;
+      this.x += dx;
+      this.y += dy;
 
-      if (this.x > game.width) { this.x -= game.width + this.size; }
-      if (this.y > game.height) { this.y -= game.height + this.size; }
+      dx *= 0.99;
+      dy *= 0.99;
+
+      dx += Math.sin(this.y);
+      dy += Math.sin(this.x);
+
+      if (this.x < -size) { this.x += width + size; }
+      if (this.x > width) { this.x -= width + size; }
+      if (this.y < -size) { this.y += height + size; }
+      if (this.y > height) { this.y -= height + size; }
     }
   }
 

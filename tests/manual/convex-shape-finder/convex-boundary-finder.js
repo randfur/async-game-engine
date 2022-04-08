@@ -5,7 +5,7 @@ import {CreateResolveablePromise} from '../../../utils/promise.js';
 import {Vec2} from '../../../utils/vec2.js';
 
 export class ConvexBoundaryFinder extends BasicEntity {
-  async run({maxLines, picture}, game) {
+  async body({maxLines, picture}) {
     this.foundLines = CreateResolveablePromise();
     this.picture = picture;
 
