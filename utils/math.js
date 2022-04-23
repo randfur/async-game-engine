@@ -1,3 +1,5 @@
+export const TAU = Math.PI * 2;
+
 export function distance(x, y) {
   return Math.sqrt(x * x + y * y);
 }
