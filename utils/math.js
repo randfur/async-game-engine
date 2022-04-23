@@ -10,3 +10,7 @@ export function indexWrapped(list, index) {
   }
   return list[index % list.length];
 }
+
+export function lerp(a, b, t) {
+  return a + (b - a) * t;
+}
