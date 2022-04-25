@@ -14,3 +14,7 @@ export function indexWrapped(list, index) {
 export function lerp(a, b, t) {
   return a + (b - a) * t;
 }
+
+export function smooth(t) {
+  return t <= 0.5 ? 2 * t ** 2 : 1 - 2 * (1 - t) ** 2;
+}
