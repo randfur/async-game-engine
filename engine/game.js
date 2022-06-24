@@ -14,7 +14,6 @@ export class Game {
     this.nextTick = CreateResolveablePromise();
 
     this.drawing = new Drawing({container, viewScale, clearFrames});
-    // this.collision = new Collision();
 
     this.#activeJobs = [];
     this.stopped = CreateResolveablePromise();

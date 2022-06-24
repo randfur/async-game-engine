@@ -1,0 +1,56 @@
+- Typescript
+  - Use as API reference documentation.
+  - Validate that JS matches TS declarations using typescript-service-worker.
+- Testing
+  - Have testing framework that can collate multiple test files, run and summarize all the tests.
+- Documentation
+  - Use .d.ts files for API references.
+  - Have README explain in English how things are meant to work.
+  - Have example code for common idioms.
+- Modules
+  - `game.modules.collision`?
+  - Pass modules to Game constructor?
+  - Modules have init() where they can receive Game?
+  - Pass module constructors to Game constructor?
+    - Can build dependency system around this?
+  - Pass module constructor to `module()` getter?
+    - Automatic dependency management, no need for explicit dependencies or initialisation.
+    - No way to configure the modules at a global level.
+      - Game constructor can still receive some module instances and deduce their constructor.
+  - Entity module getter?
+    - this.module(Collision)
+    - this.mod(Collision)
+    - this.get(Collision)
+    - Basic entity can add helper getters.
+      - this.collision
+  - Getting modules by module constructor may be slow?
+  - Other possible modules
+    - 3D Context
+    - 3D Collision
+    - Resource loader? Maybe core.
+    - Score system.
+    - Input events.
+  - Why have modules live on Game instead of global singletons?
+    - Globals feel bad.
+      - Implicit dependencies blown open.
+    - Game is a non-global object, would be weird for everything else to not follow suit.
+  - Alternative: No modules and all these modules are part of the core.
+  - Alternative: Users can create their own Game subclasses that have whatever modules they want included.
+    - Liking this one the most.
+    - Let's have BasicGame and BasicEntity.
+    - Can also have Basic3DGame and Basic3DEntity.
+    - Sounds good.
+- Collision
+  - Need to be able to query collisions at "imaginary" positions rather than only receive events for collisions at current location.
+- Sprites
+  - Resource loading
+  - Sprite library
+  - Connection with drawing module.
+  - Connection with collision module.
+  - Has 3D version for 3D drawing and 3D collisions?
+- Pool
+- 3D Context
+  - Types of 3D drawing primitives.
+  - Pools of draw objects.
+  - Z sort before draw.
+
