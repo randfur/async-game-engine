@@ -6,23 +6,24 @@ import {CreateResolveablePromise} from '../utils/promise.js';
 export class Game {
   #activeJobs;
 
-  constructor({container, run, viewScale=1, clearFrames=true, maxClampedTimeDelta=1/30, collisionBranchSize=10}) {
+  constructor(args) {
+    const {run, maxTimeDelta=1 / 30} = args;
+
     this.time = performance.now() / 1000;
     this.timeDelta = 0;
     this.clampedTimeDelta = 0;
-    this.maxClampedTimeDelta = maxClampedTimeDelta;
+    this.maxTimeDelta = maxTimeDelta;
     this.nextTick = CreateResolveablePromise();
-
-    this.drawing = new Drawing({container, viewScale, clearFrames});
 
     this.#activeJobs = [];
     this.stopped = CreateResolveablePromise();
 
+    this.initPresetParts(args);
+
     this.#startGame(run);
   }
 
-  get width() { return this.drawing.width; }
-  get height() { return this.drawing.height; }
+  initPresetParts() {}
 
   do(run, parentJob=null) {
     const job = new Job(this, parentJob);
@@ -57,8 +58,7 @@ export class Game {
 
     while (true) {
       const newTime = await new Promise(requestAnimationFrame) / 1000;
-      this.timeDelta = newTime - this.time;
-      this.clampedTimeDelta = Math.min(this.timeDelta, this.maxClampedTimeDelta);
+      this.timeDelta = Math.min(newTime - this.time, this.maxTimeDelta);
       this.time = newTime;
 
 
@@ -72,6 +72,7 @@ export class Game {
         break;
       }
     }
+
     this.stopped.resolve();
   }
 }

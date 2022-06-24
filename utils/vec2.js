@@ -2,6 +2,7 @@ export class Vec2 {
   static #temps = [];
   static #reservedTemps = 0;
 
+  // TODO: Replace with generic Pool utility.
   static getTemp() {
     ++this.#reservedTemps;
     if (this.#temps.length < this.#reservedTemps) {

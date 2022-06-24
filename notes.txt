@@ -1,6 +1,7 @@
 - Typescript
   - Use as API reference documentation.
   - Validate that JS matches TS declarations using typescript-service-worker.
+    - Can you have .d.ts files parallel to JS files to run type checking?
 - Testing
   - Have testing framework that can collate multiple test files, run and summarize all the tests.
 - Documentation

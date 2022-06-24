@@ -3,11 +3,11 @@ import {Job} from './job.js';
 export class Entity extends Job {
   constructor(game, parentJob, args) {
     super(game, parentJob);
-    this.initPresetComponents();
+    this.initPresetParts();
     this.init(args);
   }
 
-  initPresetComponents() {}
+  initPresetParts() {}
 
   init(args) {}
 
