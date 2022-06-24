@@ -1,4 +1,4 @@
-import {Entity} from './entity.js';
+import {Entity} from '../engine/entity.js';
 
 export class BasicEntity extends Entity {
   initPresetParts() {

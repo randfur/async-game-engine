@@ -1,8 +1,8 @@
-import {removeItem} from '../utils/array.js';
+import {removeItem} from '../../utils/array.js';
 
 export class Drawing {
   #drawHandles;
-  constructor({container, viewScale, clearFrames}) {
+  constructor({container, viewScale=1, clearFrames=true}) {
     this.#drawHandles = [];
 
     this.canvas = document.createElement('canvas');

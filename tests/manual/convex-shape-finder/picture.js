@@ -1,4 +1,4 @@
-import {BasicEntity} from '../../../engine/basic-entity.js';
+import {BasicEntity} from '../../../presets/basic-entity.js';
 import {random} from '../../../utils/random.js';
 
 export class Picture extends BasicEntity {

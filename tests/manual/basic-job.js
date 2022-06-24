@@ -1,8 +1,10 @@
-import {Game} from '../../engine/game.js';
+import {BasicGame} from '../../presets/basic-game.js';
 
 function main() {
-  new Game({
-    container: document.body,
+  new BasicGame({
+    drawing: {
+      container: document.body,
+    },
     async run(job, game) {
       console.log('main start');
       job.do(async job => {

@@ -1,4 +1,3 @@
-import {Drawing} from './drawing.js';
 import {Job} from './job.js';
 import {removeItems} from '../utils/array.js';
 import {CreateResolveablePromise} from '../utils/promise.js';

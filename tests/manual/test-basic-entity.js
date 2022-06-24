@@ -1,11 +1,13 @@
-import {Game} from '../../engine/game.js';
-import {BasicEntity} from '../../engine/basic-entity.js';
+import {BasicGame} from '../../presets/basic-game.js';
+import {BasicEntity} from '../../presets/basic-entity.js';
 import {random, deviate} from '../../utils/random.js';
 
 async function main() {
-  new Game({
-    container: document.body,
-    viewScale: 2,
+  new BasicGame({
+    drawing: {
+      container: document.body,
+      viewScale: 2,
+    },
     async run(job, game) {
       for (let i = 0; i < 20; ++i) {
         game.create(TestBasicEntity, {

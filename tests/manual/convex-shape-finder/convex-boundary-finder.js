@@ -1,4 +1,4 @@
-import {BasicEntity} from '../../../engine/basic-entity.js';
+import {BasicEntity} from '../../../presets/basic-entity.js';
 import {distance, indexWrapped} from '../../../utils/math.js';
 import {random} from '../../../utils/random.js';
 import {CreateResolveablePromise} from '../../../utils/promise.js';
