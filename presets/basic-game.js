@@ -4,6 +4,7 @@ import {Drawing} from '../parts/game/drawing.js';
 export class BasicGame extends Game {
   initPresetParts(args) {
     this.drawing = new Drawing(args.drawing);
+    // TODO: Add collision.
   }
 
   get width() { return this.drawing.width; }
