@@ -1,0 +1,19 @@
+Ideal things:
+- Draw/edit sprites in game.
+- Add objects to level in game.
+
+Player:
+- Up, down, left, right, jump movement.
+- Sprites and animations for all these movements.
+- Extra movements and abilities e.g. inspired by Sonic.
+
+Platforms:
+- Static blocks.
+- Moving platforms.
+- Slopes.
+
+Background:
+- Parallax.
+- Foreground elements.
+- Particles?
+- Set pieces.
