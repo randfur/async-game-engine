@@ -1,0 +1,12 @@
+For each side:
+- Find peak points
+- For left and right directions (e.g. right):
+  - Find rightmost peak.
+  - For each height from right most edge inwards:
+    - Create line from peak corner to height corner and save as "best" with endpoint.
+    - If line contains more than previous best:
+      - Save new line as best.
+      - Create new segment from height to last best line endpoint.
+
+What does "contains more" mean?
+- Has less steep rise over run.
