@@ -1,4 +1,4 @@
-import {Vec2} from '../../utils/vec2.js';
+import {Vec2} from '../../../utils/vec2.js';
 
 function assert(condition) {
   if (!condition) {

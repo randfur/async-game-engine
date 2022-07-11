@@ -1,6 +1,6 @@
-import {BasicGame} from '../../presets/basic-game.js';
-import {BasicEntity} from '../../presets/basic-entity.js';
-import {random, deviate} from '../../utils/random.js';
+import {BasicGame} from '../../../presets/basic-game.js';
+import {BasicEntity} from '../../../presets/basic-entity.js';
+import {random, deviate} from '../../../utils/random.js';
 
 async function main() {
   new BasicGame({

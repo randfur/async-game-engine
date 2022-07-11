@@ -1,4 +1,4 @@
-import {BasicGame} from '../../presets/basic-game.js';
+import {BasicGame} from '../../../presets/basic-game.js';
 
 function main() {
   new BasicGame({
