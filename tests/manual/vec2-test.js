@@ -39,6 +39,7 @@ const tests = {
 function main() {
   for (const [name, test] of Object.entries(tests)) {
     test();
+    console.log(`${name} passed`);
   }
 }
 
