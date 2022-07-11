@@ -11,7 +11,7 @@
   - Have README explain in English how things are meant to work.
   - Have example code for common idioms.
 
-- Presets:
+- Presets
   - Preset Game and Entity subclasses.
   - Modules initialised as members, possibly hooked up to each other.
   - Helper methods that use the modules.
@@ -20,6 +20,7 @@
     - 2D drawing.
     - 2D collision.
     - Sprites.
+    - In game scene & sprite editor.
   - Basic3DGame and Basic3DEntity.
     - 3D game stuff.
     - 3D drawing.
@@ -32,6 +33,56 @@
     - Add and remove a temporary collider?
       - Not sure how expensive adding and removing is, hopefully O(ln) ish.
 
+- Scenes
+  - Initial states of entities.
+  - Tile map.
+  - Size?
+    - Affects camera panning?
+  - Entities paused when not in an active scene?
+    - Some entities not in any scene and are always active?
+      - Controllers of the game.
+    - Needs core game integration to mess with nextFrame()?
+    - Needs drawing/collision module integration to cease having effects on other scene entities?
+      - Scene association needs to be part of core game engine & entity?
+        - What is initial scene?
+        - How are scenes registered with the engine?
+        - Job has associated scene.
+        - Game has active scene.
+        - Modules with registered jobs filter processing to only those associated with active scene.
+          - Sounds expensive.
+          - Need to optimise out non-active jobs.
+          - Map of scene -> job?
+        - Maybe scenes contain drawing and collision modules?
+          - Maybe what is Game today is actually Scene.
+  - Entities can move between scenes e.g. player?
+  - Declarative ways to transition between scenes?
+    - Scenes connected as a big graph?
+      - Scene transition graph editor?
+  - Stack of scenes?
+    - Copy Android Activity stack model?
+  - Singleton, cannot be instantiated multiple times.
+
+- In game editing
+  - Access to project directory, can directly edit game files and assets.
+  - Scene editor.
+    - Needs scene file format.
+      - List of entities.
+      - Entity construction arguments.
+        - BasicEntity can have standard arguments for initial state.
+          - Collision.
+          - Sprite.
+          - Transform.
+      - Tile set + tile map.
+      - Tile map can have layers with optional parallax effect.
+  - Sprite editor.
+    - Needs sprite file format.
+  - Entity editor?
+    - Output JS files?
+    - What if JS files get edited by hand?
+    - Can store declarative components in a particular getter?
+      - Make it easier for the editor to find and update.
+      - initialState() or something.
+
 - Sprites
   - Resource loading
   - Sprite library
@@ -40,6 +91,8 @@
   - Has 3D version for 3D drawing and 3D collisions?
 
 - Pool
+
+- Input
 
 - 3D Context
   - Types of 3D drawing primitives.
@@ -55,7 +108,7 @@
       - Can build dependency system around this?
     - Pass module constructor to `module()` getter?
       - Automatic dependency management, no need for explicit dependencies or initialisation.
-      - No way to configure the modules at a global level.
+      - No way to configure the modules at a global scene.
         - Game constructor can still receive some module instances and deduce their constructor.
     - Entity module getter?
       - this.module(Collision)
