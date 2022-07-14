@@ -44,8 +44,7 @@
     - Needs core game integration to mess with nextFrame()?
     - Needs drawing/collision module integration to cease having effects on other scene entities?
       - Scene association needs to be part of core game engine & entity?
-        - What is initial scene?
-        - How are scenes registered with the engine?
+        - Pass a scene to Game constructor instead of async run()?
         - Job has associated scene.
         - Game has active scene.
         - Modules with registered jobs filter processing to only those associated with active scene.
@@ -54,6 +53,13 @@
           - Map of scene -> job?
         - Maybe scenes contain drawing and collision modules?
           - Maybe what is Game today is actually Scene.
+          - Drawing and input will be two-level.
+            - Game level to set up the resources (canvas, event listeners).
+            - Scene level to handle scene scoped registrations.
+        - Scenes are job registration scopes.
+          - Jobs are registered with a particular scene for execution (nextFrame() and sleep()) and modules like collision, input and drawing.
+          - Job takes (job, scene, game)?
+        - Game has map from scene class -> scene instance.
   - Entities can move between scenes e.g. player?
   - Declarative ways to transition between scenes?
     - Scenes connected as a big graph?
