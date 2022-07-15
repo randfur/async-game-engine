@@ -6,8 +6,10 @@ export class Job {
   #cleanUpFuncs;
   #resolveStopped;
 
-  constructor(game, parentJob) {
-    this.game = game;
+  constructor(jobRunner, parentJob) {
+    this.jobRunner = jobRunner;
+    this.game = jobRunner.game;
+    this.scene = jobRunner.scene;
     this.parentJob = parentJob;
     this.#cleanUpFuncs = [];
     this.isSelfStopped = false;
@@ -15,11 +17,11 @@ export class Job {
   }
 
   do(run) {
-    return this.game.do(run, this);
+    return this.jobRunner.do(run, this);
   }
 
   create(EntityType, args) {
-    return this.game.create(EntityType, args, this);
+    return this.jobRunner.create(EntityType, this, args);
   }
 
   async tick() {
