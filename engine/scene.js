@@ -1,23 +1,27 @@
 export class Scene {
-  #activeJobs;
-  constructor(game, getNextTick, args) {
+  constructor(game) {
     this.game = game;
-    this.getNextTick = getNextTick;
+    this.nextTick = CreateResolveablePromise();
     this.pausedAtTime = null;
     this.initPresetParts();
     this.init(args);
     this.stopped = CreateResolveablePromise();
-    this.#startScene();
+
+    (async () => {
+      while (!this.stopped.resolved) {
+        await this.getNextTick();
+      }
+    })();
   }
 
   initPresetParts() {}
 
   init(args) {}
 
-  async run() {
-    while (!this.stopped.resolved) {
-      await this.getNextTick();
-    }
+  onActivated() {}
+
+  stop() {
+    this.stopped.resolve();
   }
 }
 
