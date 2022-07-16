@@ -6,10 +6,9 @@ export class Job {
   #cleanUpFuncs;
   #resolveStopped;
 
-  constructor(jobRunner, parentJob) {
-    this.jobRunner = jobRunner;
-    this.game = jobRunner.game;
-    this.scene = jobRunner.scene;
+  constructor(scene, parentJob) {
+    this.scene = scene;
+    this.game = scene.game;
     this.parentJob = parentJob;
     this.#cleanUpFuncs = [];
     this.isSelfStopped = false;

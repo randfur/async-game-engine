@@ -1,8 +1,8 @@
 import {Job} from './job.js';
 
 export class Entity extends Job {
-  constructor(jobRunner, parentJob, game, scene, args) {
-    super(jobRunner, parentJob, game, scene);
+  constructor(scene, parentJob, args) {
+    super(scene, parentJob);
     this.initPresetParts();
     this.init(args);
   }

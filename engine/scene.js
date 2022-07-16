@@ -2,8 +2,8 @@ import {removeItems} from '../utils/array.js';
 import {Job} from './job.js';
 
 export class Scene {
-  #jobs;
   #gameTimeAhead;
+  #jobs;
 
   constructor(game) {
     this.game = game;
@@ -18,7 +18,7 @@ export class Scene {
 
     this.initPresetParts();
 
-    this.do(() => this.run());
+    this.do(job => this.run(job));
 
     (async () => {
       while (!this.stopped.resolved) {
