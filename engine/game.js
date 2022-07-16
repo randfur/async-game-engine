@@ -11,7 +11,7 @@ export class Game {
     this.#inactiveScenes = new Map();
 
     this.backgroundScene = new (class extends Scene {
-      body: args.run,
+      run: args.run,
     })(this);
 
     // TODO: drawing
