@@ -1,23 +1,31 @@
-import {Job} from './job.js';
-import {removeItems} from '../utils/array.js';
 import {CreateResolveablePromise} from '../utils/promise.js';
+import {Scene} from './scene.js';
 
 export class Game {
-  #scenes;
+  #inactiveScenes;
 
   constructor(args) {
     this.time = 0;
     this.stopped = CreateResolveablePromise();
     this.activeScene = null;
-    this.#scenes = new Map();
+    this.#inactiveScenes = new Map();
 
     this.backgroundScene = new (class extends Scene {
       body: args.run,
     })(this);
 
-    this.initPresetParts(args);
+    // TODO: drawing
+    // TODO: input?
+    // TODO: audio?
+    // TODO: resources?
 
     (async () => {
+      function MaybeTickScene(scene, time) {
+        if (scene) {
+          scene.nextGameTick.resolve(time);
+          scene.nextGameTick = CreateResolveablePromise();
+        }
+      }
       const realStartTime = Performance.now() / 1000;
       while (!this.stopped.resolved) {
         const realTime = (await new Promise(requestAnimationFrame)) / 1000;
@@ -28,42 +36,47 @@ export class Game {
     });
   }
 
-  initPresetParts() {}
-
-  stop() {
-    if (!this.stopped.resolved) {
-      this.background.stop();
-      for (const scene of this.#scenes.values()) {
-        scene.stop();
-      }
-    }
-    this.stopped.resolve();
-  }
-
   activate(SceneType) {
+    if (this.activeScene.constructor === SceneType) {
+      return;
+    }
+
     if (this.activeScene) {
-      if (this.activeScene.persists) {
-        this.activeScene.pausedAtTime = this.time;
+      if (this.activeScene.persist) {
+        this.#inactiveScenes.set(this.activeScene.constructor, this.activeScene);
+        this.activeScene.pausedAtGameTime = this.time;
       } else {
         this.activeScene.stop();
-        this.#scenes.delete(this.activeScene.constructor);
       }
+      this.activeScene = null;
     }
-    if (this.#scenes.has(SceneType)) {
-      this.activeScene = this.#scenes.get(SceneType);
+
+    if (this.#inactiveScenes.has(SceneType)) {
+      this.activeScene = this.#inactiveScenes.get(SceneType);
+      this.#inactiveScenes.delete(SceneType);
     } else {
       const scene = new SceneType(this);
-      this.#scenes.set(SceneType, scene);
+      scene.stopped.then(() => {
+        if (this.activeScene === scene) {
+          this.activeScene = null;
+        } else if (this.#inactiveScenes.has(SceneType)) {
+          this.#inactiveScenes.delete(SceneType);
+        }
+      });
       this.activeScene = scene;
     }
-    this.activeScene.onActivated();
+
     return this.activeScene;
   }
-}
 
-function MaybeTickScene(scene, time) {
-  if (scene && !scene.stopped.resolved) {
-    scene.nextTick.resolve(time);
-    scene.nextTick = CreateResolveablePromise();
+  stop() {
+    if (this.stopped.resolved) {
+      return;
+    }
+    this.background.stop();
+    this.activeScene?.stop();
+    for (const scene of this.#inactiveScenes.values()) {
+      scene.stop();
+    }
   }
 }
