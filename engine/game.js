@@ -12,12 +12,12 @@ interface Game {
 
   constructor(args: interface {
     drawing: interface {
-      container: DOMElement,
+      container: DOMElement | null,
       viewScale: number,
       clearFrames: boolean,
     },
     startScene?: SceneType,
-    backgroundJob?: async (job: Job, scene: Scene, game: Game) => void,
+    backgroundScene?: SceneType,
   }),
 
   activate(SceneType): Scene,
@@ -36,11 +36,12 @@ export class Game {
     // TODO: audio?
     // TODO: resources?
     this.#inactives = new Map();
-    this.background = new (class extends Scene {
-      run: args.backgroundJob ?? async () => {},
-    })(this);
+    this.background = null;
     this.active = null;
 
+    if (args.backgroundScene) {
+      this.background = new args.backgroundScene(this);
+    }
     if (args.startScene) {
       this.activate(this.startScene);
     }
@@ -95,11 +96,14 @@ export class Game {
     return this.active;
   }
 
+  get width() { return this.drawing.width; }
+  get height() { return this.drawing.height; }
+
   stop() {
     if (this.stopped.resolved) {
       return;
     }
-    this.background.stop();
+    this.background?.stop();
     this.active?.stop();
     for (const scene of this.#inactives.values()) {
       scene.stop();

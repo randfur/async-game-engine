@@ -1,10 +1,19 @@
 import {removeItem} from '../../utils/array.js';
+import {mapAppend} from '../../utils/map.js';
 
 export class GameDrawing {
   #drawHandles;
-  constructor(game, {container, viewScale=1, clearFrames=true}) {
+  constructor(game, {container=null, viewScale=1, clearFrames=true}) {
     this.game = game;
-    this.#drawHandles = [];
+    this.#drawHandles = new Map();
+
+    if (!container) {
+      container = document.body;
+      container.style.background = 'black';
+      container.style.margin = '0';
+      container.style.height = '100vh';
+      container.style.touchAction = 'pinch-zoom';
+    }
 
     this.canvas = document.createElement('canvas');
     container.style.padding = '0px';
@@ -55,9 +64,9 @@ export class GameDrawing {
       drawFunc,
     };
     job.registerCleanUp(() => {
-      removeItem(this.#drawHandles, drawHandle);
+      removeItem(this.#drawHandles.get(job.scene), drawHandle);
     });
-    this.#drawHandles.push(drawHandle);
+    mapAppend(this.#drawHandles, job.scene, drawHandle);
     return drawHandle;
   }
 }

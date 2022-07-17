@@ -2,11 +2,16 @@ import {CreateResolveablePromise} from '../utils/promise.js';
 
 /*
 interface Job {
+  scene: Scene,
+  game: Game,
+  stopped: Promise<void>,
+
   do(async (job, scene, game) => Promise<void>): Job,
   create(EntityType, args): Entity,
   async tick(): void,
   async sleep(seconds: number): void,
   async forever(): void,
+  registerCleanUp(() => {}): void,
   stop(): void,
 }
 */
