@@ -19,7 +19,9 @@ interface Game {
     startScene?: SceneType,
     backgroundJob?: async (job: Job, scene: Scene, game: Game) => void,
   }),
+
   activate(SceneType): Scene,
+
   stop(): void,
 }
 */

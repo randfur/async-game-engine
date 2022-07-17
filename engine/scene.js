@@ -1,6 +1,22 @@
 import {removeItems} from '../utils/array.js';
 import {Job} from './job.js';
 
+/*
+interface Scene {
+  game: Game,
+  stopped: Promise<void>,
+  persists: boolean,
+  time: number
+  pausedAtGameTime: number,
+  nextTick: Promise<number>,
+
+  initPresetParts(): void,
+  async run(): void,
+  do(async (job, scene, game) => void): Job,
+  create(EntityType, args): Entity,
+  stop(): void,
+}
+*/
 export class Scene {
   #gameTimeAhead;
   #jobs;
@@ -9,11 +25,11 @@ export class Scene {
     this.game = game;
     this.stopped = CreateResolveablePromise();
     this.persists = false;
-    this.pausedAtGameTime = null;
-    this.nextGameTick = CreateResolveablePromise();
-    this.nextTick = CreateResolveablePromise();
     this.time = 0;
+    this.pausedAtGameTime = null;
     this.#gameTimeAhead = 0;
+    this.nextTick = CreateResolveablePromise();
+    this.nextGameTick = CreateResolveablePromise();
     this.#jobs = [];
 
     this.initPresetParts();

@@ -1,5 +1,15 @@
 import {CreateResolveablePromise} from '../utils/promise.js';
 
+/*
+interface Job {
+  do(async (job, scene, game) => Promise<void>): Job,
+  create(EntityType, args): Entity,
+  async tick(): void,
+  async sleep(seconds: number): void,
+  async forever(): void,
+  stop(): void,
+}
+*/
 export class Job {
   static StopSignal = Symbol('StopSignal');
 
@@ -11,7 +21,6 @@ export class Job {
     this.game = scene.game;
     this.parentJob = parentJob;
     this.#cleanUpFuncs = [];
-    this.isSelfStopped = false;
     this.stopped = CreateResolveablePromise();
   }
 
@@ -49,14 +58,13 @@ export class Job {
   }
 
   isStopped() {
-    return this.isSelfStopped || this.parentJob?.isStopped();
+    return this.stopped.resolved || this.parentJob?.isStopped();
   }
 
   stop() {
-    if (this.isSelfStopped) {
+    if (this.stopped.resolved) {
       return;
     }
-    this.isSelfStopped = true;
     this.stopped.resolve();
     for (let cleanUpFunc of this.#cleanUpFuncs) {
       cleanUpFunc();
