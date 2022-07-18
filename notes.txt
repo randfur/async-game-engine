@@ -2,6 +2,7 @@
   - Use as API reference documentation.
   - Validate that JS matches TS declarations using typescript-service-worker.
     - Can you have .d.ts files parallel to JS files to run type checking?
+  - Just using TS as comments for now.
 
 - Testing
   - Have testing framework that can collate multiple test files, run and summarize all the tests.
@@ -12,21 +13,23 @@
   - Have example code for common idioms.
 
 - Presets
-  - Preset Game and Entity subclasses.
+  - Preset Scene and Entity subclasses.
   - Modules initialised as members, possibly hooked up to each other.
   - Helper methods that use the modules.
-  - BasicGame and BasicEntity.
+  - BasicScene and BasicEntity.
     - 2D game stuff.
     - 2D drawing.
+    - Camera transformed drawing.
     - 2D collision.
     - Sprites.
     - In game scene & sprite editor.
-  - Basic3DGame and Basic3DEntity.
+  - Basic3DScene and Basic3DEntity.
     - 3D game stuff.
     - 3D drawing.
     - 3D collision.
     - 3D meshes?
     - Sprite billboards.
+  - Game itself is not subclassed, contains the core IO and scene swapping logic used by all game types.
 
 - Collision
   - Need to be able to query collisions at "imaginary" positions rather than only receive events for collisions at current location.

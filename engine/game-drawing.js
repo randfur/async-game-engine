@@ -2,10 +2,10 @@ import {removeItem} from '../../utils/array.js';
 import {mapAppend} from '../../utils/map.js';
 
 export class GameDrawing {
-  #drawHandles;
+  #sceneDrawHandles;
   constructor(game, {container=null, viewScale=1, clearFrames=true}) {
     this.game = game;
-    this.#drawHandles = new Map();
+    this.#sceneDrawHandles = new Map();
 
     if (!container) {
       container = document.body;
@@ -37,6 +37,16 @@ export class GameDrawing {
     resize(container.getBoundingClientRect());
 
     (async () => {
+      const maybeInvokeSceneDrawHandles = scene => {
+        if (!scene) {
+          return;
+        }
+        const drawHandles = this.#sceneDrawHandles.get(scene);
+        drawHandles.sort((a, b) => a.zIndex - b.zIndex);
+        for (const {drawFunc} of drawHandles) {
+          drawFunc(this.context, this.width, this.height);
+        }
+     };
       while (true) {
         await new Promise(requestAnimationFrame);
 
@@ -49,11 +59,8 @@ export class GameDrawing {
           this.context.clearRect(0, 0, this.width, this.height);
         }
 
-        this.#drawHandles.sort((a, b) => a.zIndex - b.zIndex);
-
-        for (const {drawFunc} of this.#drawHandles) {
-          drawFunc(this.context, this.width, this.height);
-        }
+        maybeInvokeSceneDrawHandles(game.active);
+        maybeInvokeSceneDrawHandles(game.background);
       }
     })();
   }
@@ -64,9 +71,9 @@ export class GameDrawing {
       drawFunc,
     };
     job.registerCleanUp(() => {
-      removeItem(this.#drawHandles.get(job.scene), drawHandle);
+      removeItem(this.#sceneDrawHandles.get(job.scene), drawHandle);
     });
-    mapAppend(this.#drawHandles, job.scene, drawHandle);
+    mapAppend(this.#sceneDrawHandles, job.scene, drawHandle);
     return drawHandle;
   }
 }
