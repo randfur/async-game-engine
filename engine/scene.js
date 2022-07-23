@@ -64,7 +64,7 @@ export class Scene {
   }
 
   static #emptyArgs = Object.freeze({});
-  create(EntityType, args=#emptyArgs, parentJob=null) {
+  create(EntityType, args=Scene.#emptyArgs, parentJob=null) {
     const entity = new EntityType(this, parentJob, args);
     this.#startJob(entity, () => entity.body());
     return entity;

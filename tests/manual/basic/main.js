@@ -1,5 +1,6 @@
 import {Game} from '../../../engine/game.js';
-import {BasicEntity} from '../../../presets/basic-scene.js';
+import {BasicScene} from '../../../presets/basic-scene.js';
+import {BasicEntity} from '../../../presets/basic-entity.js';
 import {random, deviate} from '../../../utils/random.js';
 
 async function main() {
@@ -15,7 +16,7 @@ async function main() {
             y: random(this.game.height),
           });
         }
-      },
+      }
     },
   });
 }

@@ -59,12 +59,13 @@ export class Game {
         this.time = realTime - realStartTime;
         MaybeTickScene(this.background, this.time);
         MaybeTickScene(this.active, this.time);
+        this.drawing.draw();
       }
     });
   }
 
   activate(SceneType) {
-    if (this.active.constructor === SceneType) {
+    if (this.active?.constructor === SceneType) {
       return;
     }
 

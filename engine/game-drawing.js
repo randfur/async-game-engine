@@ -65,6 +65,11 @@ export class GameDrawing {
     })();
   }
 
+  draw() {
+    this.game.active?.onDraw(this.context, this.width, this.height);
+    this.game.background?.onDraw(this.context, this.width, this.height);
+  }
+
   register(job, drawFunc) {
     const drawHandle = {
       zIndex: 0,
