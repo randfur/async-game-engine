@@ -1,3 +1,40 @@
+- Architecture
+  - 2022-07-24
+    - Game
+      - Not subclassed.
+      - Has IO modules shared across every game.
+        - Drawing.
+        - Input events.
+        - Sound.
+      - Has active scene and background scene.
+      - Ticks the active and background scenes.
+      - Has inactive scenes that don't receive ticks.
+      - May need onActivate/onDeactivate scene events.
+    - Scenes
+      - Has subclasses for presets.
+      - Basic subclass
+        - Has components
+          - 2D drawing
+          - 2D collisions
+          - Sprites
+      - Own and runs jobs.
+      - Base scene may need input and audio componets?
+    - Components
+      - Not a class, just a convention (though maybe that should change).
+      - Jobs register with the components to receive events.
+      - Registration includes automatic clean up to deregister when the job stops.
+    - Job
+      - Async function invoked with access to special sleep methods that can be paused or stopped by the parent scene/jobs.
+      - Stores clean up work to run once stopped like a destructor.
+    - Entity
+      - Subclass of Job.
+      - Invoked differently, more suited to OOP.
+      - Has subclasses for presets.
+        - Basic subclass
+          - Registers with BasicScene's 2D drawing.
+          - Registers with BasicScene's collisions.
+          - Registers with BasicScene's sprite component.
+
 - Typescript
   - Use as API reference documentation.
   - Validate that JS matches TS declarations using typescript-service-worker.

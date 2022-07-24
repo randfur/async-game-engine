@@ -36,33 +36,6 @@ export class GameDrawing {
     }).observe(container);
     resize(container.getBoundingClientRect());
 
-    (async () => {
-      const maybeInvokeSceneDrawHandles = scene => {
-        if (!scene) {
-          return;
-        }
-        const drawHandles = this.#sceneDrawHandles.get(scene);
-        drawHandles.sort((a, b) => a.zIndex - b.zIndex);
-        for (const {drawFunc} of drawHandles) {
-          drawFunc(this.context, this.width, this.height);
-        }
-     };
-      while (true) {
-        await new Promise(requestAnimationFrame);
-
-        if (this.canvas.width !== this.width || this.canvas.height !== this.height) {
-          this.canvas.width = this.width;
-          this.canvas.height = this.height;
-        }
-
-        if (clearFrames) {
-          this.context.clearRect(0, 0, this.width, this.height);
-        }
-
-        maybeInvokeSceneDrawHandles(game.active);
-        maybeInvokeSceneDrawHandles(game.background);
-      }
-    })();
   }
 
   draw() {
