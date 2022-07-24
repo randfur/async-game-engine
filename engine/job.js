@@ -38,17 +38,17 @@ export class Job {
   }
 
   async tick() {
-    await this.game.nextTick;
+    await this.scene.nextTick;
     if (this.isStopped()) {
       throw Job.StopSignal;
     }
   }
 
   async sleep(seconds) {
-    const startTime = this.game.time;
+    const startTime = this.scene.time;
     while (true) {
       await this.tick();
-      if (this.game.time - startTime >= seconds) {
+      if (this.scene.time - startTime >= seconds) {
         break;
       }
     }

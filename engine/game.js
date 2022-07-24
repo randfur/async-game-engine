@@ -43,7 +43,7 @@ export class Game {
       this.background = new args.backgroundScene(this);
     }
     if (args.startScene) {
-      this.activate(this.startScene);
+      this.activate(args.startScene);
     }
 
     (async () => {
@@ -53,7 +53,7 @@ export class Game {
           scene.nextGameTick = CreateResolveablePromise();
         }
       }
-      const realStartTime = Performance.now() / 1000;
+      const realStartTime = performance.now() / 1000;
       while (!this.stopped.resolved) {
         const realTime = (await new Promise(requestAnimationFrame)) / 1000;
         this.time = realTime - realStartTime;
@@ -61,7 +61,7 @@ export class Game {
         MaybeTickScene(this.active, this.time);
         this.drawing.draw();
       }
-    });
+    })();
   }
 
   activate(SceneType) {

@@ -1,10 +1,10 @@
 import {removeItem} from '../../utils/array.js';
-import {mapAppend} from '../../utils/map.js';
 
 export class GameDrawing {
   #sceneDrawHandles;
   constructor(game, {container=null, viewScale=1, clearFrames=true}) {
     this.game = game;
+    this.clearFrames = clearFrames;
     this.#sceneDrawHandles = new Map();
 
     if (!container) {
@@ -39,19 +39,16 @@ export class GameDrawing {
   }
 
   draw() {
+    if (this.canvas.width !== this.width || this.canvas.height !== this.height) {
+      this.canvas.width = this.width;
+      this.canvas.height = this.height;
+    }
+
+    if (this.clearFrames) {
+      this.context.clearRect(0, 0, this.width, this.height);
+    }
+
     this.game.active?.onDraw(this.context, this.width, this.height);
     this.game.background?.onDraw(this.context, this.width, this.height);
-  }
-
-  register(job, drawFunc) {
-    const drawHandle = {
-      zIndex: 0,
-      drawFunc,
-    };
-    job.registerCleanUp(() => {
-      removeItem(this.#sceneDrawHandles.get(job.scene), drawHandle);
-    });
-    mapAppend(this.#sceneDrawHandles, job.scene, drawHandle);
-    return drawHandle;
   }
 }

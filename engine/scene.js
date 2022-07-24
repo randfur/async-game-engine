@@ -1,4 +1,5 @@
 import {removeItems} from '../utils/array.js';
+import {CreateResolveablePromise} from '../utils/promise.js';
 import {Job} from './job.js';
 
 /*
@@ -38,7 +39,7 @@ export class Scene {
 
     (async () => {
       while (!this.stopped.resolved) {
-        const gameTime = await this.getNextGameTick();
+        const gameTime = await this.nextGameTick;
         if (this.pausedAtGameTime !== null) {
           this.#gameTimeAhead += gameTime - this.pausedAtGameTime;
           this.pausedAtGameTime = null;
@@ -56,6 +57,8 @@ export class Scene {
   initPresetParts() {}
 
   async run() {}
+
+  onDraw(context, width, height) {}
 
   do(run, parentJob=null) {
     const job = new Job(this, parentJob);

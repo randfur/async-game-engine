@@ -34,8 +34,9 @@ class TestEntity extends BasicEntity {
     let dy = deviate(4);
 
     while (true) {
-      const {width, height} = this.game;
       await this.tick();
+
+      const {width, height} = this.game;
       this.x += dx;
       this.y += dy;
 
