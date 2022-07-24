@@ -1,4 +1,5 @@
 import {Game} from '../../../engine/game.js';
+import {Scene} from '../../../engine/scene.js';
 import {BasicScene} from '../../../presets/basic-scene.js';
 import {BasicEntity} from '../../../presets/basic-entity.js';
 import {random, deviate} from '../../../utils/random.js';
@@ -8,24 +9,51 @@ async function main() {
     drawing: {
       viewScale: 2,
     },
-    startScene: class extends BasicScene {
+    backgroundScene: class extends Scene {
       async run(job) {
-        for (let i = 0; i < 20; ++i) {
-          this.create(TestEntity, {
-            x: random(this.game.width),
-            y: random(this.game.height),
-          });
+        while (true) {
+          this.game.activate(RedScene);
+          await job.sleep(1);
+          this.game.activate(BlueScene);
+          await job.sleep(1);
         }
       }
     },
   });
 }
 
+class BlueScene extends BasicScene {
+  async run(job) {
+    this.persists = true;
+    for (let i = 0; i < 4; ++i) {
+      this.create(TestEntity, {
+        x: random(this.game.width),
+        y: random(this.game.height),
+        colour: 'blue',
+      });
+    }
+  }
+}
+
+class RedScene extends BasicScene {
+  async run(job) {
+    this.persists = true;
+    for (let i = 0; i < 4; ++i) {
+      this.create(TestEntity, {
+        x: random(this.game.width),
+        y: random(this.game.height),
+        colour: 'red',
+      });
+    }
+  }
+}
+
 class TestEntity extends BasicEntity {
-  init({x, y}) {
+  init({x, y, colour}) {
     this.x = x;
     this.y = y;
-    this.size = 10;
+    this.colour = colour;
+    this.size = 20;
   }
 
   async body() {
@@ -53,7 +81,7 @@ class TestEntity extends BasicEntity {
   }
 
   onDraw(context, width, height) {
-    context.fillStyle = 'blue';
+    context.fillStyle = this.colour;
     context.fillRect(this.x, this.y, this.size, this.size);
   }
 }

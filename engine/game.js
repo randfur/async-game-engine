@@ -1,6 +1,6 @@
+import {Scene} from './scene.js';
 import {GameDrawing} from './game-drawing.js';
 import {CreateResolveablePromise} from '../utils/promise.js';
-import {Scene} from './scene.js';
 
 /*
 interface Game {
@@ -70,7 +70,7 @@ export class Game {
     }
 
     if (this.active) {
-      if (this.active.persist) {
+      if (this.active.persists) {
         this.#inactives.set(this.active.constructor, this.active);
         this.active.pausedAtGameTime = this.time;
       } else {

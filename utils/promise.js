@@ -1,9 +1,9 @@
 export function CreateResolveablePromise() {
   let resolve;
   const promise = new Promise(r => resolve = r);
-  promise.resolve = () => {
+  promise.resolve = value => {
     promise.resolved = true;
-    resolve();
+    resolve(value);
   };
   promise.resolved = false;
   return promise;

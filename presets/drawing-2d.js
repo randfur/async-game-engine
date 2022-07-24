@@ -1,4 +1,5 @@
 import {Entity} from '../engine/entity.js';
+import {removeItem} from '../../utils/array.js';
 
 export class Drawing2d extends Entity {
   init() {

@@ -1,6 +1,6 @@
+import {Job} from './job.js';
 import {removeItems} from '../utils/array.js';
 import {CreateResolveablePromise} from '../utils/promise.js';
-import {Job} from './job.js';
 
 /*
 interface Scene {
