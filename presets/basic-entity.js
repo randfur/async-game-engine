@@ -8,6 +8,8 @@ export class BasicEntity extends Entity {
     this.collider = this.scene.collision2d.register(this, this.onCollision.bind(this));
   }
 
+  onCollision(otherCollider) {}
+
   onDraw(context, width, height) {}
 }
 

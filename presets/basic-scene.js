@@ -4,7 +4,7 @@ import {Collision2d} from './collision-2d.js';
 
 export class BasicScene extends Scene {
   initPresetParts() {
+    this.collision2d = this.create(Collision2d);
     this.drawing2d = this.create(Drawing2d);
-    this.collision = this.create(Collision2d);
   }
 }

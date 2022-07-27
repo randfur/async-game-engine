@@ -14,7 +14,7 @@ async function main() {
         while (true) {
           this.game.activate(RedScene);
           await job.sleep(1);
-          this.game.activate(BlueScene);
+          // this.game.activate(BlueScene);
           await job.sleep(1);
         }
       }
@@ -25,7 +25,7 @@ async function main() {
 class BlueScene extends BasicScene {
   async run(job) {
     this.persists = true;
-    for (let i = 0; i < 4; ++i) {
+    for (let i = 0; i < 10; ++i) {
       this.create(TestEntity, {
         x: random(this.game.width),
         y: random(this.game.height),
@@ -38,7 +38,7 @@ class BlueScene extends BasicScene {
 class RedScene extends BasicScene {
   async run(job) {
     this.persists = true;
-    for (let i = 0; i < 4; ++i) {
+    for (let i = 0; i < 2; ++i) {
       this.create(TestEntity, {
         x: random(this.game.width),
         y: random(this.game.height),
@@ -50,10 +50,13 @@ class RedScene extends BasicScene {
 
 class TestEntity extends BasicEntity {
   init({x, y, colour}) {
-    this.x = x;
-    this.y = y;
+    this.collider.solid = true;
+    this.collider.x = x;
+    this.collider.y = y;
+    this.size = 200;
+    this.collider.width = this.size;
+    this.collider.height = this.size;
     this.colour = colour;
-    this.size = 20;
   }
 
   async body() {
@@ -65,24 +68,28 @@ class TestEntity extends BasicEntity {
       await this.tick();
 
       const {width, height} = this.game;
-      this.x += dx;
-      this.y += dy;
+      this.collider.x += dx;
+      this.collider.y += dy;
 
       const dampening = 0.99;
-      dx = dx * dampening + Math.sin(this.y);
-      dy = dy * dampening + Math.sin(this.x);
+      dx = dx * dampening + Math.sin(this.collider.y);
+      dy = dy * dampening + Math.sin(this.collider.x);
 
       const size = this.size;
-      if (this.x < -size) { this.x += width + size; }
-      if (this.x > width) { this.x -= width + size; }
-      if (this.y < -size) { this.y += height + size; }
-      if (this.y > height) { this.y -= height + size; }
+      if (this.collider.x < -size) { this.collider.x += width + size; }
+      if (this.collider.x > width) { this.collider.x -= width + size; }
+      if (this.collider.y < -size) { this.collider.y += height + size; }
+      if (this.collider.y > height) { this.collider.y -= height + size; }
     }
   }
 
+  onCollision(otherCollider) {
+    console.log(this);
+  }
+
   onDraw(context, width, height) {
-    context.fillStyle = this.colour;
-    context.fillRect(this.x, this.y, this.size, this.size);
+    context.fillStyle = this.collider.colliding ? 'white' : this.colour;
+    context.fillRect(this.collider.x, this.collider.y, this.collider.width, this.collider.height);
   }
 }
 

@@ -18,3 +18,15 @@ export function lerp(a, b, t) {
 export function smooth(t) {
   return t <= 0.5 ? 2 * t ** 2 : 1 - 2 * (1 - t) ** 2;
 }
+
+export function isColliding(aX, aY, aWidth, aHeight, bX, bY, bWidth, bHeight) {
+  return !(
+    (aX > bX + bWidth)
+    ||
+    (bX > aX + aWidth)
+    ||
+    (aY > bY + bHeight)
+    ||
+    (bY > aY + aHeight)
+  );
+}
