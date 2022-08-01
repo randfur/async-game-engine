@@ -12,10 +12,10 @@ async function main() {
     backgroundScene: class extends Scene {
       async run(job) {
         while (true) {
+          this.game.activate(BlueScene);
+          await job.sleep(4);
           this.game.activate(RedScene);
-          await job.sleep(1);
-          // this.game.activate(BlueScene);
-          await job.sleep(1);
+          await job.sleep(4);
         }
       }
     },
@@ -25,7 +25,7 @@ async function main() {
 class BlueScene extends BasicScene {
   async run(job) {
     this.persists = true;
-    for (let i = 0; i < 10; ++i) {
+    for (let i = 0; i < 3; ++i) {
       this.create(TestEntity, {
         x: random(this.game.width),
         y: random(this.game.height),
@@ -38,7 +38,7 @@ class BlueScene extends BasicScene {
 class RedScene extends BasicScene {
   async run(job) {
     this.persists = true;
-    for (let i = 0; i < 2; ++i) {
+    for (let i = 0; i < 20; ++i) {
       this.create(TestEntity, {
         x: random(this.game.width),
         y: random(this.game.height),
@@ -53,7 +53,7 @@ class TestEntity extends BasicEntity {
     this.collider.solid = true;
     this.collider.x = x;
     this.collider.y = y;
-    this.size = 200;
+    this.size = 40;
     this.collider.width = this.size;
     this.collider.height = this.size;
     this.colour = colour;
@@ -71,9 +71,9 @@ class TestEntity extends BasicEntity {
       this.collider.x += dx;
       this.collider.y += dy;
 
-      const dampening = 0.99;
-      dx = dx * dampening + Math.sin(this.collider.y);
-      dy = dy * dampening + Math.sin(this.collider.x);
+      // const dampening = 0.98;
+      // dx = dx * dampening + Math.sin(this.collider.y);
+      // dy = dy * dampening + Math.sin(this.collider.x);
 
       const size = this.size;
       if (this.collider.x < -size) { this.collider.x += width + size; }
@@ -84,7 +84,7 @@ class TestEntity extends BasicEntity {
   }
 
   onCollision(otherCollider) {
-    console.log(this);
+    // console.log(this);
   }
 
   onDraw(context, width, height) {

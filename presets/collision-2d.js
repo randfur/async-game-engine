@@ -106,11 +106,14 @@ export class Collision2d extends Entity {
     if (!collider.solid) {
       return;
     }
-    if (collider.id > collisionNode.maxId) {
-      return;
-    }
+    // if (collider.id >= collisionNode.maxId) {
+    //   return;
+    // }
     if (collisionNode.collider) {
       const otherCollider = collisionNode.collider;
+      if (collider.id >= otherCollider.id) {
+        return;
+      }
       if (isColliding(
           collider.x, collider.y, collider.width, collider.height,
           otherCollider.x, otherCollider.y, otherCollider.width, otherCollider.height)) {
@@ -158,7 +161,6 @@ function maybeInvokeCollisionFunc(collider, otherCollider) {
       return;
     }
   }
-  console.log(collider);
   collider.colliding = true;
   collider.collisionFunc(otherCollider);
 }
