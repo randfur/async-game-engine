@@ -1,3 +1,35 @@
+- Roadmap
+  - 2022-08-01
+    - End goal
+      - Animated sprite format + editor.
+      - Camera control.
+      - In game sprite editor.
+      - In game level editor.
+      - In game debugging.
+      - Useful input events.
+      - Audio?
+      - Number generation utilities.
+    - Stepping stone goals
+      - Basic input example.
+      - Click drag input events example.
+      - Emoji sprite example.
+      - Convex collision test.
+      - Large level with camera following example.
+      - Multi level teleportation example.
+      - Mini sprite editor test.
+      - In RAM level editor test.
+      - Save to disk test.
+
+- Inputs
+  - Architecture
+    - Could unify all inputs into the same event.
+      - Easy to delegate.
+    - Could split up by input types like HTML.
+      - Probably better performance.
+  - BasicEntity can check if subclass has overridden the input event handler.
+    - Don't register with input component if subclass doesn't care.
+      - This would probably make up for the performance concerns of a single event.
+
 - Architecture
   - 2022-07-24
     - Game
