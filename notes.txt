@@ -20,6 +20,10 @@
       - In RAM level editor test.
       - Save to disk test.
 
+- Make ideas
+  - Flying through landscape of 3D squares.
+  - Hanging vines in 3D.
+
 - Inputs
   - Architecture
     - Could unify all inputs into the same event.

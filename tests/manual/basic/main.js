@@ -13,9 +13,9 @@ async function main() {
       async run(job) {
         while (true) {
           this.game.activate(BlueScene);
-          await job.sleep(4);
+          await job.sleep(2);
           this.game.activate(RedScene);
-          await job.sleep(4);
+          await job.sleep(2);
         }
       }
     },
@@ -25,10 +25,11 @@ async function main() {
 class BlueScene extends BasicScene {
   async run(job) {
     this.persists = true;
-    for (let i = 0; i < 3; ++i) {
+    for (let i = 0; i < 6; ++i) {
       this.create(TestEntity, {
         x: random(this.game.width),
         y: random(this.game.height),
+        size: 100,
         colour: 'blue',
       });
     }
@@ -38,10 +39,12 @@ class BlueScene extends BasicScene {
 class RedScene extends BasicScene {
   async run(job) {
     this.persists = true;
-    for (let i = 0; i < 20; ++i) {
+
+    for (let i = 0; i < 1000; ++i) {
       this.create(TestEntity, {
         x: random(this.game.width),
         y: random(this.game.height),
+        size: 4,
         colour: 'red',
       });
     }
@@ -49,11 +52,11 @@ class RedScene extends BasicScene {
 }
 
 class TestEntity extends BasicEntity {
-  init({x, y, colour}) {
+  init({x, y, size, colour}) {
     this.collider.solid = true;
     this.collider.x = x;
     this.collider.y = y;
-    this.size = 40;
+    this.size = size;
     this.collider.width = this.size;
     this.collider.height = this.size;
     this.colour = colour;

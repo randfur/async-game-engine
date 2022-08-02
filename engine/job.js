@@ -42,6 +42,7 @@ export class Job {
     if (this.isStopped()) {
       throw Job.StopSignal;
     }
+    return this.scene.time;
   }
 
   async sleep(seconds) {
@@ -52,6 +53,7 @@ export class Job {
         break;
       }
     }
+    return this.scene.time;
   }
 
   forever() {

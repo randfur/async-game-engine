@@ -8,7 +8,7 @@ export class Collision2d extends Entity {
     this.colliders = [];
     this.nextId = 0;
     this.collisionTree = null;
-    this.maxBranching = 5;
+    this.maxBranching = 10;
     this.collisionNodePool = new Pool(() => ({
       x: null,
       y: null,
@@ -27,12 +27,14 @@ export class Collision2d extends Entity {
       this.buildCollisionTree();
 
       for (const collider of this.colliders) {
-        this.collide(collider, this.collisionTree);
+        if (collider.solid) {
+          this.collide(collider, this.collisionTree);
+        }
       }
     }
   }
 
-  buildCollisionTree() {
+  async buildCollisionTree() {
     this.collisionNodePool.releaseAll();
     this.collisionTree = null;
     for (const collider of this.colliders) {
@@ -73,12 +75,12 @@ export class Collision2d extends Entity {
     }
 
     const branchNode = collisionSubTree;
+    branchNode.width = Math.max(branchNode.width, branchNode.x + branchNode.width - colliderNode.x, colliderNode.x + colliderNode.width - branchNode.x);
+    branchNode.height = Math.max(branchNode.height, branchNode.y + branchNode.height - colliderNode.y, colliderNode.y + colliderNode.height - branchNode.y);
+    branchNode.x = Math.min(branchNode.x, colliderNode.x);
+    branchNode.y = Math.min(branchNode.y, colliderNode.y);
+    branchNode.maxId = Math.min(branchNode.maxId, colliderNode.maxId);
     if (branchNode.children.length < this.maxBranching) {
-      branchNode.width = Math.max(branchNode.x + branchNode.width, colliderNode.x + colliderNode.width) - branchNode.x;
-      branchNode.height = Math.max(branchNode.y + branchNode.height, colliderNode.y + colliderNode.height) - branchNode.y;
-      branchNode.x = Math.min(branchNode.x, colliderNode.x);
-      branchNode.y = Math.min(branchNode.y, colliderNode.y);
-      branchNode.maxId = Math.min(branchNode.maxId, colliderNode.maxId);
       branchNode.children.push(colliderNode);
     } else {
       let mergeIndex = null;
@@ -86,11 +88,11 @@ export class Collision2d extends Entity {
       for (let i = 0; i < branchNode.children.length; ++i) {
         const childNode = branchNode.children[i];
         const newArea = (
-          (Math.max(branchNode.x + branchNode.width, colliderNode.x + colliderNode.width) - branchNode.x)
+          Math.max(childNode.width, childNode.x + childNode.width - colliderNode.x, colliderNode.x + colliderNode.width - childNode.x)
           *
-          (Math.max(branchNode.y + branchNode.height, colliderNode.y + colliderNode.height) - branchNode.y)
+          Math.max(childNode.height, childNode.y + childNode.height - colliderNode.y, colliderNode.y + colliderNode.height - childNode.y)
         );
-        const areaAdd = newArea - (branchNode.width * branchNode.height);
+        const areaAdd = newArea - (childNode.width * childNode.height);
         if (areaAdd < leastAreaAdd) {
           mergeIndex = i;
           leastAreaAdd = areaAdd;
@@ -103,23 +105,18 @@ export class Collision2d extends Entity {
   }
 
   collide(collider, collisionNode) {
-    if (!collider.solid) {
+    if (!isColliding(
+        collider.x, collider.y, collider.width, collider.height,
+        collisionNode.x, collisionNode.y, collisionNode.width, collisionNode.height)) {
       return;
     }
-    // if (collider.id >= collisionNode.maxId) {
-    //   return;
-    // }
     if (collisionNode.collider) {
       const otherCollider = collisionNode.collider;
       if (collider.id >= otherCollider.id) {
         return;
       }
-      if (isColliding(
-          collider.x, collider.y, collider.width, collider.height,
-          otherCollider.x, otherCollider.y, otherCollider.width, otherCollider.height)) {
-        maybeInvokeCollisionFunc(collider, otherCollider);
-        maybeInvokeCollisionFunc(otherCollider, collider);
-      }
+      maybeInvokeCollisionFunc(collider, otherCollider);
+      maybeInvokeCollisionFunc(otherCollider, collider);
     } else {
       for (const child of collisionNode.children) {
         this.collide(collider, child);
