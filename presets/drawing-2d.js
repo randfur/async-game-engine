@@ -1,19 +1,8 @@
-import {Entity} from '../engine/entity.js';
 import {removeItem} from '../../utils/array.js';
 
-export class Drawing2d extends Entity {
-  init() {
+export class Drawing2d {
+  constructor() {
     this.drawHandles = [];
-  }
-
-  async body() {
-    while (true) {
-      await this.tick();
-      this.drawHandles.sort((a, b) => a.zIndex - b.zIndex);
-      for (const {drawFunc} of this.drawHandles) {
-        drawFunc(this.game.drawing.context, this.game.drawing.width, this.game.drawing.width);
-      }
-    }
   }
 
   register(job, drawFunc) {
@@ -26,5 +15,12 @@ export class Drawing2d extends Entity {
     });
     this.drawHandles.push(drawHandle);
     return drawHandle;
+  }
+
+  onDraw(context, width, height) {
+    this.drawHandles.sort((a, b) => a.zIndex - b.zIndex);
+    for (const {drawFunc} of this.drawHandles) {
+      drawFunc(context, width, width);
+    }
   }
 }
