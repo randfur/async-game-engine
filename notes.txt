@@ -1,3 +1,12 @@
+- Make ideas
+  - Flying through landscape of 3D squares.
+  - Hanging vines in 3D.
+  - Shmup.
+  - Chain reactions.
+
+- Experiments
+  - A space to try out new tech (like file system access) and ideas without altering the core engine.
+
 - Roadmap
   - 2022-08-01
     - End goal
@@ -19,10 +28,6 @@
       - Mini sprite editor test.
       - In RAM level editor test.
       - Save to disk test.
-
-- Make ideas
-  - Flying through landscape of 3D squares.
-  - Hanging vines in 3D.
 
 - Inputs
   - Architecture
