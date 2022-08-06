@@ -10,12 +10,12 @@ async function main() {
       viewScale: 2,
     },
     backgroundScene: class extends Scene {
-      async run(job) {
+      async run() {
         while (true) {
           this.game.activate(BlueScene);
-          await job.sleep(2);
+          await this.sleep(2);
           this.game.activate(RedScene);
-          await job.sleep(2);
+          await this.sleep(2);
         }
       }
     },
@@ -23,8 +23,9 @@ async function main() {
 }
 
 class BlueScene extends BasicScene {
-  async run(job) {
+  async run() {
     this.persists = true;
+
     for (let i = 0; i < 6; ++i) {
       this.create(TestEntity, {
         x: random(this.game.width),
@@ -33,11 +34,13 @@ class BlueScene extends BasicScene {
         colour: 'blue',
       });
     }
+
+    await this.forever();
   }
 }
 
 class RedScene extends BasicScene {
-  async run(job) {
+  async run() {
     this.persists = true;
 
     for (let i = 0; i < 1000; ++i) {
@@ -48,6 +51,8 @@ class RedScene extends BasicScene {
         colour: 'red',
       });
     }
+
+    await this.forever();
   }
 }
 

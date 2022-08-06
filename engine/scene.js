@@ -18,11 +18,14 @@ interface Scene {
   stop(): void,
 }
 */
-export class Scene {
+export class Scene extends Job {
   #gameTimeAhead;
   #jobs;
 
   constructor(game) {
+    // Unable to use `this` in super() call.
+    super(null, null);
+    this.scene = this;
     this.game = game;
     this.stopped = CreateResolveablePromise();
     this.persists = false;
@@ -35,7 +38,7 @@ export class Scene {
 
     this.initPresetParts();
 
-    this.do(job => this.run(job));
+    this.#startJob(this, () => this.run());
 
     (async () => {
       while (!this.stopped.resolved) {
@@ -92,7 +95,9 @@ export class Scene {
       return;
     }
     for (const job of this.#jobs) {
-      job.stop();
+      if (job !== this) {
+        job.stop();
+      }
     }
     this.stopped.resolve();
   }

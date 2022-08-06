@@ -23,18 +23,18 @@ export class Job {
 
   constructor(scene, parentJob) {
     this.scene = scene;
-    this.game = scene.game;
+    this.game = scene?.game;
     this.parentJob = parentJob;
     this.#cleanUpFuncs = [];
     this.stopped = CreateResolveablePromise();
   }
 
   do(run) {
-    return this.jobRunner.do(run, this);
+    return this.scene.do(run, this);
   }
 
   create(EntityType, args) {
-    return this.jobRunner.create(EntityType, this, args);
+    return this.scene.create(EntityType, this, args);
   }
 
   async tick() {
