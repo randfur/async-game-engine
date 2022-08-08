@@ -82,10 +82,6 @@ class TestEntity extends BasicEntity {
     }
   }
 
-  onCollision(otherCollider) {
-    // console.log(this);
-  }
-
   onDraw(context, width, height) {
     context.fillStyle = this.collider.colliding ? 'white' : this.colour;
     context.fillRect(this.collider.x, this.collider.y, this.collider.width, this.collider.height);

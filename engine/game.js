@@ -16,7 +16,7 @@ interface Game {
       viewScale: number,
       clearFrames: boolean,
     },
-    startScene?: SceneType,
+    initialScene?: SceneType,
     backgroundScene?: SceneType,
   }),
 
@@ -42,8 +42,8 @@ export class Game {
     if (args.backgroundScene) {
       this.background = new args.backgroundScene(this);
     }
-    if (args.startScene) {
-      this.activate(args.startScene);
+    if (args.initialScene) {
+      this.activate(args.initialScene);
     }
 
     (async () => {

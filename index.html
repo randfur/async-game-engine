@@ -1,1 +1,29 @@
-<a href="tests/manual/">tests/manual/</a>
+<!DOCTYPE html>
+<body></body>
+<script>
+  const root = {
+    experiments: [
+      'scene-camera',
+    ],
+    tests: {
+      manual: [
+        'basic',
+        'convex-shape-finder',
+        'platformer',
+        'simple-collision',
+        'vec2-test',
+      ],
+    },
+  };
+  function extractPaths(directory) {
+    if (directory instanceof Array) {
+      return directory;
+    }
+    return Array.from(Object.entries(directory)).flatMap(
+      ([subDirectory, contents]) => extractPaths(contents).map(
+        subPath => `${subDirectory}/${subPath}`
+      )
+    );
+  }
+  document.body.innerHTML = extractPaths(root).map(path => `<a href="${path}">${path}</a>`).join('<br>');
+</script>
