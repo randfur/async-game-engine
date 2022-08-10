@@ -1,4 +1,4 @@
-import {removeItem} from '../../utils/array.js';
+import {removeItem} from '../utils/array.js';
 
 export class GameDrawing {
   #sceneDrawHandles;

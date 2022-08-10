@@ -1,7 +1,7 @@
 import {Entity} from '../engine/entity.js';
-import {Pool} from '../../utils/pool.js';
-import {removeItem} from '../../utils/array.js';
-import {isColliding} from '../../utils/math.js';
+import {Pool} from '../utils/pool.js';
+import {removeItem} from '../utils/array.js';
+import {isColliding} from '../utils/math.js';
 
 export class Collision2d extends Entity {
   init() {

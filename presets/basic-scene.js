@@ -1,4 +1,4 @@
-import {Scene} from '../../engine/scene.js';
+import {Scene} from '../engine/scene.js';
 import {Drawing2d} from './drawing-2d.js';
 import {Collision2d} from './collision-2d.js';
 
