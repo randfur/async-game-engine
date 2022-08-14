@@ -1,12 +1,13 @@
 import {Scene} from './scene.js';
-import {GameDrawing} from './game-drawing.js';
+import {Input} from './input.js';
+import {Drawing} from './drawing.js';
 import {CreateResolveablePromise} from '../utils/promise.js';
 
 /*
 interface Game {
   stopped: Promise<void>,
   time: number,
-  drawing: GameDrawing,
+  drawing: Drawing,
   background: Scene,
   active: Scene,
 
@@ -31,7 +32,8 @@ export class Game {
   constructor(args) {
     this.stopped = CreateResolveablePromise();
     this.time = 0;
-    this.drawing = new GameDrawing(this, args.drawing);
+    this.drawing = new Drawing(this, args.drawing);
+    this.input = new Input(this);
     // TODO: input?
     // TODO: audio?
     // TODO: resources?

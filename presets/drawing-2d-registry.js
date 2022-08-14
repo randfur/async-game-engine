@@ -1,6 +1,6 @@
 import {removeItem} from '../utils/array.js';
 
-export class Drawing2d {
+export class Drawing2dRegistry {
   constructor() {
     this.drawHandles = [];
   }

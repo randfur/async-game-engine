@@ -61,8 +61,6 @@ export class Scene extends Job {
 
   async run() {}
 
-  onDraw(context, width, height) {}
-
   do(run, parentJob=null) {
     const job = new Job(this, parentJob);
     this.#startJob(job, () => run(job, this, this.game), () => job.stop());
@@ -101,5 +99,8 @@ export class Scene extends Job {
     }
     this.stopped.resolve();
   }
-}
 
+  onInput(eventName, event) {}
+
+  onDraw(context, width, height) {}
+}

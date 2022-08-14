@@ -1,11 +1,7 @@
-import {removeItem} from '../utils/array.js';
-
-export class GameDrawing {
-  #sceneDrawHandles;
+export class Drawing {
   constructor(game, {container=null, viewScale=1, clearFrames=true}) {
     this.game = game;
     this.clearFrames = clearFrames;
-    this.#sceneDrawHandles = new Map();
 
     if (!container) {
       container = document.body;
@@ -35,7 +31,6 @@ export class GameDrawing {
       resize(entries.pop().contentRect);
     }).observe(container);
     resize(container.getBoundingClientRect());
-
   }
 
   draw() {

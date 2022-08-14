@@ -3,7 +3,7 @@ import {Pool} from '../utils/pool.js';
 import {removeItem} from '../utils/array.js';
 import {isColliding} from '../utils/math.js';
 
-export class Collision2d extends Entity {
+export class Collision2dRegistry extends Entity {
   init() {
     this.colliders = [];
     this.nextId = 0;
