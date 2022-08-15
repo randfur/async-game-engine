@@ -6,6 +6,8 @@
 
 - Experiments
   - A space to try out new tech (like file system access) and ideas without altering the core engine.
+  - Camera object integration with drawing.
+  - Collision interactions.
 
 - Roadmap
   - 2022-08-01
