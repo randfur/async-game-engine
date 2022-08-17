@@ -13,53 +13,12 @@ async function main() {
 }
 
 class Pants extends BasicEntity {
-  init() {
-    this.dx = 0;
-    this.dy = 0;
-  }
   async body() {
     while (true) {
       await this.tick();
 
-      this.collider.x += this.dx;
-      this.collider.y += this.dy;
-    }
-  }
-
-  onInput(eventName, event) {
-    switch (eventName) {
-      case 'keydown':
-        switch (event.code) {
-          case 'ArrowLeft':
-            this.dx -= 10;
-            break;
-          case 'ArrowRight':
-            this.dx += 10;
-            break;
-          case 'ArrowUp':
-            this.dy -= 10;
-            break;
-          case 'ArrowDown':
-            this.dy += 10;
-            break;
-        }
-        break;
-      case 'keyup':
-        switch (event.code) {
-          case 'ArrowLeft':
-            this.dx += 10;
-            break;
-          case 'ArrowRight':
-            this.dx -= 10;
-            break;
-          case 'ArrowUp':
-            this.dy += 10;
-            break;
-          case 'ArrowDown':
-            this.dy -= 10;
-            break;
-        }
-        break;
+      this.collider.x += this.game.input.arrowX * 10;
+      this.collider.y += this.game.input.arrowY * 10;
     }
   }
 
