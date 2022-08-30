@@ -20,7 +20,7 @@ export class Drawing2dRegistry {
   onDraw(context, width, height) {
     this.drawHandles.sort((a, b) => a.zIndex - b.zIndex);
     for (const {drawFunc} of this.drawHandles) {
-      drawFunc(context, width, width);
+      drawFunc(context, width, height);
     }
   }
 }
