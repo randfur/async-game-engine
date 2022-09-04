@@ -54,9 +54,9 @@ class RedScene extends BasicScene {
 
 class TestEntity extends BasicEntity {
   init({x, y, size, colour}) {
-    this.collider.solid = true;
-    this.collider.x = x;
-    this.collider.y = y;
+    this.enableCollisions();
+    this.position.x = x;
+    this.position.y = y;
     this.size = size;
     this.collider.width = this.size;
     this.collider.height = this.size;
@@ -71,20 +71,20 @@ class TestEntity extends BasicEntity {
       await this.tick();
 
       const {width, height} = this.game;
-      this.collider.x += dx;
-      this.collider.y += dy;
+      this.position.x += dx;
+      this.position.y += dy;
 
       const size = this.size;
-      if (this.collider.x < -size) { this.collider.x += width + size; }
-      if (this.collider.x > width) { this.collider.x -= width + size; }
-      if (this.collider.y < -size) { this.collider.y += height + size; }
-      if (this.collider.y > height) { this.collider.y -= height + size; }
+      if (this.position.x < -size) { this.position.x += width + size; }
+      if (this.position.x > width) { this.position.x -= width + size; }
+      if (this.position.y < -size) { this.position.y += height + size; }
+      if (this.position.y > height) { this.position.y -= height + size; }
     }
   }
 
   onDraw(context, width, height) {
     context.fillStyle = this.collider.colliding ? 'white' : this.colour;
-    context.fillRect(this.collider.x, this.collider.y, this.collider.width, this.collider.height);
+    context.fillRect(this.position.x, this.position.y, this.collider.width, this.collider.height);
   }
 }
 

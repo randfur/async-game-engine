@@ -1,5 +1,6 @@
 import {BasicEntity} from '../../../presets/basic-entity.js';
-import {BasicGame} from '../../../presets/basic-game.js';
+import {BasicScene} from '../../../presets/basic-scene.js';
+import {Game} from '../../../engine/game.js';
 import {range} from '../../../utils/range.js';
 
 async function main() {
@@ -8,17 +9,29 @@ async function main() {
       container: document.body,
       viewScale: 4,
     },
-    startScene: CollisionScene,
+    initialScene: CollisionScene,
   });
 }
 
 class CollisionScene extends BasicScene {
   async run(job) {
+    for (let i = 0; i <
     this.create(Thing);
   }
 }
 
 class Thing extends BasicEntity {
+  init() {
+    this.enableCollisions();
+  }
+
+  async body() {
+
+  }
+
+  onCollision(other) {
+
+  }
 }
 
 main();

@@ -103,6 +103,16 @@
     - 2D collision.
     - Sprites.
     - In game scene & sprite editor.
+    - Not sure how to go about a basic entity's shape.
+      - Sprites have shapes.
+      - Colliders have shapes.
+      - Entities have position?
+      - Sprites and collider shapes could be set as offset to the entity's position.
+        - Maybe later have transform instead of position to generalise to different scales and rotations.
+        - Maybe even later let entities have a parent entity which their transform lives nested inside.
+          - Used by platformers, the character's transform becomes a child node of a moving platform's transform to make moving along with it trivial.
+      - Colliders don't have shapes?
+        - Colliders use the sprite's shape if there is a sprite otherwise a fallback width/height shape on entitiy?
   - Basic3DScene and Basic3DEntity.
     - 3D game stuff.
     - 3D drawing.

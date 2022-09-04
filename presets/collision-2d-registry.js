@@ -2,6 +2,7 @@ import {Entity} from '../engine/entity.js';
 import {Pool} from '../utils/pool.js';
 import {removeItem} from '../utils/array.js';
 import {isColliding} from '../utils/math.js';
+import {Vec2} from '../utils/vec2.js';
 
 export class Collision2dRegistry extends Entity {
   init() {
@@ -27,7 +28,7 @@ export class Collision2dRegistry extends Entity {
       this.buildCollisionTree();
 
       for (const collider of this.colliders) {
-        if (collider.solid) {
+        if (collider.position && collider.solid) {
           this.collide(collider, this.collisionTree);
         }
       }
@@ -45,8 +46,8 @@ export class Collision2dRegistry extends Entity {
       const colliderNode = this.collisionNodePool.acquire();
       colliderNode.collider = collider;
       colliderNode.children.length = 0;
-      colliderNode.x = collider.x;
-      colliderNode.y = collider.y;
+      colliderNode.x = collider.position.x;
+      colliderNode.y = collider.position.y;
       colliderNode.width = collider.width;
       colliderNode.height = collider.height;
       colliderNode.maxId = collider.id;
@@ -106,7 +107,7 @@ export class Collision2dRegistry extends Entity {
 
   collide(collider, collisionNode) {
     if (!isColliding(
-        collider.x, collider.y, collider.width, collider.height,
+        collider.position.x, collider.position.y, collider.width, collider.height,
         collisionNode.x, collisionNode.y, collisionNode.width, collisionNode.height)) {
       return;
     }
@@ -129,9 +130,9 @@ export class Collision2dRegistry extends Entity {
       id: this.nextId++,
       job,
       filterTypes: null,
-      solid: false,
-      x: 0,
-      y: 0,
+      solid: true,
+      position: null,
+      offset: new Vec2(0, 0),
       width: 0,
       height: 0,
       collisionFunc,
