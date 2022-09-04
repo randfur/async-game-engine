@@ -1,30 +1,104 @@
 import {Game} from '../../engine/game.js';
 import {BasicScene} from '../../presets/basic-scene.js';
 import {BasicEntity} from '../../presets/basic-entity.js';
+import {TAU} from '../../utils/math.js';
+import {Vec2} from '../../utils/vec2.js';
 
 async function main() {
   new Game({
     initialScene: class extends BasicScene {
       async run() {
-        this.create(Pants);
+        this.create(ArrowControl);
+        this.create(MouseControl);
       }
     },
   });
 }
 
-class Pants extends BasicEntity {
+class ArrowControl extends BasicEntity {
   async body() {
+    this.position.set(this.game.width / 2, this.game.height / 2);
     while (true) {
       await this.tick();
-
-      this.position.x += this.game.input.arrowX * 10;
-      this.position.y += this.game.input.arrowY * 10;
+      this.position.addScaled(this.game.input.arrowKeys, 10);
     }
   }
 
   onDraw(context, width, height) {
     context.fillStyle = 'blue';
     context.fillRect(this.position.x, this.position.y, 10, 10);
+  }
+}
+
+class MouseControl extends BasicEntity {
+  async body() {
+    while (true) {
+      await this.tick();
+      this.position.copy(this.game.input.mouse.position);
+    }
+  }
+
+  onInput(eventName, event) {
+    if (eventName === 'mousedown') {
+      this.scene.create(Projectile, {
+        target: this.position.clone(),
+      });
+    }
+  }
+
+  onDraw(context, width, height) {
+    context.strokeStyle = 'red';
+    const radius = 20;
+    const hairSize = 15;
+    context.beginPath();
+    context.save();
+    context.translate(this.position.x, this.position.y);
+    context.arc(0, 0, radius, 0, TAU);
+    context.moveTo(0, -radius - hairSize / 2);
+    context.lineTo(0, -radius + hairSize / 2);
+    context.moveTo(0, radius - hairSize / 2);
+    context.lineTo(0, radius + hairSize / 2);
+    context.moveTo(-radius - hairSize / 2, 0);
+    context.lineTo(-radius + hairSize / 2, 0);
+    context.moveTo(radius - hairSize / 2, 0);
+    context.lineTo(radius + hairSize / 2, 0);
+    context.restore();
+    context.stroke();
+  }
+}
+
+class Projectile extends BasicEntity {
+  init({target}) {
+    this.target = target;
+    this.position.set((this.game.width / 2 + target.x) / 2, this.game.height);
+    this.size = 0;
+  }
+
+  async body() {
+    while (true) {
+      await this.tick();
+
+      const delta = Vec2.getTemp();
+      delta.assignSub(this.target, this.position);
+      this.position.addScaled(delta, 0.1);
+      Vec2.releaseTemps(1);
+
+      this.size = Vec2.distance(this.position, this.target) * 0.1;
+
+      if (this.size < 1) {
+        break;
+      }
+    }
+  }
+
+  onDraw(context, width, height) {
+    context.fillStyle = 'white';
+    context.fillRect(
+      this.position.x - this.size / 2,
+      this.position.y - this.size / 2,
+      this.size,
+      this.size,
+    );
   }
 }
 

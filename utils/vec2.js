@@ -15,6 +15,14 @@ export class Vec2 {
     this.#reservedTemps -= n;
   }
 
+  static squareDistance(va, vb) {
+    return (va.x - vb.x) ** 2 + (va.y - vb.y) ** 2;
+  }
+
+  static distance(va, vb) {
+    return Math.sqrt(Vec2.squareDistance(va, vb));
+  }
+
   constructor(x=0, y=0) {
     this.x = x;
     this.y = y;
@@ -25,9 +33,13 @@ export class Vec2 {
     this.y = y;
   }
 
-  assign({x, y}) {
-    this.x = x;
-    this.y = y;
+  copy(v) {
+    this.x = v.x;
+    this.y = v.y;
+  }
+
+  clone() {
+    return new Vec2(this.x, this.y);
   }
 
   assignSum(va, vb) {
@@ -40,9 +52,9 @@ export class Vec2 {
     this.y = va.y - vb.y;
   }
 
-  assignMulSum(ka, va, kb, vb) {
-    this.x = ka * va.x + kb * vb.x;
-    this.y = ka * va.y + kb * vb.y;
+  assignScaledSum(va, ka, vb, kb) {
+    this.x = va.x * ka + vb.x * kb;
+    this.y = va.y * ka + vb.y * kb;
   }
 
   assignBoundariesIntersection(boundaryA, boundaryB) {
@@ -93,9 +105,19 @@ export class Vec2 {
     this.y += v.y;
   }
 
-  addMul(k, v) {
+  addScaled(v, k) {
     this.x += k * v.x;
     this.y += k * v.y;
+  }
+
+  sub(v) {
+    this.x -= v.x;
+    this.y -= v.y;
+  }
+
+  scale(k) {
+    this.x *= k;
+    this.y *= k;
   }
 
   // Rotates 90 degrees clockwise in a right handed co-ordinate system.

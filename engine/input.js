@@ -1,9 +1,13 @@
+import {Vec2} from '../utils/vec2.js';
+
 export class Input {
-  constructor(game) {
+  constructor(game, viewScale) {
     this.game = game;
 
-    this.arrowX = 0;
-    this.arrowY = 0;
+    this.arrowKeys = new Vec2(0, 0);
+    this.mouse = {
+      position: new Vec2(0, 0),
+    };
 
     this.keyDown = {};
 
@@ -13,7 +17,11 @@ export class Input {
       'mouseup',
     ];
     for (const eventName of mouseEventNames) {
-      this.game.drawing.canvas.addEventListener(eventName, event => this.onInput(eventName, event));
+      this.game.drawing.canvas.addEventListener(eventName, event => {
+        this.mouse.position.x = event.offsetX / viewScale;
+        this.mouse.position.y = event.offsetY / viewScale;
+        this.onInput(eventName, event);
+      });
     }
     const keyEventNames = [
       'keydown',
@@ -29,16 +37,16 @@ export class Input {
             this.keyDown[event.code] = true;
             switch (event.code) {
               case 'ArrowUp':
-                this.arrowY -= 1;
+                this.arrowKeys.y -= 1;
                 break;
               case 'ArrowDown':
-                this.arrowY += 1;
+                this.arrowKeys.y += 1;
                 break;
               case 'ArrowLeft':
-                this.arrowX -= 1;
+                this.arrowKeys.x -= 1;
                 break;
               case 'ArrowRight':
-                this.arrowX += 1;
+                this.arrowKeys.x += 1;
                 break;
             }
             break;
@@ -46,16 +54,16 @@ export class Input {
             this.keyDown[event.code] = false;
             switch (event.code) {
               case 'ArrowUp':
-                this.arrowY += 1;
+                this.arrowKeys.y += 1;
                 break;
               case 'ArrowDown':
-                this.arrowY -= 1;
+                this.arrowKeys.y -= 1;
                 break;
               case 'ArrowLeft':
-                this.arrowX += 1;
+                this.arrowKeys.x += 1;
                 break;
               case 'ArrowRight':
-                this.arrowX -= 1;
+                this.arrowKeys.x -= 1;
                 break;
             }
             break;
