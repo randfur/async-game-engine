@@ -39,10 +39,25 @@ class MouseControl extends BasicEntity {
   }
 
   onInput(eventName, event) {
-    if (eventName === 'mousedown') {
-      this.scene.create(Projectile, {
-        target: this.position.clone(),
-      });
+    switch (eventName) {
+      case 'mousedown': {
+        if (!this.shootingJob) {
+          this.shootingJob = this.do(async job => {
+            while (true) {
+              this.scene.create(Projectile, {
+                target: this.position.clone(),
+              });
+              await job.sleep(0.1);
+            }
+          });
+        }
+        break;
+      }
+      case 'mouseup': {
+        this.shootingJob?.stop();
+        this.shootingJob = null;
+        break;
+      }
     }
   }
 
