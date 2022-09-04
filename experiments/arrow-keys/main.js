@@ -45,7 +45,7 @@ class MouseControl extends BasicEntity {
           this.shootingJob = this.do(async job => {
             while (true) {
               this.scene.create(Projectile, {
-                target: this.position.clone(),
+                target: this.game.input.mouse.position.clone(),
               });
               await job.sleep(0.1);
             }
