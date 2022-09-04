@@ -17,14 +17,14 @@ class Pants extends BasicEntity {
     while (true) {
       await this.tick();
 
-      this.collider.x += this.game.input.arrowX * 10;
-      this.collider.y += this.game.input.arrowY * 10;
+      this.position.x += this.game.input.arrowX * 10;
+      this.position.y += this.game.input.arrowY * 10;
     }
   }
 
   onDraw(context, width, height) {
     context.fillStyle = 'blue';
-    context.fillRect(this.collider.x, this.collider.y, 10, 10);
+    context.fillRect(this.position.x, this.position.y, 10, 10);
   }
 }
 
