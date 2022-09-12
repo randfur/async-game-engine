@@ -160,5 +160,5 @@ function maybeInvokeCollisionFunc(collider, otherCollider) {
     }
   }
   collider.colliding = true;
-  collider.collisionFunc(otherCollider);
+  collider.collisionFunc(otherCollider.job, otherCollider);
 }

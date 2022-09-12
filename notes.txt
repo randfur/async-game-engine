@@ -181,6 +181,19 @@
     - Can store declarative components in a particular getter?
       - Make it easier for the editor to find and update.
       - initialState() or something.
+  - Opening the editors
+    - Special hot key?
+    - Can be disabled as a global game option (maybe later).
+    - Implemented as a separate scene?
+      - A sub scene?
+      - May need input/drawing layering controls.
+
+- Global game options
+  - Part of game args.
+  - Stashed on game, specific classes read the values relevant to them.
+  - Very duck typey unfortunately.
+  - Not sure how to dynamically build an args interface based on stuff used in the code.
+  - Some kind of type  registration system.
 
 - Sprites
   - Resource loading
@@ -192,6 +205,14 @@
 - Pool
 
 - Input
+  - Hot keys
+    - Entities register keys relevant to them?
+    - Entities specify priority layering and bubbling rules?
+    - Key to action mapping should be very declarative to allow easy remapping and introspection.
+  - State
+    - Key and button states exposed outside of events.
+    - Arrow keys direction exposed as Vec2.
+    - Mouse click drag path and time exposed.
 
 - 3D Context
   - Types of 3D drawing primitives.

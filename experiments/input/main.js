@@ -16,17 +16,37 @@ async function main() {
 }
 
 class ArrowControl extends BasicEntity {
+  init() {
+    this.enableCollisions();
+    this.collider.filterTypes = [Projectile];
+    this.collider.width = 100;
+    this.collider.height = 100;
+  }
+
   async body() {
     this.position.set(this.game.width / 2, this.game.height / 2);
     while (true) {
       await this.tick();
       this.position.addScaled(this.game.input.arrowKeys, 10);
+      this.hit = false;
     }
   }
 
   onDraw(context, width, height) {
-    context.fillStyle = 'blue';
-    context.fillRect(this.position.x, this.position.y, 10, 10);
+    context.fillStyle = this.hit ? 'brown' : 'blue';
+    context.fillRect(
+      this.position.x,
+      this.position.y,
+      this.collider.width,
+      this.collider.height,
+    );
+  }
+
+  onCollision(projectile) {
+    console.assert(projectile instanceof Projectile);
+    if (projectile.size <= 3) {
+      this.hit = true;
+    }
   }
 }
 
@@ -84,6 +104,9 @@ class MouseControl extends BasicEntity {
 
 class Projectile extends BasicEntity {
   init({target}) {
+    this.enableCollisions();
+    this.collider.width = 10;
+    this.collider.height = 10;
     this.target = target;
     this.position.set((this.game.width / 2 + target.x) / 2, this.game.height);
     this.size = 0;
