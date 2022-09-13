@@ -99,7 +99,12 @@
   - BasicScene and BasicEntity.
     - 2D game stuff.
     - 2D drawing.
-    - Camera transformed drawing.
+      - Camera transformed drawing.
+      - HTMLCanvas2DContext wrapper.
+        - Apply canvas transforms.
+        - Use own transform stack.
+          - save() and restore() performance is bad.
+        - Drawing method overloads that work with Vec2.
     - 2D collision.
     - Sprites.
     - In game scene & sprite editor.
@@ -213,6 +218,13 @@
     - Key and button states exposed outside of events.
     - Arrow keys direction exposed as Vec2.
     - Mouse click drag path and time exposed.
+
+- JobSlots
+  - Used to store jobs by name.
+  - Will automatically stop() jobs when they're overridden.
+  - Maybe can support job factories to make starting them from multiple places easier.
+  - Maybe proxy object over an object?
+    - Nah, too confusing, use a Map style interface with get() and set().
 
 - 3D Context
   - Types of 3D drawing primitives.
