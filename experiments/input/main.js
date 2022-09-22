@@ -3,6 +3,7 @@ import {BasicScene} from '../../presets/basic-scene.js';
 import {BasicEntity} from '../../presets/basic-entity.js';
 import {TAU} from '../../utils/math.js';
 import {Vec2} from '../../utils/vec2.js';
+import {JobSlots} from '../../utils/job-slots.js';
 
 async function main() {
   new Game({
@@ -50,7 +51,21 @@ class ArrowControl extends BasicEntity {
   }
 }
 
+const kShooting = Symbol();
 class MouseControl extends BasicEntity {
+  init() {
+    this.jobSlots = new JobSlots(this, {
+      [kShooting]: async job => {
+        while (true) {
+          this.scene.create(Projectile, {
+            target: this.game.input.mouse.position.clone(),
+          });
+          await job.sleep(0.1);
+        }
+      },
+    });
+  }
+
   async body() {
     while (true) {
       await this.tick();
@@ -61,21 +76,11 @@ class MouseControl extends BasicEntity {
   onInput(eventName, event) {
     switch (eventName) {
       case 'mousedown': {
-        if (!this.shootingJob) {
-          this.shootingJob = this.do(async job => {
-            while (true) {
-              this.scene.create(Projectile, {
-                target: this.game.input.mouse.position.clone(),
-              });
-              await job.sleep(0.1);
-            }
-          });
-        }
+        this.jobSlots.start(kShooting);
         break;
       }
       case 'mouseup': {
-        this.shootingJob?.stop();
-        this.shootingJob = null;
+        this.jobSlots.stop(kShooting);
         break;
       }
     }

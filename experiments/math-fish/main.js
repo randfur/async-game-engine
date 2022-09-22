@@ -1,7 +1,7 @@
 import {Game} from '../../engine/game.js';
 import {BasicScene} from '../../presets/basic-scene.js';
 import {BasicEntity} from '../../presets/basic-entity.js';
-import {deviate, random} from '../../utils/random.js';
+import {deviate, random, randomRange} from '../../utils/random.js';
 import {loadImage} from '../../utils/image.js';
 import {recycledRange} from '../../utils/range.js';
 
@@ -17,7 +17,7 @@ async function main() {
           context.fillRect(0, 0, width, height);
         });
 
-        for (let i of recycledRange(10)) {
+        for (let i of recycledRange(20)) {
           this.create(Bubble);
           this.create(Seaweed);
         }
@@ -33,6 +33,7 @@ class Seaweed extends BasicEntity {
     this.image = loadImage('./seaweed.png');
     this.position.x = Math.floor(random(this.game.width));
     this.position.y = this.game.height - 64;
+    this.drawHandle.zIndex = randomRange(1, 3);
   }
 
   async body() {
@@ -54,7 +55,9 @@ class Bubble extends BasicEntity {
     this.position.x = random(this.game.width);
     this.position.y = random(this.game.height);
 
-    this.floatUpSpeed = random(4);
+    this.drawHandle.zIndex = randomRange(1, 2);
+
+    this.floatUpSpeed = randomRange(0.5, 1);
     this.wobbleAmount = random(1);
     this.wobbleSpeed = random(1);
 
@@ -102,6 +105,8 @@ class Fish extends BasicEntity {
       bite: loadImage('./fish-bite.png'),
     };
     this.movementScale = 4;
+
+    this.drawHandle.zIndex = 2;
 
     this.enableCollisions();
     this.collider.width = 32;
