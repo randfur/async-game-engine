@@ -70,7 +70,7 @@ class Bubble extends BasicEntity {
     this.transform.translate.x = random(this.game.width);
     this.transform.translate.y = random(this.game.height);
 
-    this.drawHandle.zIndex = randomRange(1, 2);
+    this.drawHandle.zIndex = randomRange(1, 3);
 
     this.floatUpSpeed = randomRange(0.5, 1);
     this.wobbleAmount = random(1);
