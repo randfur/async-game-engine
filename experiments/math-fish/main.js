@@ -5,6 +5,7 @@ import {deviate, random, randomRange} from '../../utils/random.js';
 import {loadImage} from '../../utils/image.js';
 import {recycledRange} from '../../utils/range.js';
 import {Transform} from '../../utils/transform.js';
+import {TAU} from '../../utils/math.js';
 
 async function main() {
   new Game({
@@ -13,26 +14,84 @@ async function main() {
     },
     initialScene: class extends BasicScene {
       async run() {
+        const cameraTransform = new Transform();
+
         this.drawing2dRegistry.register(this, (context, width, height) => {
+          cameraTransform.applyToContext(context);
           context.fillStyle = '#49f';
           context.fillRect(0, 0, width, height);
         });
 
         for (let i of recycledRange(20)) {
-          this.create(Bubble);
-          this.create(Seaweed);
+          this.create(Bubble, {cameraTransform});
+          this.create(Seaweed, {cameraTransform});
         }
 
-        this.create(Fish);
+        this.create(Fish, {cameraTransform});
+
+        while (true) {
+          await this.tick();
+          cameraTransform.offset.set(-this.game.width / 2, -this.game.height / 2);
+          cameraTransform.translate.set(this.game.width / 2, this.game.height / 2);
+          cameraTransform.translate.x += Math.sin(this.time / 1) * 10;
+          cameraTransform.rotate.setPolar(Math.sin(this.time / 2.1) * TAU / 100);
+        }
       }
     },
   });
 }
 
+class Fish extends BasicEntity {
+  init({cameraTransform}) {
+    this.transform.parent = cameraTransform;
+    this.transform.translate.set(
+      this.game.width / 2,
+      this.game.height / 2,
+    );
+    this.imageTransform = new Transform(this.transform);
+    this.imageTransform.offset.set(-16, -16);
+    this.images = {
+      normal: loadImage('./fish-normal.png'),
+      bite: loadImage('./fish-bite.png'),
+    };
+    this.movementScale = 4;
+
+    this.drawHandle.zIndex = 2;
+
+    this.enableCollisions();
+    this.collider.width = 32;
+    this.collider.height = 32;
+  }
+
+  async body() {
+    while (true) {
+      await this.tick();
+
+      const arrowKeys = this.game.input.arrowKeys;
+
+      this.transform.translate.addScaled(arrowKeys, this.movementScale);
+      // this.transform.rotate.setPolar(this.scene.time);
+
+      if (arrowKeys.x < 0) {
+        this.imageTransform.scale.x = 1;
+      } else if (arrowKeys.x > 0) {
+        this.imageTransform.scale.x = -1;
+      }
+    }
+  }
+
+  onDraw(context, width, height) {
+    this.imageTransform.applyToContext(context);
+    const image = this.game.input.keyDown['Space'] ? this.images.bite : this.images.normal;
+    context.drawImage(image, 0, 0);
+  }
+}
+
 class Seaweed extends BasicEntity {
-  init() {
-    this.imageTransform = new Transform();
-    this.imageTransform.translate.set(-16, -64);
+  init({cameraTransform}) {
+    this.transform.parent = cameraTransform;
+    this.imageTransform = new Transform(this.transform);
+    this.imageTransform.offset.set(-16, -64);
     this.image = loadImage('./seaweed.png');
     this.transform.translate.x = Math.floor(random(this.game.width));
     this.transform.translate.y = this.game.height;
@@ -44,29 +103,29 @@ class Seaweed extends BasicEntity {
   async body() {
     this.do(async job => {
       while (true) {
-        await this.sleep(random(10));
+        await job.sleep(random(10));
         this.transform.scale.x *= -1;
-        await this.sleep(5);
+        await job.sleep(5);
       }
     });
 
     while (true) {
-      await job.tick();
+      await this.tick();
       this.transform.translate.y = this.game.height;
     }
   }
 
   onDraw(context, width, height) {
-    this.transform.applyToContext(context);
     this.imageTransform.applyToContext(context);
     context.drawImage(this.image, 0, 0);
-    context.resetTransform();
   }
 }
 
 class Bubble extends BasicEntity {
-  init() {
+  init({cameraTransform}) {
+    this.transform.parent = cameraTransform;
     this.image = loadImage('./bubble.png');
+    this.imageTransform = new Transform(this.transform);
     this.transform.translate.x = random(this.game.width);
     this.transform.translate.y = random(this.game.height);
 
@@ -100,61 +159,8 @@ class Bubble extends BasicEntity {
   }
 
   onDraw(context, width, height) {
-    context.drawImage(
-      this.image,
-      Math.floor(this.transform.translate.x),
-      Math.floor(this.transform.translate.y),
-    );
-  }
-}
-
-
-class Fish extends BasicEntity {
-  init() {
-    this.transform.translate.set(
-      this.game.width / 2,
-      this.game.height / 2,
-    );
-    this.imageTransform = new Transform();
-    this.imageTransform.translate.set(-16, -16);
-    this.images = {
-      normal: loadImage('./fish-normal.png'),
-      bite: loadImage('./fish-bite.png'),
-    };
-    this.movementScale = 4;
-
-    this.drawHandle.zIndex = 2;
-
-    this.enableCollisions();
-    this.collider.width = 32;
-    this.collider.height = 32;
-  }
-
-  async body() {
-    while (true) {
-      await this.tick();
-
-      const arrowKeys = this.game.input.arrowKeys;
-
-      this.transform.translate.addScaled(arrowKeys, this.movementScale);
-
-      if (arrowKeys.x < 0) {
-        this.transform.scale.x = 1;
-      } else if (arrowKeys.x > 0) {
-        this.transform.scale.x = -1;
-      }
-    }
-  }
-
-  onDraw(context, width, height) {
-    this.transform.applyToContext(context);
     this.imageTransform.applyToContext(context);
-    context.drawImage(
-      this.game.input.keyDown['Space'] ? this.images.bite : this.images.normal,
-      0,
-      0,
-    );
-    context.resetTransform();
+    context.drawImage(this.image, 0, 0);
   }
 }
 

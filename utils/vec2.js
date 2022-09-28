@@ -33,6 +33,11 @@ export class Vec2 {
     this.y = y;
   }
 
+  setPolar(angle, radius=1) {
+    this.x = Math.cos(angle) * radius;
+    this.y = Math.sin(angle) * radius;
+  }
+
   copy(v) {
     this.x = v.x;
     this.y = v.y;
