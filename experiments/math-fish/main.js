@@ -4,6 +4,7 @@ import {BasicEntity} from '../../presets/basic-entity.js';
 import {deviate, random, randomRange} from '../../utils/random.js';
 import {loadImage} from '../../utils/image.js';
 import {recycledRange} from '../../utils/range.js';
+import {Transform} from '../../utils/transform.js';
 
 async function main() {
   new Game({
@@ -30,30 +31,44 @@ async function main() {
 
 class Seaweed extends BasicEntity {
   init() {
+    this.imageTransform = new Transform();
+    this.imageTransform.translate.set(-16, -64);
     this.image = loadImage('./seaweed.png');
-    this.position.x = Math.floor(random(this.game.width));
-    this.position.y = this.game.height - 64;
-    this.drawHandle.zIndex = randomRange(1, 3);
+    this.transform.translate.x = Math.floor(random(this.game.width));
+    this.transform.translate.y = this.game.height;
+    const scale = randomRange(0.5, 1.5);
+    this.transform.scale.scale(scale);
+    this.drawHandle.zIndex = 1 + scale * 0.8;
   }
 
   async body() {
-    await this.forever();
+    this.do(async job => {
+      while (true) {
+        await this.sleep(random(10));
+        this.transform.scale.x *= -1;
+        await this.sleep(5);
+      }
+    });
+
+    while (true) {
+      await job.tick();
+      this.transform.translate.y = this.game.height;
+    }
   }
 
   onDraw(context, width, height) {
-    context.drawImage(
-      this.image,
-      this.position.x,
-      this.position.y,
-    );
+    this.transform.applyToContext(context);
+    this.imageTransform.applyToContext(context);
+    context.drawImage(this.image, 0, 0);
+    context.resetTransform();
   }
 }
 
 class Bubble extends BasicEntity {
   init() {
     this.image = loadImage('./bubble.png');
-    this.position.x = random(this.game.width);
-    this.position.y = random(this.game.height);
+    this.transform.translate.x = random(this.game.width);
+    this.transform.translate.y = random(this.game.height);
 
     this.drawHandle.zIndex = randomRange(1, 2);
 
@@ -70,25 +85,25 @@ class Bubble extends BasicEntity {
   async body() {
     while (true) {
       await this.tick();
-      this.position.x += Math.sin(this.position.y * this.wobbleSpeed) * this.wobbleAmount;
-      this.position.y -= this.floatUpSpeed;
+      this.transform.translate.x += Math.sin(this.transform.translate.y * this.wobbleSpeed) * this.wobbleAmount;
+      this.transform.translate.y -= this.floatUpSpeed;
 
-      if (this.position.x < 0 || this.position.x > this.game.width || this.position.y < 0) {
-        this.position.x = random(this.game.width);
-        this.position.y = this.game.height;
+      if (this.transform.translate.x < 0 || this.transform.translate.x > this.game.width || this.transform.translate.y < 0) {
+        this.transform.translate.x = random(this.game.width);
+        this.transform.translate.y = this.game.height;
       }
     }
   }
 
   onCollision(other, otherCollider) {
-    this.position.y += this.game.height;
+    this.transform.translate.y += this.game.height;
   }
 
   onDraw(context, width, height) {
     context.drawImage(
       this.image,
-      Math.floor(this.position.x),
-      Math.floor(this.position.y),
+      Math.floor(this.transform.translate.x),
+      Math.floor(this.transform.translate.y),
     );
   }
 }
@@ -96,10 +111,12 @@ class Bubble extends BasicEntity {
 
 class Fish extends BasicEntity {
   init() {
-    this.position.set(
+    this.transform.translate.set(
       this.game.width / 2,
       this.game.height / 2,
     );
+    this.imageTransform = new Transform();
+    this.imageTransform.translate.set(-16, -16);
     this.images = {
       normal: loadImage('./fish-normal.png'),
       bite: loadImage('./fish-bite.png'),
@@ -116,16 +133,28 @@ class Fish extends BasicEntity {
   async body() {
     while (true) {
       await this.tick();
-      this.position.addScaled(this.game.input.arrowKeys, this.movementScale);
+
+      const arrowKeys = this.game.input.arrowKeys;
+
+      this.transform.translate.addScaled(arrowKeys, this.movementScale);
+
+      if (arrowKeys.x < 0) {
+        this.transform.scale.x = 1;
+      } else if (arrowKeys.x > 0) {
+        this.transform.scale.x = -1;
+      }
     }
   }
 
   onDraw(context, width, height) {
+    this.transform.applyToContext(context);
+    this.imageTransform.applyToContext(context);
     context.drawImage(
       this.game.input.keyDown['Space'] ? this.images.bite : this.images.normal,
-      Math.floor(this.position.x),
-      Math.floor(this.position.y),
+      0,
+      0,
     );
+    context.resetTransform();
   }
 }
 

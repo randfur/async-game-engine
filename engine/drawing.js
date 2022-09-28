@@ -37,6 +37,7 @@ export class Drawing {
     if (this.canvas.width !== this.width || this.canvas.height !== this.height) {
       this.canvas.width = this.width;
       this.canvas.height = this.height;
+      this.context.imageSmoothingEnabled = false;
     }
 
     if (this.clearFrames) {
