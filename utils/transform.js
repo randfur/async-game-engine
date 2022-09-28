@@ -22,49 +22,14 @@ export class Transform {
 
     let transform = this;
     while (transform) {
-      // // Pre-translate
-      // // [a c e]   [1  0 tx]
-      // // [b d f] * [0  1 ty]
-      // // [0 0 1]   [0  0  1]
-      // e = a * transform.translate.x + c * transform.translate.y + e;
-      // f = b * transform.translate.x + d * transform.translate.y + f;
-
-      // // Pre-rotate
-      // // [a c e]   [cos -sin  0]
-      // // [b d f] * [sin  cos  0]
-      // // [0 0 1]   [  0    0  1]
-      // const [cos, sin] = [transform.rotate.x, transform.rotate.y];
-      // [a, b, c, d] = [
-      //   /*a =*/ a * cos + c * sin,
-      //   /*b =*/ b * cos + d * sin,
-      //   /*c =*/ a * -sin + c * cos,
-      //   /*d =*/ b * -sin + d * cos,
-      // ];
-
-      // // Pre-scale
-      // // [a c e]   [sx  0  0]
-      // // [b d f] * [ 0 sy  0]
-      // // [0 0 1]   [ 0  0  1]
-      // a *= transform.scale.x;
-      // b *= transform.scale.x;
-      // c *= transform.scale.y;
-      // d *= transform.scale.y;
-
-      // // Pre-offset
-      // // [a c e]   [1  0 tx]
-      // // [b d f] * [0  1 ty]
-      // // [0 0 1]   [0  0  1]
-      // e = a * transform.offset.x + c * transform.offset.y + e;
-      // f = b * transform.offset.x + d * transform.offset.y + f;
-
-      // Post-offset
+      // Offset
       // [1  0 tx]   [a c e]
       // [0  1 ty] * [b d f]
       // [0  0  1]   [0 0 1]
       e += transform.offset.x;
       f += transform.offset.y;
 
-      // Post-scale
+      // Scale
       // [sx  0  0]   [a c e]
       // [ 0 sy  0] * [b d f]
       // [ 0  0  1]   [0 0 1]
@@ -76,7 +41,7 @@ export class Transform {
       e *= sx;
       f *= sy;
 
-      // Post-rotate
+      // Rotate
       // [cos -sin  0]   [a c e]
       // [sin  cos  0] * [b d f]
       // [  0    0  1]   [0 0 1]
@@ -90,7 +55,7 @@ export class Transform {
         /*f =*/ sin * e + cos * f,
       ];
 
-      // Post-translate
+      // Translate
       // [1  0 tx]   [a c e]
       // [0  1 ty] * [b d f]
       // [0  0  1]   [0 0 1]
