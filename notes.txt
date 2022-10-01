@@ -8,6 +8,10 @@
   - A space to try out new tech (like file system access) and ideas without altering the core engine.
   - Camera object integration with drawing.
   - Collision interactions.
+  - Scene camera.
+    - Drawing registrations state whether they're drawing HUD or not.
+    - Maybe BasicEntity has onDrawHud() and onDraw().
+      - Two registrations per Basic
 
 - Roadmap
   - 2022-08-01

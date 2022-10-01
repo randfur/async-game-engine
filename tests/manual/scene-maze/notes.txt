@@ -1,0 +1,5 @@
+- Generate a grid of scenes that are interconnected.
+- Put a prize somewhere.
+- Add input controls to control a character to walk from room to room.
+- Add walls and enemies and stuff.
+- Maybe add scene activation args.
