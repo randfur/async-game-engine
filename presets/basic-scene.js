@@ -9,15 +9,19 @@ export class BasicScene extends Scene {
     this.inputRegistry = new InputRegistry();
 
     this.cameraTransform = new Transform();
-    this.cameraTransform.origin.set(this.game.width / 2, this.game.height / 2);
-    this.cameraTransform.translate.set(this.game.width / 2, this.game.height / 2);
+    this.centreCamera();
 
     this.drawing2dRegistry = new Drawing2dRegistry(this.cameraTransform);
 
     this.collision2dRegistry = this.create(Collision2dRegistry);
 
     this.debugMode = true;//false;
- }
+  }
+
+  centreCamera() {
+    this.cameraTransform.origin.set(this.game.width / 2, this.game.height / 2);
+    this.cameraTransform.translate.set(this.game.width / 2, this.game.height / 2);
+  }
 
   onInput(eventName, event) {
     if (eventName === 'keydown' && event.shiftKey && event.code === 'F12') {

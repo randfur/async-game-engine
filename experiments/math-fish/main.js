@@ -29,10 +29,8 @@ async function main() {
 
         while (true) {
           await this.tick();
-          this.cameraTransform.translate.set(
-            this.game.width / 2 + Math.sin(this.time / 1) * 10,
-            this.game.height / 2,
-          );
+          this.centreCamera();
+          this.cameraTransform.translate.x += Math.sin(this.time / 1) * 10;
           this.cameraTransform.rotate.setPolar(Math.sin(this.time / 2.1) * TAU / 100);
         }
       }

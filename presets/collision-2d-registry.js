@@ -151,6 +151,9 @@ export class Collision2dRegistry extends Entity {
   }
 
   debugDrawNode(context, collisionNode) {
+    if (!collisionNode) {
+      return;
+    }
     if (collisionNode.collider) {
       const collider = collisionNode.collider;
       if (collider.colliding) {
