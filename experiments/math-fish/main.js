@@ -14,8 +14,6 @@ async function main() {
     },
     initialScene: class extends BasicScene {
       async run() {
-        const cameraTransform = new Transform();
-
         this.drawing2dRegistry.register(this, (context, width, height) => {
           cameraTransform.applyToContext(context);
           context.fillStyle = '#49f';
@@ -23,18 +21,19 @@ async function main() {
         });
 
         for (let i of recycledRange(20)) {
-          this.create(Bubble, {cameraTransform});
-          this.create(Seaweed, {cameraTransform});
+          this.create(Bubble);
+          this.create(Seaweed);
         }
 
-        this.create(Fish, {cameraTransform});
+        this.create(Fish);
 
         while (true) {
           await this.tick();
-          cameraTransform.offset.set(-this.game.width / 2, -this.game.height / 2);
-          cameraTransform.translate.set(this.game.width / 2, this.game.height / 2);
-          cameraTransform.translate.x += Math.sin(this.time / 1) * 10;
-          cameraTransform.rotate.setPolar(Math.sin(this.time / 2.1) * TAU / 100);
+          this.cameraTransform.translate.set(
+            this.game.width / 2 + Math.sin(this.time / 1) * 10,
+            this.game.height / 2,
+          );
+          this.cameraTransform.rotate.setPolar(Math.sin(this.time / 2.1) * TAU / 100);
         }
       }
     },
@@ -42,18 +41,21 @@ async function main() {
 }
 
 class Fish extends BasicEntity {
-  init({cameraTransform}) {
-    this.transform.parent = cameraTransform;
+  init() {
     this.transform.translate.set(
       this.game.width / 2,
       this.game.height / 2,
     );
-    this.imageTransform = new Transform(this.transform);
-    this.imageTransform.offset.set(-16, -16);
-    this.images = {
-      normal: loadImage('./fish-normal.png'),
-      bite: loadImage('./fish-bite.png'),
+
+    this.sprites = {
+      normal: this.loadSprite('./fish-normal.png'),
+      bite: this.loadSprite('./fish-bite.png'),
     };
+    // TODO: Make sprites its own format that stores the offset and other stuff.
+    for (const sprite of Object.values(this.sprites)) {
+      sprite.transform.offset.set(-16, -16);
+    }
+
     this.movementScale = 4;
 
     this.drawHandle.zIndex = 2;
@@ -70,7 +72,6 @@ class Fish extends BasicEntity {
       const arrowKeys = this.game.input.arrowKeys;
 
       this.transform.translate.addScaled(arrowKeys, this.movementScale);
-      // this.transform.rotate.setPolar(this.scene.time);
 
       if (arrowKeys.x < 0) {
         this.imageTransform.scale.x = 1;
@@ -81,22 +82,20 @@ class Fish extends BasicEntity {
   }
 
   onDraw(context, width, height) {
-    this.imageTransform.applyToContext(context);
-    const image = this.game.input.keyDown['Space'] ? this.images.bite : this.images.normal;
-    context.drawImage(image, 0, 0);
+    const sprite = this.game.input.keyDown['Space'] ? this.sprites.bite : this.sprites.normal;
+    sprite.draw(context);
   }
 }
 
 class Seaweed extends BasicEntity {
-  init({cameraTransform}) {
-    this.transform.parent = cameraTransform;
-    this.imageTransform = new Transform(this.transform);
-    this.imageTransform.offset.set(-16, -64);
-    this.image = loadImage('./seaweed.png');
+  init() {
+    this.sprite = this.loadSprite('./seaweed.png');
+    this.sprite.transform.offset.set(-16, -64);
+
     this.transform.translate.x = Math.floor(random(this.game.width));
     this.transform.translate.y = this.game.height;
-    const scale = randomRange(0.5, 1.5);
-    this.transform.scale.scale(scale);
+    this.transform.scale.scale(randomRange(0.5, 1.5));
+
     this.drawHandle.zIndex = 1 + scale * 0.8;
   }
 
@@ -116,14 +115,12 @@ class Seaweed extends BasicEntity {
   }
 
   onDraw(context, width, height) {
-    this.imageTransform.applyToContext(context);
-    context.drawImage(this.image, 0, 0);
+    this.sprite.draw(context);
   }
 }
 
 class Bubble extends BasicEntity {
-  init({cameraTransform}) {
-    this.transform.parent = cameraTransform;
+  init() {
     this.image = loadImage('./bubble.png');
     this.imageTransform = new Transform(this.transform);
     this.transform.translate.x = random(this.game.width);

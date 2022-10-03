@@ -1,7 +1,7 @@
 import {removeItem} from '../utils/array.js';
 
 export class Drawing2dRegistry {
-  constructor() {
+  constructor(cameraTransform) {
     this.drawHandles = [];
   }
 

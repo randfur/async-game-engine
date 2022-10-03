@@ -17,6 +17,14 @@ export class BasicEntity extends Entity {
     this.transform = new Transform();
   }
 
+  loadSprite(src) {
+    return new Sprite(
+      src,
+      /*parentTransform=*/this.transform,
+      this.scene.cameraTransform,
+    );
+  }
+
   enableCollisions() {
     this.collider = this.scene.collision2dRegistry.register(this, this.onCollision.bind(this));
     this.collider.transform = this.transform;

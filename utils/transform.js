@@ -9,7 +9,7 @@ export class Transform {
     this.translate = new Vec2(0, 0);
   }
 
-  applyToContext(context) {
+  applyToContext(context, outerTransform=null) {
     // [a c e]   [x]
     // [b d f] * [y]
     // [0 0 1]   [1]
@@ -63,6 +63,11 @@ export class Transform {
       f += transform.translate.y;
 
       transform = transform.parent;
+
+      if (!transform && outerTransform) {
+        transform = outerTransform;
+        outerTransform = null;
+      }
     }
 
     context.setTransform(a, b, c, d, e, f);
