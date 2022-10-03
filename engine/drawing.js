@@ -41,6 +41,7 @@ export class Drawing {
     }
 
     if (this.clearFrames) {
+      this.context.resetTransform();
       this.context.clearRect(0, 0, this.width, this.height);
     }
 

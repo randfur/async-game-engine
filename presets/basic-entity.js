@@ -1,4 +1,5 @@
 import {Entity} from '../engine/entity.js';
+import {Sprite} from './sprite.js';
 import {Vec2} from '../utils/vec2.js';
 import {Transform} from '../utils/transform.js';
 

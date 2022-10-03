@@ -15,7 +15,7 @@ async function main() {
     initialScene: class extends BasicScene {
       async run() {
         this.drawing2dRegistry.register(this, (context, width, height) => {
-          cameraTransform.applyToContext(context);
+          this.cameraTransform.applyToContext(context);
           context.fillStyle = '#49f';
           context.fillRect(0, 0, width, height);
         });
@@ -51,9 +51,9 @@ class Fish extends BasicEntity {
       normal: this.loadSprite('./fish-normal.png'),
       bite: this.loadSprite('./fish-bite.png'),
     };
-    // TODO: Make sprites its own format that stores the offset and other stuff.
+    // TODO: Make sprites its own format that stores the origin and other stuff.
     for (const sprite of Object.values(this.sprites)) {
-      sprite.transform.offset.set(-16, -16);
+      sprite.transform.origin.set(16, 16);
     }
 
     this.movementScale = 4;
@@ -74,9 +74,9 @@ class Fish extends BasicEntity {
       this.transform.translate.addScaled(arrowKeys, this.movementScale);
 
       if (arrowKeys.x < 0) {
-        this.imageTransform.scale.x = 1;
+        this.transform.scale.x = 1;
       } else if (arrowKeys.x > 0) {
-        this.imageTransform.scale.x = -1;
+        this.transform.scale.x = -1;
       }
     }
   }
@@ -90,11 +90,12 @@ class Fish extends BasicEntity {
 class Seaweed extends BasicEntity {
   init() {
     this.sprite = this.loadSprite('./seaweed.png');
-    this.sprite.transform.offset.set(-16, -64);
+    this.sprite.transform.origin.set(16, 64);
 
     this.transform.translate.x = Math.floor(random(this.game.width));
     this.transform.translate.y = this.game.height;
-    this.transform.scale.scale(randomRange(0.5, 1.5));
+    const scale = randomRange(0.5, 1.5);
+    this.transform.scale.scale(scale);
 
     this.drawHandle.zIndex = 1 + scale * 0.8;
   }

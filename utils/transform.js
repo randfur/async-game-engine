@@ -3,7 +3,7 @@ import {Vec2} from './vec2.js';
 export class Transform {
   constructor(parent=null) {
     this.parent = parent;
-    this.offset = new Vec2(0, 0);
+    this.origin = new Vec2(0, 0);
     this.scale = new Vec2(1, 1);
     this.rotate = new Vec2(1, 0);
     this.translate = new Vec2(0, 0);
@@ -26,8 +26,8 @@ export class Transform {
       // [1  0 tx]   [a c e]
       // [0  1 ty] * [b d f]
       // [0  0  1]   [0 0 1]
-      e += transform.offset.x;
-      f += transform.offset.y;
+      e -= transform.origin.x;
+      f -= transform.origin.y;
 
       // Scale
       // [sx  0  0]   [a c e]

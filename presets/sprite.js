@@ -1,4 +1,4 @@
-import {image} from '../utils/image.js';
+import {loadImage} from '../utils/image.js';
 import {Transform} from '../utils/transform.js';
 
 export class Sprite {
@@ -13,5 +13,6 @@ export class Sprite {
       context,
       /*outerTransform=*/this.cameraTransform,
     );
+    context.drawImage(this.image, 0, 0);
   }
 }

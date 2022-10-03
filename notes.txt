@@ -217,11 +217,10 @@
   - Stores offsets for their origin point (for rotations and scales and positioning).
     - E.g. a tree would have its origin at the base of the trunk.
   - Can be animated.
-
-- Sprite packs
-  - Collection of named sprites.
-  - Sprites can be a transform of another sprite.
-  - Animations can link to another sprite to switch to when done.
+  - Sprite packs
+    - Collection of named sprites.
+    - Sprites can be a transform of another sprite.
+    - Animations can be linked to another sprite to switch to when done.
 
 - Pool
 

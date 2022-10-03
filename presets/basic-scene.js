@@ -9,7 +9,7 @@ export class BasicScene extends Scene {
     this.inputRegistry = new InputRegistry();
 
     this.cameraTransform = new Transform();
-    this.cameraTransform.offset.set(this.game.width / 2, this.game.height / 2);
+    this.cameraTransform.origin.set(this.game.width / 2, this.game.height / 2);
     this.cameraTransform.translate.set(this.game.width / 2, this.game.height / 2);
 
     this.drawing2dRegistry = new Drawing2dRegistry(this.cameraTransform);
