@@ -55,8 +55,8 @@ class RedScene extends BasicScene {
 class TestEntity extends BasicEntity {
   init({x, y, size, colour}) {
     this.enableCollisions();
-    this.position.x = x;
-    this.position.y = y;
+    this.transform.translate.x = x;
+    this.transform.translate.y = y;
     this.size = size;
     this.collider.width = this.size;
     this.collider.height = this.size;
@@ -66,25 +66,26 @@ class TestEntity extends BasicEntity {
   async body() {
     let dx = deviate(4);
     let dy = deviate(4);
+    const translate = this.transform.translate;
 
     while (true) {
       await this.tick();
 
       const {width, height} = this.game;
-      this.position.x += dx;
-      this.position.y += dy;
+      translate.x += dx;
+      translate.y += dy;
 
       const size = this.size;
-      if (this.position.x < -size) { this.position.x += width + size; }
-      if (this.position.x > width) { this.position.x -= width + size; }
-      if (this.position.y < -size) { this.position.y += height + size; }
-      if (this.position.y > height) { this.position.y -= height + size; }
+      if (translate.x < -size) { translate.x += width + size; }
+      if (translate.x > width) { translate.x -= width + size; }
+      if (translate.y < -size) { translate.y += height + size; }
+      if (translate.y > height) { translate.y -= height + size; }
     }
   }
 
   onDraw(context, width, height) {
     context.fillStyle = this.collider.colliding ? 'white' : this.colour;
-    context.fillRect(this.position.x, this.position.y, this.collider.width, this.collider.height);
+    context.fillRect(this.transform.translate.x, this.transform.translate.y, this.collider.width, this.collider.height);
   }
 }
 

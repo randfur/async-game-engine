@@ -202,6 +202,10 @@
 
 - Sprites
   - Resource loading
+    - loaded promise?
+    - Annoying when things want to position themselves based on their image size and it isn't loaded yet.
+    - Should init() be async and body() waits for it to complete?
+      - Store init() promise return value on entitiy to let callers await init() completion.
   - Sprite library
   - Connection with drawing module.
   - Connection with collision module.

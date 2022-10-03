@@ -25,10 +25,10 @@ class ArrowControl extends BasicEntity {
   }
 
   async body() {
-    this.position.set(this.game.width / 2, this.game.height / 2);
+    this.transform.translate.set(this.game.width / 2, this.game.height / 2);
     while (true) {
       await this.tick();
-      this.position.addScaled(this.game.input.arrowKeys, 10);
+      this.transform.translate.addScaled(this.game.input.arrowKeys, 10);
       this.hit = false;
     }
   }
@@ -36,8 +36,8 @@ class ArrowControl extends BasicEntity {
   onDraw(context, width, height) {
     context.fillStyle = this.hit ? 'brown' : 'blue';
     context.fillRect(
-      this.position.x,
-      this.position.y,
+      this.transform.translate.x,
+      this.transform.translate.y,
       this.collider.width,
       this.collider.height,
     );
@@ -69,7 +69,7 @@ class MouseControl extends BasicEntity {
   async body() {
     while (true) {
       await this.tick();
-      this.position.copy(this.game.input.mouse.position);
+      this.transform.translate.copy(this.game.input.mouse.position);
     }
   }
 
@@ -92,7 +92,7 @@ class MouseControl extends BasicEntity {
     const hairSize = 15;
     context.beginPath();
     context.save();
-    context.translate(this.position.x, this.position.y);
+    context.translate(this.transform.translate.x, this.transform.translate.y);
     context.arc(0, 0, radius, 0, TAU);
     context.moveTo(0, -radius - hairSize / 2);
     context.lineTo(0, -radius + hairSize / 2);
@@ -113,7 +113,7 @@ class Projectile extends BasicEntity {
     this.collider.width = 10;
     this.collider.height = 10;
     this.target = target;
-    this.position.set((this.game.width / 2 + target.x) / 2, this.game.height);
+    this.transform.translate.set((this.game.width / 2 + target.x) / 2, this.game.height);
     this.size = 0;
   }
 
@@ -122,11 +122,11 @@ class Projectile extends BasicEntity {
       await this.tick();
 
       const delta = Vec2.getTemp();
-      delta.assignSub(this.target, this.position);
-      this.position.addScaled(delta, 0.1);
+      delta.assignSub(this.target, this.transform.translate);
+      this.transform.translate.addScaled(delta, 0.1);
       Vec2.releaseTemps(1);
 
-      this.size = Vec2.distance(this.position, this.target) * 0.1;
+      this.size = Vec2.distance(this.transform.translate, this.target) * 0.1;
 
       if (this.size < 1) {
         break;
@@ -137,8 +137,8 @@ class Projectile extends BasicEntity {
   onDraw(context, width, height) {
     context.fillStyle = 'white';
     context.fillRect(
-      this.position.x - this.size / 2,
-      this.position.y - this.size / 2,
+      this.transform.translate.x - this.size / 2,
+      this.transform.translate.y - this.size / 2,
       this.size,
       this.size,
     );

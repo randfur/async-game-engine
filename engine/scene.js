@@ -63,14 +63,25 @@ export class Scene extends Job {
 
   do(run, parentJob=null) {
     const job = new Job(this, parentJob);
-    this.#startJob(job, () => run(job, this, this.game), () => job.stop());
+    this.#startJob(
+      /*job=*/job,
+      /*startJob*/() => run(job, this, this.game),
+      /*stopJob*/() => job.stop(),
+    );
     return job;
   }
 
   static #emptyArgs = Object.freeze({});
   create(EntityType, args=Scene.#emptyArgs, parentJob=null) {
     const entity = new EntityType(this, parentJob, args);
-    this.#startJob(entity, () => entity.body(), () => entity.stop());
+    this.#startJob(
+      /*job=*/entity,
+      /*startJob=*/async () => {
+        await entity.initialised;
+        await entity.body();
+      },
+      /*stopJob=*/() => entity.stop(),
+    );
     return entity;
   }
 
