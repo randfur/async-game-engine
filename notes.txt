@@ -45,6 +45,15 @@
     - Don't register with input component if subclass doesn't care.
       - This would probably make up for the performance concerns of a single event.
 
+- Debugging
+  - Special overlay draw call.
+  - All entities invoked, no need to register.
+  - Entities have onDebugDraw() method.
+  - Drawn on top of onDraw().
+  - Shortcut key to toggle: Shift-F12
+  - Part of BasicScene rather than Game.
+  - Only applies to the active scene, background scene can use regular F12.
+
 - Architecture
   - 2022-07-24
     - Game

@@ -73,6 +73,8 @@ class Fish extends BasicEntity {
 
       this.transform.translate.addScaled(arrowKeys, this.movementScale);
 
+      this.collider.solid = this.game.input.keyDown['Space'];
+
       if (arrowKeys.x < 0) {
         this.transform.scale.x = 1;
       } else if (arrowKeys.x > 0) {
@@ -82,7 +84,7 @@ class Fish extends BasicEntity {
   }
 
   onDraw(context, width, height) {
-    const sprite = this.game.input.keyDown['Space'] ? this.sprites.bite : this.sprites.normal;
+    const sprite = this.collider.solid ? this.sprites.bite : this.sprites.normal;
     sprite.draw(context);
   }
 }
@@ -122,8 +124,7 @@ class Seaweed extends BasicEntity {
 
 class Bubble extends BasicEntity {
   init() {
-    this.image = loadImage('./bubble.png');
-    this.imageTransform = new Transform(this.transform);
+    this.sprite = this.loadSprite('./bubble.png');
     this.transform.translate.x = random(this.game.width);
     this.transform.translate.y = random(this.game.height);
 
@@ -157,8 +158,7 @@ class Bubble extends BasicEntity {
   }
 
   onDraw(context, width, height) {
-    this.imageTransform.applyToContext(context);
-    context.drawImage(this.image, 0, 0);
+    this.sprite.draw(context);
   }
 }
 

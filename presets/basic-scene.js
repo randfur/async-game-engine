@@ -15,13 +15,25 @@ export class BasicScene extends Scene {
     this.drawing2dRegistry = new Drawing2dRegistry(this.cameraTransform);
 
     this.collision2dRegistry = this.create(Collision2dRegistry);
+
+    this.debugMode = true;//false;
  }
 
   onInput(eventName, event) {
+    if (eventName === 'keydown' && event.shiftKey && event.code === 'F12') {
+      this.debugMode ^= true;
+    }
+
     this.inputRegistry.onInput(eventName, event);
   }
 
   onDraw(context, width, height) {
     this.drawing2dRegistry.onDraw(context, width, height);
+
+    if (this.debugMode) {
+      for (const job of this.jobs) {
+        job.onDebugDraw?.(context, width, height);
+      }
+    }
   }
 }

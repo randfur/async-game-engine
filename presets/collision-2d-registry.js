@@ -144,6 +144,29 @@ export class Collision2dRegistry extends Entity {
     this.colliders.push(collider);
     return collider;
   }
+
+  onDebugDraw(context, width, height) {
+    context.resetTransform();
+    this.debugDrawNode(context, this.collisionTree);
+  }
+
+  debugDrawNode(context, collisionNode) {
+    if (collisionNode.collider) {
+      const collider = collisionNode.collider;
+      if (collider.colliding) {
+        context.strokeStyle = '#f00';
+      } else {
+        context.strokeStyle = '#800';
+      }
+      context.strokeRect(collisionNode.x, collisionNode.y, collisionNode.width, collisionNode.height);
+    } else {
+      context.strokeStyle = '#0004';
+      context.strokeRect(collisionNode.x, collisionNode.y, collisionNode.width, collisionNode.height);
+      for (const child of collisionNode.children) {
+        this.debugDrawNode(context, child);
+      }
+    }
+  }
 }
 
 function maybeInvokeCollisionFunc(collider, otherCollider) {
