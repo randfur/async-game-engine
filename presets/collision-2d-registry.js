@@ -142,7 +142,7 @@ export class Collision2dRegistry extends Entity {
   }
 
   onDebugDraw(context, width, height) {
-    context.resetTransform();
+    this.scene.cameraTransform.applyToContext(context);
     this.debugDrawNode(context, this.collisionTree);
   }
 

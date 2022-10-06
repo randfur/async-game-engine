@@ -23,24 +23,13 @@ export class BasicEntity extends Entity {
   }
 
   enableCollisions() {
-    const collisionBoundingBoxPoints = [
-      new Vec2(),
-      new Vec2(),
-      new Vec2(),
-      new Vec2(),
-    ];
-
     this.collider = this.scene.collision2dRegistry.register(
       this,
       collisionNode => {
         if (!this.sprite) {
           return false;
         }
-        const [a, b, c, d] = collisionBoundingBoxPoints;
-        a.set(0, 0);
-        b.set(this.sprite.image.width, 0);
-        c.set(this.sprite.image.width, this.sprite.image.height);
-        d.set(0, this.sprite.image.height);
+        this.sprite.updateCollisionNode(collisionNode, this.transform);
         return true;
       },
       otherCollider => this.onCollision(otherCollider),
