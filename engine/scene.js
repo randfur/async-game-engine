@@ -1,5 +1,5 @@
 import {Job} from './job.js';
-import {removeItems} from '../utils/array.js';
+import {removeItem, removeItems} from '../utils/array.js';
 import {CreateResolveablePromise} from '../utils/promise.js';
 
 /*
@@ -20,6 +20,7 @@ interface Scene {
 */
 export class Scene extends Job {
   #gameTimeAhead;
+  #initialisingJobs;
 
   constructor(game) {
     // Unable to use `this` in super() call.
@@ -33,6 +34,7 @@ export class Scene extends Job {
     this.#gameTimeAhead = 0;
     this.nextTick = CreateResolveablePromise();
     this.nextGameTick = CreateResolveablePromise();
+    this.#initialisingJobs = [];
     this.jobs = [];
 
     this.initPresetParts();
@@ -61,22 +63,29 @@ export class Scene extends Job {
   async run() {}
 
   do(run, parentJob=null) {
+    if (this.stopped.resolved) {
+      return;
+    }
     const job = new Job(this, parentJob);
     this.#startJob(
       /*job=*/job,
-      /*startJob*/() => run(job, this, this.game),
-      /*stopJob*/() => job.stop(),
+      /*jobInitialised=*/null,
+      /*runJob=*/() => run(job, this, this.game),
+      /*stopJob=*/() => job.stop(),
     );
     return job;
   }
 
   static #emptyArgs = Object.freeze({});
   create(EntityType, args=Scene.#emptyArgs, parentJob=null) {
+    if (this.stopped.resolved) {
+      return;
+    }
     const entity = new EntityType(this, parentJob, args);
     this.#startJob(
       /*job=*/entity,
-      /*startJob=*/async () => {
-        await entity.initialised;
+      /*jobInitialised=*/entity.initialised,
+      /*runJob=*/async () => {
         await entity.body();
       },
       /*stopJob=*/() => entity.stop(),
@@ -84,23 +93,32 @@ export class Scene extends Job {
     return entity;
   }
 
-  #startJob(job, runJob, stopJob) {
+  async #startJob(job, jobInitialised, runJob, stopJob) {
+    this.#initialisingJobs.push(job);
+    await jobInitialised?.();
+    removeItem(this.#initialisingJobs, job);
+    if (job.stopped.resolved) {
+      return;
+    }
     this.jobs.push(job);
-    (async () => {
-      try {
-        await runJob();
-      } catch (error) {
-        if (error !== Job.StopSignal) {
-          throw error;
-        }
+    try {
+      await runJob();
+    } catch (error) {
+      if (error !== Job.StopSignal) {
+        throw error;
       }
-      stopJob?.()
-    })();
+    }
+    stopJob?.()
   }
 
   stop() {
     if (this.stopped.resolved) {
       return;
+    }
+    for (const job of this.#initialisingJobs) {
+      if (job !== this) {
+        job.stop();
+      }
     }
     for (const job of this.jobs) {
       if (job !== this) {
