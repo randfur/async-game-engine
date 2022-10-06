@@ -27,7 +27,24 @@ export class BasicEntity extends Entity {
   }
 
   enableCollisions() {
-    this.collider = this.scene.collision2dRegistry.register(this, this.onCollision.bind(this));
+    const collisionBoundingBoxPoints = [
+      new Vec2(),
+      new Vec2(),
+      new Vec2(),
+      new Vec2(),
+    ];
+    this.collider = this.scene.collision2dRegistry.register(
+      this,
+      collisionNode => {
+        const [a, b, c, d] = collisionBoundingBoxPoints;
+        a.set(0, 0);
+        b.set(this.sprite.image.width, 0);
+        c.set(this.sprite.image.width, this.sprite.image.height);
+        d.set(0, this.sprite.image.height);
+
+      },
+      otherCollider => this.onCollision(otherCollider),
+    );
     this.collider.transform = this.transform;
   }
 

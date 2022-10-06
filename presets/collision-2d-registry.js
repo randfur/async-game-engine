@@ -46,11 +46,8 @@ export class Collision2dRegistry extends Entity {
       const colliderNode = this.collisionNodePool.acquire();
       colliderNode.collider = collider;
       colliderNode.children.length = 0;
-      colliderNode.x = collider.transform.translate.x;
-      colliderNode.y = collider.transform.translate.y;
-      colliderNode.width = collider.width;
-      colliderNode.height = collider.height;
       colliderNode.maxId = collider.id;
+      collider.rectFunc(colliderNode);
       this.collisionTree = this.insert(colliderNode, this.collisionTree);
     }
   }
@@ -125,16 +122,13 @@ export class Collision2dRegistry extends Entity {
     }
   }
 
-  register(job, collisionFunc) {
+  register(job, rectFunc, collisionFunc) {
     const collider = {
       id: this.nextId++,
       job,
       filterTypes: null,
       solid: true,
-      transform: null,
-      offset: new Vec2(0, 0),
-      width: 0,
-      height: 0,
+      rectFunc,
       collisionFunc,
       colliding: false,
     };

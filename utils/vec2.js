@@ -1,10 +1,6 @@
 import {Pool} from './pool.js';
 
 export class Vec2 {
-  static #temps = [];
-  static #reservedTemps = 0;
-
-  // TODO: Replace with generic Pool utility.
   static pool = new Pool(() => new Vec2());
 
   static squareDistance(va, vb) {

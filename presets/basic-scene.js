@@ -35,6 +35,7 @@ export class BasicScene extends Scene {
     this.drawing2dRegistry.onDraw(context, width, height);
 
     if (this.debugMode) {
+      this.cameraTransform.applyToContext(context);
       for (const job of this.jobs) {
         job.onDebugDraw?.(context, width, height);
       }
