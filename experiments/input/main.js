@@ -121,10 +121,10 @@ class Projectile extends BasicEntity {
     while (true) {
       await this.tick();
 
-      const delta = Vec2.getTemp();
+      const delta = Vec2.pool.acquire();
       delta.assignSub(this.target, this.transform.translate);
       this.transform.translate.addScaled(delta, 0.1);
-      Vec2.releaseTemps(1);
+      Vec2.pool.release(1);
 
       this.size = Vec2.distance(this.transform.translate, this.target) * 0.1;
 

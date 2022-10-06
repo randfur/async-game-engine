@@ -96,12 +96,12 @@ export class ConvexBoundaryFinder extends BasicEntity {
   }
 
   boundaryIsClear(boundary, boundaryAfter) {
-    const cursor = Vec2.getTemp();
+    const cursor = Vec2.pool.acquire();
     cursor.assign(boundary.position);
-    const dir = Vec2.getTemp();
+    const dir = Vec2.pool.acquire();
     dir.assign(boundary.normal);
     dir.rotateCCW();
-    const endDelta = Vec2.getTemp();
+    const endDelta = Vec2.pool.acquire();
     let hitOpaque = false;
     const stepX = Math.abs(dir.x) > Math.abs(dir.y);
     const slope = stepX ? dir.y / dir.x : dir.x / dir.y;
@@ -124,7 +124,7 @@ export class ConvexBoundaryFinder extends BasicEntity {
         cursor.x = boundary.position.x + (cursor.y - boundary.position.y) * slope;
       }
     }
-    Vec2.releaseTemps(3);
+    Vec2.pool.release(3);
     return !hitOpaque;
   }
 
@@ -141,7 +141,7 @@ export class ConvexBoundaryFinder extends BasicEntity {
   onDraw(context, width, height) {
     context.strokeStyle = 'yellow';
     context.beginPath();
-    const intersection = Vec2.getTemp();
+    const intersection = Vec2.pool.acquire();
     for (let i = 0; i < this.boundaries.length; ++i) {
       const boundary = this.boundaries[i];
       const boundaryAfter = indexWrapped(this.boundaries, i + 1);
@@ -165,7 +165,7 @@ export class ConvexBoundaryFinder extends BasicEntity {
           this.picture.y + intersection.y);
     }
 
-    Vec2.releaseTemps(1);
+    Vec2.pool.release(1);
     context.stroke();
   }
 }

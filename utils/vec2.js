@@ -1,19 +1,11 @@
+import {Pool} from './pool.js';
+
 export class Vec2 {
   static #temps = [];
   static #reservedTemps = 0;
 
   // TODO: Replace with generic Pool utility.
-  static getTemp() {
-    ++this.#reservedTemps;
-    if (this.#temps.length < this.#reservedTemps) {
-      this.#temps.push(new Vec2());
-    }
-    return this.#temps[this.#reservedTemps - 1];
-  }
-
-  static releaseTemps(n) {
-    this.#reservedTemps -= n;
-  }
+  static pool = new Pool(() => new Vec2());
 
   static squareDistance(va, vb) {
     return (va.x - vb.x) ** 2 + (va.y - vb.y) ** 2;
@@ -63,17 +55,17 @@ export class Vec2 {
   }
 
   assignBoundariesIntersection(boundaryA, boundaryB) {
-    const dirA = Vec2.getTemp();
+    const dirA = Vec2.pool.acquire();
     dirA.assign(boundaryA.normal);
     dirA.rotateCW();
 
-    const dirB = Vec2.getTemp();
+    const dirB = Vec2.pool.acquire();
     dirB.assign(boundaryB.normal);
     dirB.rotateCW();
 
     this.assignIntersection(boundaryA.position, dirA, boundaryB.position, dirB);
 
-    Vec2.releaseTemps(2);
+    Vec2.pool.release(2);
   }
 
   assignIntersection(startA, dirA, startB, dirB) {
