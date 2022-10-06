@@ -1,8 +1,7 @@
 import {Entity} from '../engine/entity.js';
-import {Sprite} from './sprite.js';
-import {Vec2} from '../utils/vec2.js';
 import {Mat3} from '../utils/mat3.js';
 import {Transform} from '../utils/transform.js';
+import {Vec2} from '../utils/vec2.js';
 
 export class BasicEntity extends Entity {
   initPresetParts() {
@@ -15,10 +14,6 @@ export class BasicEntity extends Entity {
     this.collider = null;
     this.transform = new Transform();
     this.sprite = null;
-  }
-
-  loadSprite(src) {
-    return new Sprite(src);
   }
 
   enableCollisions() {

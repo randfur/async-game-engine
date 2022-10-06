@@ -1,11 +1,12 @@
-import {Game} from '../../engine/game.js';
-import {BasicScene} from '../../presets/basic-scene.js';
 import {BasicEntity} from '../../presets/basic-entity.js';
+import {BasicScene} from '../../presets/basic-scene.js';
 import {deviate, random, randomRange} from '../../utils/random.js';
+import {Game} from '../../engine/game.js';
 import {loadImage} from '../../utils/image.js';
 import {recycledRange} from '../../utils/range.js';
-import {Transform} from '../../utils/transform.js';
+import {Sprite} from '../../utils/sprite.js';
 import {TAU} from '../../utils/math.js';
+import {Transform} from '../../utils/transform.js';
 
 async function main() {
   new Game({
@@ -46,8 +47,8 @@ class Fish extends BasicEntity {
     );
 
     this.sprites = {
-      normal: this.loadSprite('./fish-normal.png'),
-      bite: this.loadSprite('./fish-bite.png'),
+      normal: new Sprite('./fish-normal.png'),
+      bite: new Sprite('./fish-bite.png'),
     };
     // TODO: Make sprites its own format that stores the origin and other stuff.
     for (const sprite of Object.values(this.sprites)) {
@@ -86,7 +87,7 @@ class Fish extends BasicEntity {
 
 class Seaweed extends BasicEntity {
   init() {
-    this.sprite = this.loadSprite('./seaweed.png');
+    this.sprite = new Sprite('./seaweed.png');
     this.sprite.transform.origin.set(16, 64);
 
     this.transform.translate.x = Math.floor(random(this.game.width));
@@ -115,7 +116,7 @@ class Seaweed extends BasicEntity {
 
 class Bubble extends BasicEntity {
   init() {
-    this.sprite = this.loadSprite('./bubble.png');
+    this.sprite = new Sprite('./bubble.png');
     this.transform.translate.x = random(this.game.width);
     this.transform.translate.y = random(this.game.height);
 
