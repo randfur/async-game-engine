@@ -84,7 +84,7 @@ class Fish extends BasicEntity {
         this.transform.scale.x = -1;
       }
 
-      this.angle -= 0.2 * this.transform.scale.x;
+      this.angle -= 0.01 * this.transform.scale.x;
       this.transform.rotate.setPolar(this.angle);
     }
   }
