@@ -4,17 +4,12 @@ import {Pool} from './pool.js';
 // [a c e]
 // [b d f]
 // [0 0 1]
-// This matches the matrix shape of HTMLCanvasContext2D.setTransform().
+// This matches the parameters of HTMLCanvasContext2D.setTransform().
 export class Mat3 {
   static pool = new Pool(() => new Mat3());
 
   constructor() {
-    this.a = 1;
-    this.b = 0;
-    this.c = 0;
-    this.d = 1;
-    this.e = 0;
-    this.f = 0;
+    this.setIdentity()
   }
 
   setIdentity() {
@@ -35,8 +30,8 @@ export class Mat3 {
     // [b d f] * [y]
     // [0 0 1] * [1]
     [vector.x, vector.y] = [
-      /*x=*/ this.a * vector.x + this.c * vector.y + this.e,
-      /*x=*/ this.b * vector.x + this.d * vector.y + this.f,
+      /*x =*/ this.a * vector.x + this.c * vector.y + this.e,
+      /*y =*/ this.b * vector.x + this.d * vector.y + this.f,
     ];
   }
 }
