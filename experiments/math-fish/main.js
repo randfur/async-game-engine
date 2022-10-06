@@ -71,7 +71,9 @@ class Fish extends BasicEntity {
 
       this.transform.translate.addScaled(arrowKeys, this.movementScale);
 
-      this.collider.solid = this.game.input.keyDown['Space'];
+      const biting = this.game.input.keyDown['Space'];
+      this.collider.solid = biting;
+      this.sprite = biting ? this.sprites.bite : this.sprites.normal;
 
       if (arrowKeys.x < 0) {
         this.transform.scale.x = 1;
@@ -79,11 +81,6 @@ class Fish extends BasicEntity {
         this.transform.scale.x = -1;
       }
     }
-  }
-
-  onDraw(context, width, height) {
-    const sprite = this.collider.solid ? this.sprites.bite : this.sprites.normal;
-    sprite.draw(context);
   }
 }
 
@@ -113,10 +110,6 @@ class Seaweed extends BasicEntity {
       await this.tick();
       this.transform.translate.y = this.game.height;
     }
-  }
-
-  onDraw(context, width, height) {
-    this.sprite.draw(context);
   }
 }
 
@@ -153,10 +146,6 @@ class Bubble extends BasicEntity {
 
   onCollision(other, otherCollider) {
     this.transform.translate.y += this.game.height;
-  }
-
-  onDraw(context, width, height) {
-    this.sprite.draw(context);
   }
 }
 

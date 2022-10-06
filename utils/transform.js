@@ -1,4 +1,5 @@
 import {Vec2} from './vec2.js';
+import {Mat3} from './mat3.js';
 
 export class Transform {
   constructor(parent=null) {
@@ -9,67 +10,53 @@ export class Transform {
     this.translate = new Vec2(0, 0);
   }
 
-  applyToContext(context, outerTransform=null) {
-    // [a c e]   [x]
-    // [b d f] * [y]
-    // [0 0 1]   [1]
-    let a = 1;
-    let b = 0;
-    let c = 0;
-    let d = 1;
-    let e = 0;
-    let f = 0;
+  applyToMatrix(matrix) {
+    // Offset
+    // [1  0 tx]   [a c e]
+    // [0  1 ty] * [b d f]
+    // [0  0  1]   [0 0 1]
+    matrix.e -= this.origin.x;
+    matrix.f -= this.origin.y;
 
-    let transform = this;
-    while (transform) {
-      // Offset
-      // [1  0 tx]   [a c e]
-      // [0  1 ty] * [b d f]
-      // [0  0  1]   [0 0 1]
-      e -= transform.origin.x;
-      f -= transform.origin.y;
+    // Scale
+    // [sx  0  0]   [a c e]
+    // [ 0 sy  0] * [b d f]
+    // [ 0  0  1]   [0 0 1]
+    const [sx, sy] = [this.scale.x, this.scale.y];
+    matrix.a *= sx;
+    matrix.b *= sy;
+    matrix.c *= sx;
+    matrix.d *= sy;
+    matrix.e *= sx;
+    matrix.f *= sy;
 
-      // Scale
-      // [sx  0  0]   [a c e]
-      // [ 0 sy  0] * [b d f]
-      // [ 0  0  1]   [0 0 1]
-      const [sx, sy] = [transform.scale.x, transform.scale.y];
-      a *= sx;
-      b *= sy;
-      c *= sx;
-      d *= sy;
-      e *= sx;
-      f *= sy;
+    // Rotate
+    // [cos -sin  0]   [a c e]
+    // [sin  cos  0] * [b d f]
+    // [  0    0  1]   [0 0 1]
+    const [cos, sin] = [this.rotate.x, this.rotate.y];
+    [matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f] = [
+      /*a =*/ cos * matrix.a - sin * matrix.b,
+      /*b =*/ sin * matrix.a + cos * matrix.b,
+      /*c =*/ cos * matrix.c - sin * matrix.d,
+      /*d =*/ sin * matrix.c + cos * matrix.d,
+      /*e =*/ cos * matrix.e - sin * matrix.f,
+      /*f =*/ sin * matrix.e + cos * matrix.f,
+    ];
 
-      // Rotate
-      // [cos -sin  0]   [a c e]
-      // [sin  cos  0] * [b d f]
-      // [  0    0  1]   [0 0 1]
-      const [cos, sin] = [transform.rotate.x, transform.rotate.y];
-      [a, b, c, d, e, f] = [
-        /*a =*/ cos * a - sin * b,
-        /*b =*/ sin * a + cos * b,
-        /*c =*/ cos * c - sin * d,
-        /*d =*/ sin * c + cos * d,
-        /*e =*/ cos * e - sin * f,
-        /*f =*/ sin * e + cos * f,
-      ];
+    // Translate
+    // [1  0 tx]   [a c e]
+    // [0  1 ty] * [b d f]
+    // [0  0  1]   [0 0 1]
+    matrix.e += this.translate.x;
+    matrix.f += this.translate.y;
+  }
 
-      // Translate
-      // [1  0 tx]   [a c e]
-      // [0  1 ty] * [b d f]
-      // [0  0  1]   [0 0 1]
-      e += transform.translate.x;
-      f += transform.translate.y;
-
-      transform = transform.parent;
-
-      if (!transform && outerTransform) {
-        transform = outerTransform;
-        outerTransform = null;
-      }
-    }
-
-    context.setTransform(a, b, c, d, e, f);
+  applyToContext(context) {
+    const matrix = Mat3.pool.acquire();
+    matrix.setIdentity();
+    this.applyToMatrix(matrix);
+    matrix.applyToContext(context);
+    Mat3.pool.release(1);
   }
 }

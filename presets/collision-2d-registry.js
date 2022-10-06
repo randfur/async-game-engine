@@ -44,10 +44,12 @@ export class Collision2dRegistry extends Entity {
         continue;
       }
       const colliderNode = this.collisionNodePool.acquire();
+      if (!collider.rectFunc(colliderNode)) {
+        continue;
+      }
       colliderNode.collider = collider;
       colliderNode.children.length = 0;
       colliderNode.maxId = collider.id;
-      collider.rectFunc(colliderNode);
       this.collisionTree = this.insert(colliderNode, this.collisionTree);
     }
   }
