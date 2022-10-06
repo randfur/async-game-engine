@@ -11,45 +11,51 @@ export class Transform {
   }
 
   applyToMatrix(matrix) {
-    // Offset
-    // [1  0 tx]   [a c e]
-    // [0  1 ty] * [b d f]
-    // [0  0  1]   [0 0 1]
-    matrix.e -= this.origin.x;
-    matrix.f -= this.origin.y;
+    let transform = this;
 
-    // Scale
-    // [sx  0  0]   [a c e]
-    // [ 0 sy  0] * [b d f]
-    // [ 0  0  1]   [0 0 1]
-    const [sx, sy] = [this.scale.x, this.scale.y];
-    matrix.a *= sx;
-    matrix.b *= sy;
-    matrix.c *= sx;
-    matrix.d *= sy;
-    matrix.e *= sx;
-    matrix.f *= sy;
+    while (transform) {
+      // Offset
+      // [1  0 tx]   [a c e]
+      // [0  1 ty] * [b d f]
+      // [0  0  1]   [0 0 1]
+      matrix.e -= transform.origin.x;
+      matrix.f -= transform.origin.y;
 
-    // Rotate
-    // [cos -sin  0]   [a c e]
-    // [sin  cos  0] * [b d f]
-    // [  0    0  1]   [0 0 1]
-    const [cos, sin] = [this.rotate.x, this.rotate.y];
-    [matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f] = [
-      /*a =*/ cos * matrix.a - sin * matrix.b,
-      /*b =*/ sin * matrix.a + cos * matrix.b,
-      /*c =*/ cos * matrix.c - sin * matrix.d,
-      /*d =*/ sin * matrix.c + cos * matrix.d,
-      /*e =*/ cos * matrix.e - sin * matrix.f,
-      /*f =*/ sin * matrix.e + cos * matrix.f,
-    ];
+      // Scale
+      // [sx  0  0]   [a c e]
+      // [ 0 sy  0] * [b d f]
+      // [ 0  0  1]   [0 0 1]
+      const [sx, sy] = [transform.scale.x, transform.scale.y];
+      matrix.a *= sx;
+      matrix.b *= sy;
+      matrix.c *= sx;
+      matrix.d *= sy;
+      matrix.e *= sx;
+      matrix.f *= sy;
 
-    // Translate
-    // [1  0 tx]   [a c e]
-    // [0  1 ty] * [b d f]
-    // [0  0  1]   [0 0 1]
-    matrix.e += this.translate.x;
-    matrix.f += this.translate.y;
+      // Rotate
+      // [cos -sin  0]   [a c e]
+      // [sin  cos  0] * [b d f]
+      // [  0    0  1]   [0 0 1]
+      const [cos, sin] = [transform.rotate.x, transform.rotate.y];
+      [matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f] = [
+        /*a =*/ cos * matrix.a - sin * matrix.b,
+        /*b =*/ sin * matrix.a + cos * matrix.b,
+        /*c =*/ cos * matrix.c - sin * matrix.d,
+        /*d =*/ sin * matrix.c + cos * matrix.d,
+        /*e =*/ cos * matrix.e - sin * matrix.f,
+        /*f =*/ sin * matrix.e + cos * matrix.f,
+      ];
+
+      // Translate
+      // [1  0 tx]   [a c e]
+      // [0  1 ty] * [b d f]
+      // [0  0  1]   [0 0 1]
+      matrix.e += transform.translate.x;
+      matrix.f += transform.translate.y;
+
+      transform = transform.parent;
+    }
   }
 
   applyToContext(context) {

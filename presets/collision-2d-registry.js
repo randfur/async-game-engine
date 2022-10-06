@@ -1,8 +1,8 @@
 import {Entity} from '../engine/entity.js';
 import {Pool} from '../utils/pool.js';
 import {removeItem} from '../utils/array.js';
-import {isColliding} from '../utils/math.js';
 import {Vec2} from '../utils/vec2.js';
+import {BoundingBox} from '../utils/bounding-box.js';
 
 export class Collision2dRegistry extends Entity {
   init() {
@@ -11,10 +11,7 @@ export class Collision2dRegistry extends Entity {
     this.collisionTree = null;
     this.maxBranching = 10;
     this.collisionNodePool = new Pool(() => ({
-      x: null,
-      y: null,
-      width: null,
-      height: null,
+      boundingBox: new BoundingBox(),
       maxId: null,
       collider: null,
       children: [],
@@ -28,9 +25,7 @@ export class Collision2dRegistry extends Entity {
       this.buildCollisionTree();
 
       for (const collider of this.colliders) {
-        if (collider.transform && collider.solid) {
-          this.collide(collider, this.collisionTree);
-        }
+        this.collide(collider, this.collisionTree);
       }
     }
   }
@@ -40,13 +35,15 @@ export class Collision2dRegistry extends Entity {
     this.collisionTree = null;
     for (const collider of this.colliders) {
       collider.colliding = false;
+      collider.colliderNode = null;
       if (!collider.solid) {
         continue;
       }
       const colliderNode = this.collisionNodePool.acquire();
-      if (!collider.rectFunc(colliderNode)) {
+      if (!collider.updateBoundingBox(colliderNode.boundingBox)) {
         continue;
       }
+      collider.colliderNode = colliderNode;
       colliderNode.collider = collider;
       colliderNode.children.length = 0;
       colliderNode.maxId = collider.id;
@@ -54,6 +51,7 @@ export class Collision2dRegistry extends Entity {
     }
   }
 
+  static #insertAreaTestBoundingBox = new BoundingBox();
   insert(colliderNode, collisionSubTree) {
     if (collisionSubTree === null) {
       return colliderNode;
@@ -63,10 +61,7 @@ export class Collision2dRegistry extends Entity {
       const otherColliderNode = collisionSubTree;
       const branchNode = this.collisionNodePool.acquire();
       branchNode.collider = null;
-      branchNode.x = Math.min(colliderNode.x, otherColliderNode.x);
-      branchNode.y = Math.min(colliderNode.y, otherColliderNode.y);
-      branchNode.width = Math.max(colliderNode.x + colliderNode.width, otherColliderNode.x + otherColliderNode.width) - branchNode.x;
-      branchNode.height = Math.max(colliderNode.y + colliderNode.height, otherColliderNode.y + otherColliderNode.height) - branchNode.y;
+      branchNode.boundingBox.setFromUnion(colliderNode.boundingBox, otherColliderNode.boundingBox);
       branchNode.maxId = Math.max(colliderNode.maxId, otherColliderNode.maxId);
       branchNode.children.length = 0;
       branchNode.children.push(colliderNode);
@@ -75,10 +70,7 @@ export class Collision2dRegistry extends Entity {
     }
 
     const branchNode = collisionSubTree;
-    branchNode.width = Math.max(branchNode.width, branchNode.x + branchNode.width - colliderNode.x, colliderNode.x + colliderNode.width - branchNode.x);
-    branchNode.height = Math.max(branchNode.height, branchNode.y + branchNode.height - colliderNode.y, colliderNode.y + colliderNode.height - branchNode.y);
-    branchNode.x = Math.min(branchNode.x, colliderNode.x);
-    branchNode.y = Math.min(branchNode.y, colliderNode.y);
+    branchNode.boundingBox.setFromUnion(branchNode.boundingBox, colliderNode.boundingBox);
     branchNode.maxId = Math.min(branchNode.maxId, colliderNode.maxId);
     if (branchNode.children.length < this.maxBranching) {
       branchNode.children.push(colliderNode);
@@ -87,12 +79,9 @@ export class Collision2dRegistry extends Entity {
       let leastAreaAdd = Infinity;
       for (let i = 0; i < branchNode.children.length; ++i) {
         const childNode = branchNode.children[i];
-        const newArea = (
-          Math.max(childNode.width, childNode.x + childNode.width - colliderNode.x, colliderNode.x + colliderNode.width - childNode.x)
-          *
-          Math.max(childNode.height, childNode.y + childNode.height - colliderNode.y, colliderNode.y + colliderNode.height - childNode.y)
-        );
-        const areaAdd = newArea - (childNode.width * childNode.height);
+        const testAreaBoundingBox = Collision2dRegistry.#insertAreaTestBoundingBox;
+        testAreaBoundingBox.setFromUnion(childNode.boundingBox, colliderNode.boundingBox);
+        const areaAdd = testAreaBoundingBox.area() - childNode.boundingBox.area();
         if (areaAdd < leastAreaAdd) {
           mergeIndex = i;
           leastAreaAdd = areaAdd;
@@ -105,9 +94,10 @@ export class Collision2dRegistry extends Entity {
   }
 
   collide(collider, collisionNode) {
-    if (!isColliding(
-        collider.transform.translate.x, collider.transform.translate.y, collider.width, collider.height,
-        collisionNode.x, collisionNode.y, collisionNode.width, collisionNode.height)) {
+    if (!collider.colliderNode) {
+      return;
+    }
+    if (!collider.colliderNode.boundingBox.isCollidingWith(collisionNode.boundingBox)) {
       return;
     }
     if (collisionNode.collider) {
@@ -124,13 +114,14 @@ export class Collision2dRegistry extends Entity {
     }
   }
 
-  register(job, rectFunc, collisionFunc) {
+  register(job, updateBoundingBox, collisionFunc) {
     const collider = {
       id: this.nextId++,
       job,
       filterTypes: null,
       solid: true,
-      rectFunc,
+      updateBoundingBox,
+      colliderNode: null,
       collisionFunc,
       colliding: false,
     };
@@ -157,10 +148,10 @@ export class Collision2dRegistry extends Entity {
       } else {
         context.strokeStyle = '#800';
       }
-      context.strokeRect(collisionNode.x, collisionNode.y, collisionNode.width, collisionNode.height);
+      collisionNode.boundingBox.draw(context);
     } else {
       context.strokeStyle = '#0004';
-      context.strokeRect(collisionNode.x, collisionNode.y, collisionNode.width, collisionNode.height);
+      collisionNode.boundingBox.draw(context);
       for (const child of collisionNode.children) {
         this.debugDrawNode(context, child);
       }

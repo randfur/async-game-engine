@@ -34,4 +34,10 @@ export class Mat3 {
       /*y =*/ this.b * vector.x + this.d * vector.y + this.f,
     ];
   }
+
+  applyToPoints(points) {
+    for (const point of points) {
+      this.applyToVector(point);
+    }
+  }
 }
