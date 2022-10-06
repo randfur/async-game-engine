@@ -62,6 +62,8 @@ class Fish extends BasicEntity {
     this.enableCollisions();
     this.collider.width = 32;
     this.collider.height = 32;
+
+    this.angle = 0;
   }
 
   async body() {
@@ -81,6 +83,9 @@ class Fish extends BasicEntity {
       } else if (arrowKeys.x > 0) {
         this.transform.scale.x = -1;
       }
+
+      this.angle -= 0.2 * this.transform.scale.x;
+      this.transform.rotate.setPolar(this.angle);
     }
   }
 }
