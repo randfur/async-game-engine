@@ -6,7 +6,6 @@ import {Transform} from '../utils/transform.js';
 
 export class BasicEntity extends Entity {
   initPresetParts() {
-    // TODO: Add sprite handle when it exists.
     if (this.onInput !== BasicEntity.prototype.onInput) {
       this.scene.inputRegistry.register(this, this.onInput.bind(this));
     }
