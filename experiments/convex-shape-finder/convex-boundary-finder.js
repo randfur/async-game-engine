@@ -5,19 +5,23 @@ import {CreateResolveablePromise} from '../../../utils/promise.js';
 import {Vec2} from '../../../utils/vec2.js';
 
 export class ConvexBoundaryFinder extends BasicEntity {
-  async body({maxLines, picture}) {
-    this.foundLines = CreateResolveablePromise();
+  init({maxLines, picture}) {
     this.picture = picture;
+    this.maxLines = maxLines;
+  }
+
+  async body() {
+    this.foundLines = CreateResolveablePromise();
 
     this.centre = new Vec2(
-      picture.x + picture.width / 2,
-      picture.y + picture.height / 2,
+      this.picture.x + this.picture.width / 2,
+      this.picture.y + this.picture.height / 2,
     );
-    this.maxDistance = distance(picture.width, picture.height) / 2;
+    this.maxDistance = distance(this.picture.width, this.picture.height) / 2;
 
     this.boundaries = await this.buildInitialBoundaries();
     await this.advanceInitialBoundaries(this.boundaries);
-    // await this.addMoreBoundaries(maxLines - this.boundaries.length);
+    // await this.addMoreBoundaries(this.maxLines - this.boundaries.length);
 
     this.foundLines.resolve();
     await this.forever();

@@ -2,7 +2,7 @@ import {BasicEntity} from '../../../presets/basic-entity.js';
 import {random} from '../../../utils/random.js';
 
 export class Picture extends BasicEntity {
-  async body() {
+  init() {
     this.width = 100;
     this.height = 100;
     this.x = (this.game.width - this.width) / 2;
@@ -12,7 +12,9 @@ export class Picture extends BasicEntity {
     this.context = this.canvas.getContext('2d');
     this.drawImage();
     this.imageData = this.context.getImageData(0, 0, this.width, this.height);
+  }
 
+  async body() {
     await this.forever();
   }
 

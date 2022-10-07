@@ -34,7 +34,7 @@ export class Job {
   }
 
   create(EntityType, args) {
-    return this.scene.create(EntityType, this, args);
+    return this.scene.create(EntityType, args, this);
   }
 
   async tick() {
