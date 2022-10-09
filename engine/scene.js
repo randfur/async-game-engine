@@ -39,7 +39,12 @@ export class Scene extends Job {
 
     this.initPresetParts();
 
-    this.#startJob(this, () => this.run(), null);
+    this.#startJob(
+      /*job=*/this,
+      /*jobInitialised=*/null,
+      /*runJob=*/() => this.run(),
+      /*stopJob=*/() => this.stop(),
+    );
 
     (async () => {
       while (!this.stopped.resolved) {
@@ -79,7 +84,7 @@ export class Scene extends Job {
   static #emptyArgs = Object.freeze({});
   create(EntityType, args=Scene.#emptyArgs, parentJob=null) {
     if (this.stopped.resolved) {
-      return;
+     return;
     }
     const entity = new EntityType(this, parentJob, args);
     this.#startJob(

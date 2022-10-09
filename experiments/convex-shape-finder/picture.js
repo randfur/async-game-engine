@@ -1,17 +1,25 @@
 import {BasicEntity} from '../../../presets/basic-entity.js';
+import {Sprite} from '../../../utils/sprite.js';
 import {random} from '../../../utils/random.js';
 
 export class Picture extends BasicEntity {
   init() {
     this.width = 100;
     this.height = 100;
-    this.x = (this.game.width - this.width) / 2;
-    this.y = (this.game.height - this.height) / 2;
 
     this.canvas = new OffscreenCanvas(this.width, this.height);
     this.context = this.canvas.getContext('2d');
     this.drawImage();
     this.imageData = this.context.getImageData(0, 0, this.width, this.height);
+
+    this.sprite = new Sprite(this.canvas);
+    this.sprite.transform.origin.set(
+      Math.floor(this.canvas.width / 2),
+      Math.floor(this.canvas.height / 2));
+
+    this.transform.translate.set(
+      Math.floor(this.game.width / 2),
+      Math.floor(this.game.height / 2));
   }
 
   async body() {
@@ -31,10 +39,6 @@ export class Picture extends BasicEntity {
     context.lineWidth = 2;
     context.strokeStyle = '#04a';
     context.stroke();
-  }
-
-  onDraw(context, width, height) {
-    context.drawImage(this.canvas, this.x, this.y);
   }
 }
 

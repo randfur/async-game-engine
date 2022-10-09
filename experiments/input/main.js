@@ -69,7 +69,7 @@ class MouseControl extends BasicEntity {
   async body() {
     while (true) {
       await this.tick();
-      this.transform.translate.copy(this.game.input.mouse.position);
+      this.transform.translate.assign(this.game.input.mouse.position);
     }
   }
 

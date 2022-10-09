@@ -1,9 +1,8 @@
-import {loadImage} from '../utils/image.js';
 import {Transform} from '../utils/transform.js';
 
 export class Sprite {
-  constructor(src) {
-    this.image = loadImage(src);
+  constructor(image) {
+    this.image = image;
     this.transform = new Transform();
   }
 }

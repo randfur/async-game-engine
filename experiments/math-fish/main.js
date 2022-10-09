@@ -1,3 +1,4 @@
+import {loadImage} from '../utils/image.js';
 import {BasicEntity} from '../../presets/basic-entity.js';
 import {BasicScene} from '../../presets/basic-scene.js';
 import {deviate, random, randomRange} from '../../utils/random.js';
@@ -47,8 +48,8 @@ class Fish extends BasicEntity {
     );
 
     this.sprites = {
-      normal: new Sprite('./fish-normal.png'),
-      bite: new Sprite('./fish-bite.png'),
+      normal: new Sprite(loadImage('./fish-normal.png')),
+      bite: new Sprite(loadImage('./fish-bite.png')),
     };
     // TODO: Make sprites its own format that stores the origin and other stuff.
     for (const sprite of Object.values(this.sprites)) {
@@ -92,7 +93,7 @@ class Fish extends BasicEntity {
 
 class Seaweed extends BasicEntity {
   init() {
-    this.sprite = new Sprite('./seaweed.png');
+    this.sprite = new Sprite(loadImage('./seaweed.png'));
     this.sprite.transform.origin.set(16, 64);
 
     this.transform.translate.x = Math.floor(random(this.game.width));
@@ -121,7 +122,7 @@ class Seaweed extends BasicEntity {
 
 class Bubble extends BasicEntity {
   init() {
-    this.sprite = new Sprite('./bubble.png');
+    this.sprite = new Sprite(loadImage('./bubble.png'));
     this.transform.translate.x = random(this.game.width);
     this.transform.translate.y = random(this.game.height);
 

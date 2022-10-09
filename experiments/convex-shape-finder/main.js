@@ -7,11 +7,11 @@ function main() {
   new Game({
     drawing: {
       container: document.body,
-      viewScale: 6,
+      viewScale: 4,
     },
     initialScene: class extends BasicScene {
       async run() {
-        while (true) {
+        while (false) {
           await this.do(async job => {
             const picture = job.create(Picture);
             const convexBoundaryFinder = job.create(ConvexBoundaryFinder, {
