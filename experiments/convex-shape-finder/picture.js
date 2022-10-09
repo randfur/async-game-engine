@@ -1,6 +1,6 @@
-import {BasicEntity} from '../../../presets/basic-entity.js';
-import {Sprite} from '../../../utils/sprite.js';
-import {random} from '../../../utils/random.js';
+import {BasicEntity} from '../../presets/basic-entity.js';
+import {Sprite} from '../../utils/sprite.js';
+import {random} from '../../utils/random.js';
 
 export class Picture extends BasicEntity {
   init() {
