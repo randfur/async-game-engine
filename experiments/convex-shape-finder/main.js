@@ -11,7 +11,7 @@ function main() {
     },
     initialScene: class extends BasicScene {
       async run() {
-        while (false) {
+        while (true) {
           await this.do(async job => {
             const picture = job.create(Picture);
             const convexBoundaryFinder = job.create(ConvexBoundaryFinder, {

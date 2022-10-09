@@ -14,10 +14,10 @@ export class Transform {
     let transform = this;
 
     while (transform) {
-      // Offset
-      // [1  0 tx]   [a c e]
-      // [0  1 ty] * [b d f]
-      // [0  0  1]   [0 0 1]
+      // Origin
+      // [1  0 -ox]   [a c e]
+      // [0  1 -oy] * [b d f]
+      // [0  0   1]   [0 0 1]
       matrix.e -= transform.origin.x;
       matrix.f -= transform.origin.y;
 
@@ -57,6 +57,46 @@ export class Transform {
       transform = transform.parent;
     }
   }
+
+  applyToVector(vector) {
+    let transform = this;
+
+    while (transform) {
+      // Origin
+      // [1  0 -ox]   [x]
+      // [0  1 -oy] * [y]
+      // [0  0   1]   [1]
+      vector.x -= transform.origin.x;
+      vector.y -= transform.origin.y;
+
+      // Scale
+      // [sx  0  0]   [x]
+      // [ 0 sy  0] * [y]
+      // [ 0  0  1]   [1]
+      vector.x *= transform.scale.x;
+      vector.y *= transform.scale.y;
+
+      // Rotate
+      // [cos -sin  0]   [x]
+      // [sin  cos  0] * [y]
+      // [  0    0  1]   [1]
+      const [cos, sin] = [transform.rotate.x, transform.rotate.y];
+      [vector.x, vector.y] = [
+        /*x =*/ cos * vector.x - sin * vector.y,
+        /*y =*/ sin * vector.x + cos * vector.y,
+      ];
+
+      // Translate
+      // [1  0 tx]   [x]
+      // [0  1 ty] * [y]
+      // [0  0  1]   [1]
+      vector.x += transform.translate.x;
+      vector.y += transform.translate.y;
+
+      transform = transform.parent;
+    }
+  }
+
 
   applyToContext(context) {
     const matrix = Mat3.pool.acquire();

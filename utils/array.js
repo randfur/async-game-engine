@@ -17,3 +17,9 @@ export function removeItems(array, predicate) {
   }
   array.length = length;
 }
+
+export function* enumerate(array) {
+  for (let i = 0; i < array.length; ++i) {
+    yield [i, array[i]];
+  }
+}
