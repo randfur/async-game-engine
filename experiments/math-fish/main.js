@@ -1,4 +1,3 @@
-import {loadImage} from '../utils/image.js';
 import {BasicEntity} from '../../presets/basic-entity.js';
 import {BasicScene} from '../../presets/basic-scene.js';
 import {deviate, random, randomRange} from '../../utils/random.js';
