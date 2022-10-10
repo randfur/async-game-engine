@@ -36,11 +36,10 @@ export class BasicEntity extends Entity {
 
     const image = this.sprite.image;
     const points = BasicEntity.#updateBoundingBoxPoints;
-    const [a, b, c, d] = points;
-    a.set(0, 0);
-    b.set(image.width, 0);
-    c.set(image.width, image.height);
-    d.set(0, image.height);
+    points[0].set(0, 0);
+    points[1].set(image.width, 0);
+    points[2].set(image.width, image.height);
+    points[3].set(0, image.height);
 
     const matrix = BasicEntity.#updateBoundingBoxMatrix;
     matrix.setIdentity();

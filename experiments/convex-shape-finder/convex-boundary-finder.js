@@ -20,10 +20,47 @@ export class ConvexBoundaryFinder extends BasicEntity {
 
   async findLines() {
     const heightMap = await this.buildHeightMap();
+
     heightMap.sort((a, b) => b.height - a.height);
     this.inProgressSortedHeightMap = heightMap;
-    await this.sleep(2);
-    // Grow lines from peak.
+
+    const points = [];
+    this.inProgressPoints = points;
+    for (const item of heightMap) {
+      await this.tick();
+
+      if (points.length === 0) {
+        points.push(item);
+        continue;
+      }
+
+      if (item.x < points[0].x) {
+        while (true) {
+          if (points.length === 1) {
+            break;
+          }
+          const oldDeltaX = points[1].x - points[0].x;
+          const oldDeltaY = points[1].y - points[0].y;
+          const newDeltaX = points[0].x - item.x;
+          const newDeltaY = points[0].y - item.y;
+          // (dy1 / dx1 <= dy2 / dx2) * (dx1 * dx2)
+          // dy1 * dx2 <= dy2 * dx1
+          const oldSlope = oldDeltaY * newDeltaX;
+          const newSlope = newDeltaY * oldDeltaX;
+          if (newSlope <= oldSlope)
+
+        const newDeltaX = first.x - item.x;
+        const newDeltaY = first.height - item.height;
+
+        points.splice(0, 0, item);
+        continue;
+      }
+
+      if (item.x > points[points.length - 1].x) {
+        points.push(item);
+        continue;
+      }
+    }
   }
 
   async buildHeightMap() {
@@ -34,10 +71,10 @@ export class ConvexBoundaryFinder extends BasicEntity {
     for (let x = 0; x <= imageData.width; ++x) {
       await this.tick();
       const thisHeight = x < imageData.width ? this.getHeight(x) : lastHeight;
-      heightMap.push({
-        x,
-        height: Math.max(lastHeight, thisHeight),
-      });
+      const height = Math.max(lastHeight, thisHeight);
+      if (height > 0) {
+        heightMap.push({x, height});
+      }
       lastHeight = thisHeight;
     }
     this.inProgressHeightMap = null;
@@ -81,6 +118,21 @@ export class ConvexBoundaryFinder extends BasicEntity {
         context.fillStyle = `rgba(255, 0, 0, ${alpha})`;
         context.fillRect(bottom.x + x, bottom.y - height, 1, height);
       }
+    }
+
+    if (this.inProgressPoints) {
+      context.strokeStyle = 'red';
+      context.beginPath();
+      let first = true;
+      for (const {x, height} of this.inProgressPoints) {
+        if (first) {
+          context.moveTo(bottom.x + x, bottom.y - height, 1, height);
+          first = false;
+        } else {
+          context.lineTo(bottom.x + x, bottom.y - height, 1, height);
+        }
+      }
+      context.stroke();
     }
 
     Vec2.pool.release(1);
