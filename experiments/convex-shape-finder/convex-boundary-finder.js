@@ -9,7 +9,6 @@ export class ConvexBoundaryFinder extends BasicEntity {
   init({maxLines, picture}) {
     this.picture = picture;
     this.maxLines = maxLines;
-    this.inProgressHeightMap = null;
 
     this.foundLines = this.findLines();
   }
@@ -24,6 +23,10 @@ export class ConvexBoundaryFinder extends BasicEntity {
     heightMap.sort((a, b) => b.height - a.height);
     this.inProgressSortedHeightMap = heightMap;
 
+    const points = await this.extractConvexPoints(heightMap);
+  }
+
+  async extractConvexPoints(heightMap) {
     const points = [];
     this.inProgressPoints = points;
     for (const item of heightMap) {
@@ -41,11 +44,9 @@ export class ConvexBoundaryFinder extends BasicEntity {
           }
 
           const oldDeltaX = points[1].x - points[0].x;
-          const oldDeltaY = points[1].y - points[0].y;
+          const oldDeltaY = points[1].height - points[0].height;
           const newDeltaX = points[0].x - item.x;
-          const newDeltaY = points[0].y - item.y;
-          // (dy1 / dx1 <= dy2 / dx2) * (dx1 * dx2)
-          // dy1 * dx2 <= dy2 * dx1
+          const newDeltaY = points[0].height - item.height;
           const oldSlope = oldDeltaY * newDeltaX;
           const newSlope = newDeltaY * oldDeltaX;
           if (newSlope <= oldSlope) {
@@ -64,19 +65,42 @@ export class ConvexBoundaryFinder extends BasicEntity {
       }
 
       if (item.x > points[points.length - 1].x) {
+        while (true) {
+          if (points.length === 1) {
+            break;
+          }
+
+          const last = points[points.length - 1];
+          const secondLast = points[points.length - 2];
+          const oldDeltaX = last.x - secondLast.x;
+          const oldDeltaY = last.height - secondLast.height;
+          const newDeltaX = item.x - last.x;
+          const newDeltaY = item.height - last.height;
+          const oldSlope = oldDeltaY * newDeltaX;
+          const newSlope = newDeltaY * oldDeltaX;
+          if (newSlope >= oldSlope) {
+            // \
+            //  --
+            points.splice(points.length - 1, 1);
+          } else {
+            // __
+            //   \
+            break;
+          }
+        }
+
         points.push(item);
         continue;
       }
     }
+    return points;
   }
 
   async buildHeightMap() {
     const heightMap = [];
-    this.inProgressHeightMap = heightMap;
     const imageData = this.picture.imageData;
     let lastHeight = 0;
     for (let x = 0; x <= imageData.width; ++x) {
-      await this.tick();
       const thisHeight = x < imageData.width ? this.getHeight(x) : lastHeight;
       const height = Math.max(lastHeight, thisHeight);
       if (height > 0) {
@@ -84,7 +108,6 @@ export class ConvexBoundaryFinder extends BasicEntity {
       }
       lastHeight = thisHeight;
     }
-    this.inProgressHeightMap = null;
     return heightMap;
   }
 
@@ -112,13 +135,6 @@ export class ConvexBoundaryFinder extends BasicEntity {
     this.picture.sprite.transform.applyToVector(bottom);
     this.picture.transform.applyToVector(bottom);
 
-    if (this.inProgressHeightMap) {
-      context.fillStyle = '#f00a';
-      for (const {x, height} of this.inProgressHeightMap) {
-        context.fillRect(bottom.x + x, bottom.y - height, 1, height);
-      }
-    }
-
     if (this.inProgressSortedHeightMap) {
       for (const [i, {x, height}] of enumerate(this.inProgressSortedHeightMap)) {
         const alpha = (1 - (i / (this.inProgressSortedHeightMap.length - 1))) / 2;
@@ -133,13 +149,17 @@ export class ConvexBoundaryFinder extends BasicEntity {
       let first = true;
       for (const {x, height} of this.inProgressPoints) {
         if (first) {
-          context.moveTo(bottom.x + x, bottom.y - height, 1, height);
+          context.moveTo(bottom.x + x, bottom.y - height);
           first = false;
         } else {
-          context.lineTo(bottom.x + x, bottom.y - height, 1, height);
+          context.lineTo(bottom.x + x, bottom.y - height);
         }
       }
       context.stroke();
+      context.fillStyle = 'white';
+      for (const {x, height} of this.inProgressPoints) {
+        context.fillRect(bottom.x + x, bottom.y - height, 1, 1);
+      }
     }
 
     Vec2.pool.release(1);
