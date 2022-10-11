@@ -29,10 +29,14 @@ export class Picture extends BasicEntity {
   drawImage() {
     const context = this.context;
     context.beginPath();
-    context.moveTo(random(this.width), random(this.height));
-    context.lineTo(random(this.width), random(this.height));
-    context.lineTo(random(this.width), random(this.height));
-    context.lineTo(random(this.width), random(this.height));
+    context.moveTo(20, 80);
+    context.lineTo(80, 20);
+    context.lineTo(60, 30);
+    context.lineTo(80, 80);
+    // context.moveTo(random(this.width), random(this.height));
+    // context.lineTo(random(this.width), random(this.height));
+    // context.lineTo(random(this.width), random(this.height));
+    // context.lineTo(random(this.width), random(this.height));
     context.closePath();
     context.fillStyle = '#3af';
     context.fill();

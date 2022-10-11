@@ -39,6 +39,7 @@ export class ConvexBoundaryFinder extends BasicEntity {
           if (points.length === 1) {
             break;
           }
+
           const oldDeltaX = points[1].x - points[0].x;
           const oldDeltaY = points[1].y - points[0].y;
           const newDeltaX = points[0].x - item.x;
@@ -47,10 +48,16 @@ export class ConvexBoundaryFinder extends BasicEntity {
           // dy1 * dx2 <= dy2 * dx1
           const oldSlope = oldDeltaY * newDeltaX;
           const newSlope = newDeltaY * oldDeltaX;
-          if (newSlope <= oldSlope)
-
-        const newDeltaX = first.x - item.x;
-        const newDeltaY = first.height - item.height;
+          if (newSlope <= oldSlope) {
+            //   /
+            // --
+            points.splice(0, 1);
+          } else {
+            //  __
+            // /
+            break;
+          }
+        }
 
         points.splice(0, 0, item);
         continue;
