@@ -1,18 +1,21 @@
 export class Pool {
-  constructor(createNew) {
-    this.createNew = createNew;
+  constructor({create, initialise}) {
+    this.create = create;
+    this.initialise = initialise;
     this.buffer = [];
     this.inUse = 0;
   }
   
-  acquire() {
+  acquire(param) {
     if (this.inUse == this.buffer.length) {
-      this.buffer.push(this.createNew());
+      this.buffer.push(this.create());
     }
-    return this.buffer[this.inUse++];
+    const result = this.buffer[this.inUse++];
+    this.initialise(result, param);
+    return result;
   }
   
-  release(n) {
+  release(n=1) {
     this.inUse -= n;
   }
 

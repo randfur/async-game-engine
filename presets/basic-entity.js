@@ -45,9 +45,7 @@ export class BasicEntity extends Entity {
     matrix.setIdentity();
     this.sprite.transform.applyToMatrix(matrix);
     this.transform.applyToMatrix(matrix);
-    matrix.applyToPoints(points);
-
-    boundingBox.setFromPoints(points);
+    boundingBox.setFromMatrixTransformedPoints(matrix, points);
     return true;
   }
 

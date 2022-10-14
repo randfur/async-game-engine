@@ -97,12 +97,10 @@ export class Transform {
     }
   }
 
-
   applyToContext(context) {
     const matrix = Mat3.pool.acquire();
-    matrix.setIdentity();
     this.applyToMatrix(matrix);
     matrix.applyToContext(context);
-    Mat3.pool.release(1);
+    Mat3.pool.release();
   }
 }

@@ -1,7 +1,16 @@
 import {Pool} from './pool.js';
 
 export class Vec2 {
-  static pool = new Pool(() => new Vec2());
+  static pool = new Pool({
+    create() { return new Vec2(); },
+    initialise(vector, other) {
+      if (other) {
+        vector.assign(other);
+      } else {
+        vector.set(0, 0);
+      }
+    },
+  });
 
   static squareDistance(va, vb) {
     return (va.x - vb.x) ** 2 + (va.y - vb.y) ** 2;
@@ -51,12 +60,10 @@ export class Vec2 {
   }
 
   assignBoundariesIntersection(boundaryA, boundaryB) {
-    const dirA = Vec2.pool.acquire();
-    dirA.assign(boundaryA.normal);
+    const dirA = Vec2.pool.acquire(boundaryA.normal);
     dirA.rotateCW();
 
-    const dirB = Vec2.pool.acquire();
-    dirB.assign(boundaryB.normal);
+    const dirB = Vec2.pool.acquire(boundaryB.normal);
     dirB.rotateCW();
 
     this.assignIntersection(boundaryA.position, dirA, boundaryB.position, dirB);
@@ -115,16 +122,26 @@ export class Vec2 {
 
   // Rotates 90 degrees clockwise in a right handed co-ordinate system.
   rotateCW() {
-    const x = this.x;
-    this.x = -this.y;
-    this.y = x;
+    [this.x, this.y] = [
+      /*x =*/ -this.y,
+      /*y =*/ this.x,
+    ];
   }
 
   // Rotates 90 degrees counter clockwise in a right handed co-ordinate system.
   rotateCCW() {
-    const x = this.x;
-    this.x = this.y;
-    this.y = -x;
+    [this.x, this.y] = [
+      /*x =*/ this.y,
+      /*y =*/ -this.x,
+    ];
+  }
+
+  // Rotates by the angle of a unit vector.
+  rotate(v) {
+    [this.x, this.y] = [
+      /*x =*/ this.x * v.x - this.y * v.y,
+      /*y =*/ this.x * v.y + this.y * v.x,
+    ];
   }
 
   normalise() {

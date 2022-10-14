@@ -1,6 +1,7 @@
 export class Drawing {
-  constructor(game, {container=null, viewScale=1, clearFrames=true}={}) {
+  constructor(game, {container=null, viewScale=4, clearFrames=true}={}) {
     this.game = game;
+    this.viewScale = viewScale;
     this.clearFrames = clearFrames;
 
     if (!container) {

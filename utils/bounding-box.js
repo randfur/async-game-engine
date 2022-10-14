@@ -1,46 +1,61 @@
+import {Vec2} from './vec2.js';
+
 export class BoundingBox {
   constructor() {
-    this.minX = 0;
-    this.minY = 0;
-    this.maxX = 0;
-    this.maxY = 0;
+    this.min = new Vec2();
+    this.max = new Vec2();
   }
 
-  setFromPoints(points) {
-    this.minX = this.maxX = points[0].x;
-    this.minY = this.maxY = points[0].y;
-    for (const point of points) {
-      this.minX = Math.min(this.minX, point.x);
-      this.minY = Math.min(this.minY, point.y);
-      this.maxX = Math.max(this.maxX, point.x);
-      this.maxY = Math.max(this.maxY, point.y);
+  setAsPoint(point) {
+    this.min.assign(point);
+    this.max.assign(point);
+  }
+
+  static #setFromMatrixTransformedPointsVector = new Vec2();
+  setFromMatrixTransformedPoints(matrix, points) {
+    // TODO: point/vector naming inconsistent.
+    const vector = BoundingBox.#setFromMatrixTransformedPointsVector;
+    vector.assign(points[0]);
+    matrix.applyToVector(vector);
+    this.setAsPoint(vector);
+    for (let i = 1; i < points.length; ++i) {
+      vector.assign(points[i]);
+      matrix.applyToVector(vector);
+      this.includePoint(vector);
     }
   }
 
+  includePoint(point) {
+    this.min.x = Math.min(this.min.x, point.x);
+    this.min.y = Math.min(this.min.y, point.y);
+    this.max.x = Math.max(this.max.x, point.x);
+    this.max.y = Math.max(this.max.y, point.y);
+  }
+
   setFromUnion(boundingBoxA, boundingBoxB) {
-    this.minX = Math.min(boundingBoxA.minX, boundingBoxB.minX);
-    this.minY = Math.min(boundingBoxA.minY, boundingBoxB.minY);
-    this.maxX = Math.max(boundingBoxA.maxX, boundingBoxB.maxX);
-    this.maxY = Math.max(boundingBoxA.maxY, boundingBoxB.maxY);
+    this.min.x = Math.min(boundingBoxA.min.x, boundingBoxB.min.x);
+    this.min.y = Math.min(boundingBoxA.min.y, boundingBoxB.min.y);
+    this.max.x = Math.max(boundingBoxA.max.x, boundingBoxB.max.x);
+    this.max.y = Math.max(boundingBoxA.max.y, boundingBoxB.max.y);
   }
 
   area() {
-    return (this.maxX - this.minX) * (this.maxY - this.minY);
+    return (this.max.x - this.min.x) * (this.max.y - this.min.y);
   }
 
   isCollidingWith(other) {
     return !(
-      this.minX > other.maxX
+      this.min.x > other.max.x
       ||
-      other.minX > this.maxX
+      other.min.x > this.max.x
       ||
-      this.minY > other.maxY
+      this.min.y > other.max.y
       ||
-      other.minY > this.maxY
+      other.min.y > this.max.y
     );
   }
 
   draw(context) {
-    context.strokeRect(this.minX, this.minY, this.maxX - this.minX, this.maxY - this.minY);
+    context.strokeRect(this.min.x, this.min.y, this.max.x - this.min.x, this.max.y - this.min.y);
   }
 }

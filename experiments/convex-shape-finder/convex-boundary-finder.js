@@ -194,6 +194,6 @@ export class ConvexBoundaryFinder extends BasicEntity {
       }
     }
 
-    Vec2.pool.release(1);
+    Vec2.pool.release();
   }
 }

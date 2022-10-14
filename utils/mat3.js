@@ -6,7 +6,10 @@ import {Pool} from './pool.js';
 // [0 0 1]
 // This matches the parameters of HTMLCanvasContext2D.setTransform().
 export class Mat3 {
-  static pool = new Pool(() => new Mat3());
+  static pool = new Pool({
+    create() { return new Mat3(); },
+    initialise(matrix) { matrix.setIdentity(); },
+  });
 
   constructor() {
     this.setIdentity()

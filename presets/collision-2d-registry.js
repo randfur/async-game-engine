@@ -10,12 +10,17 @@ export class Collision2dRegistry extends Entity {
     this.nextId = 0;
     this.collisionTree = null;
     this.maxBranching = 10;
-    this.collisionNodePool = new Pool(() => ({
-      boundingBox: new BoundingBox(),
-      maxId: null,
-      collider: null,
-      children: [],
-    }));
+    this.collisionNodePool = new Pool({
+      create() {
+        return {
+          boundingBox: new BoundingBox(),
+          maxId: null,
+          collider: null,
+          children: [],
+        };
+      },
+      initialise() {},
+    });
   }
 
   async body() {

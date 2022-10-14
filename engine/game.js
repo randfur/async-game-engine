@@ -33,7 +33,7 @@ export class Game {
     this.stopped = CreateResolveablePromise();
     this.time = 0;
     this.drawing = new Drawing(this, args.drawing);
-    this.input = new Input(this, args.drawing?.viewScale ?? 1);
+    this.input = new Input(this, this.drawing.viewScale);
     // TODO: input?
     // TODO: audio?
     // TODO: resources?
