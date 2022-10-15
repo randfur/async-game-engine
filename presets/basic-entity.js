@@ -22,7 +22,7 @@ export class BasicEntity extends Entity {
     this.collider = this.scene.collision2dRegistry.register(
       this,
       collisionNode => this.updateBoundingBox(collisionNode),
-      otherCollider => this.onCollision(otherCollider),
+      (other, otherCollider) => this.onCollision(other, otherCollider),
     );
     this.collider.transform = this.transform;
   }

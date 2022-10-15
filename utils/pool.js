@@ -11,6 +11,7 @@ export class Pool {
       this.buffer.push(this.create());
     }
     const result = this.buffer[this.inUse++];
+    // TODO: Is this worth it? Optional param is a bit weird. Maybe garbage is simpler.
     this.initialise(result, param);
     return result;
   }

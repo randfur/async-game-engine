@@ -23,9 +23,21 @@ function main() {
   });
 }
 
+// Points running in a positive radians direction create a shape.
+// Points running in a negative radians direction create a cavity.
+class ConvexShape {
+  constructor(points) {
+    this.points = points;
+    this.normals = [];
+    for (let i = 0; i < this.points.length; ++i) {
+    }
+  }
+}
+
 class FloatingConvexShape extends BasicEntity {
   init() {
     this.enableCollisions();
+    this.collider.filterTypes = [FloatingConvexShape];
 
     this.transform.translate.set(
       random(this.game.width),
@@ -48,6 +60,7 @@ class FloatingConvexShape extends BasicEntity {
     }
   }
 
+  // TODO: Update collision core logic to work with ConvexShapes and matrix transforms.
   updateBoundingBox(boundingBox) {
     if (this.points.length === 0) {
       return false;
@@ -66,12 +79,18 @@ class FloatingConvexShape extends BasicEntity {
       this.transform.translate.add(this.velocity);
       this.transform.rotate.rotate(this.angularVelocity);
       this.transform.rotate.normalise();
+      if (this.pants > 0) {
+        this.pants -= 1;
+      }
     }
+  }
+
+  onCollision(other, otherCollider) {
   }
 
   onDraw(context, width, height) {
     this.transform.applyToContext(context);
-    // TODO: Helper function?
+    // TODO: Could be helper function?
     context.beginPath();
     for (let i = 0; i < this.points.length; ++i) {
       const point = this.points[i];
@@ -82,12 +101,12 @@ class FloatingConvexShape extends BasicEntity {
       }
     }
     context.closePath();
-    if (!this.collider.colliding) {
+    if (this.pants > 0) {
+      context.fillStyle = `rgba(255, 255, 255, ${this.pants}%)`;
+      context.fill();
+    } else {
       context.strokeStyle = 'orange';
       context.stroke();
-    } else {
-      context.fillStyle = 'white';
-      context.fill();
     }
   }
 }
