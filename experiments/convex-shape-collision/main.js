@@ -11,10 +11,15 @@ function main() {
   new Game({
     initialScene: class extends BasicScene {
       async run() {
+        // this.create(FloatingConvexShape);
+        // this.create(FloatingConvexShape);
+        // this.create(FloatingConvexShape);
+        // this.create(FloatingConvexShape);
+        // await this.forever();
         while (true) {
           this.do(async job => {
             job.create(FloatingConvexShape);
-            await job.sleep(10);
+            await job.sleep(30);
           });
           await this.sleep(0.5);
         }
@@ -26,11 +31,42 @@ function main() {
 // Points running in a positive radians direction create a shape.
 // Points running in a negative radians direction create a cavity.
 class ConvexShape {
-  constructor(points) {
-    this.points = points;
-    this.normals = [];
+  constructor(originalPoints) {
+    this.originalPoints = originalPoints;
+    this.points = this.originalPoints.map(point => point.clone());
+  }
+
+  applyMatrix(matrix) {
     for (let i = 0; i < this.points.length; ++i) {
+      const point = this.points[i];
+      point.assign(this.originalPoints[i]);
+      matrix.applyToVector(point);
     }
+  }
+
+  static #isCollidingWithNormal = new Vec2();
+  static #isCollidingWithDelta = new Vec2();
+  isCollidingWith(otherConvexShape) {
+    const normal = ConvexShape.#isCollidingWithNormal;
+    const delta = ConvexShape.#isCollidingWithDelta;
+    for (let i = 0; i < this.points.length; ++i) {
+      const point = this.points[i];
+      const nextPoint = this.points[(i + 1) % this.points.length];
+      normal.assignSub(nextPoint, point);
+      normal.rotateCCW();
+      let allOutside = true;
+      for (const otherPoint of otherConvexShape.points) {
+        delta.assignSub(otherPoint, point);
+        if (delta.dot(normal) < 0) {
+          allOutside = false;
+          break;
+        }
+      }
+      if (allOutside) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -58,17 +94,17 @@ class FloatingConvexShape extends BasicEntity {
     for (const point of this.points) {
       this.transform.origin.addScaled(point, 1 / pointCount);
     }
+    this.convexShape = new ConvexShape(this.points);
   }
 
-  // TODO: Update collision core logic to work with ConvexShapes and matrix transforms.
   updateBoundingBox(boundingBox) {
     if (this.points.length === 0) {
       return false;
     }
-
     const matrix = Mat3.pool.acquire();
     this.transform.applyToMatrix(matrix);
-    boundingBox.setFromMatrixTransformedPoints(matrix, this.points);
+    this.convexShape.applyMatrix(matrix);
+    boundingBox.setFromPoints(this.convexShape.points);
     Mat3.pool.release();
     return true;
   }
@@ -79,13 +115,20 @@ class FloatingConvexShape extends BasicEntity {
       this.transform.translate.add(this.velocity);
       this.transform.rotate.rotate(this.angularVelocity);
       this.transform.rotate.normalise();
-      if (this.pants > 0) {
-        this.pants -= 1;
+      if (this.glow > 0) {
+        this.glow -= 1;
       }
     }
   }
 
   onCollision(other, otherCollider) {
+    if (this.collider.id > otherCollider.id) {
+      return;
+    }
+    if (this.convexShape.isCollidingWith(other.convexShape)) {
+      this.glow = 100;
+      other.glow = 100;
+    }
   }
 
   onDraw(context, width, height) {
@@ -101,13 +144,12 @@ class FloatingConvexShape extends BasicEntity {
       }
     }
     context.closePath();
-    if (this.pants > 0) {
-      context.fillStyle = `rgba(255, 255, 255, ${this.pants}%)`;
+    if (this.glow > 0) {
+      context.fillStyle = `rgba(255, 200, 0, ${this.glow}%)`;
       context.fill();
-    } else {
-      context.strokeStyle = 'orange';
-      context.stroke();
     }
+    context.strokeStyle = 'orange';
+    context.stroke();
   }
 }
 

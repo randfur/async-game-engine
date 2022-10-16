@@ -11,17 +11,11 @@ export class BoundingBox {
     this.max.assign(point);
   }
 
-  static #setFromMatrixTransformedPointsVector = new Vec2();
-  setFromMatrixTransformedPoints(matrix, points) {
+  setFromPoints(points) {
     // TODO: point/vector naming inconsistent.
-    const vector = BoundingBox.#setFromMatrixTransformedPointsVector;
-    vector.assign(points[0]);
-    matrix.applyToVector(vector);
-    this.setAsPoint(vector);
+    this.setAsPoint(points[0]);
     for (let i = 1; i < points.length; ++i) {
-      vector.assign(points[i]);
-      matrix.applyToVector(vector);
-      this.includePoint(vector);
+      this.includePoint(points[i]);
     }
   }
 
