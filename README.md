@@ -2,6 +2,8 @@
 
 This is a minimal game engine built around JavaScript's async await syntax.  
 
+[github.io page](https://randfur.github.io/async-game-engine/)
+
 ## Example
 
 ```js
