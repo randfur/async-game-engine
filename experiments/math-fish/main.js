@@ -66,7 +66,7 @@ class Fish extends BasicEntity {
     this.angle = 0;
   }
 
-  async body() {
+  async run() {
     while (true) {
       await this.tick();
 
@@ -103,7 +103,7 @@ class Seaweed extends BasicEntity {
     this.drawHandle.zIndex = 1 + scale * 0.8;
   }
 
-  async body() {
+  async run() {
     this.do(async job => {
       while (true) {
         await job.sleep(random(10));
@@ -137,7 +137,7 @@ class Bubble extends BasicEntity {
     this.collider.height = 16;
   }
 
-  async body() {
+  async run() {
     while (true) {
       await this.tick();
       this.transform.translate.x += Math.sin(this.transform.translate.y * this.wobbleSpeed) * this.wobbleAmount;

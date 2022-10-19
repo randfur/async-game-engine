@@ -24,7 +24,7 @@ class ArrowControl extends BasicEntity {
     this.collider.height = 100;
   }
 
-  async body() {
+  async run() {
     this.transform.translate.set(this.game.width / 2, this.game.height / 2);
     while (true) {
       await this.tick();

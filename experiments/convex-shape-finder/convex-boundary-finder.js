@@ -13,7 +13,7 @@ export class ConvexBoundaryFinder extends BasicEntity {
     this.foundLines = this.findLines();
   }
 
-  async body() {
+  async run() {
     await this.forever();
   }
 

@@ -23,7 +23,7 @@ export class Collision2dRegistry extends Entity {
     });
   }
 
-  async body() {
+  async run() {
     while (true) {
       await this.tick();
 

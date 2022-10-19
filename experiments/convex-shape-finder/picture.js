@@ -22,7 +22,7 @@ export class Picture extends BasicEntity {
       Math.floor(this.game.height / 2));
   }
 
-  async body() {
+  async run() {
     await this.forever();
   }
 

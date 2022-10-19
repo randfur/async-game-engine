@@ -4,7 +4,7 @@ import {Job} from './job.js';
 interface Entity extends Job {
   initPresetParts(): void,
   init(args): void,
-  async body(args): void,
+  async run(): void,
 }
 */
 export class Entity extends Job {
@@ -18,7 +18,7 @@ export class Entity extends Job {
 
   async init(args) {}
 
-  async body(args) {
-    console.warn('async body() not implemented for:', this);
+  async run() {
+    console.warn('async run() not implemented for:', this);
   }
 }

@@ -90,9 +90,7 @@ export class Scene extends Job {
     this.#startJob(
       /*job=*/entity,
       /*jobInitialised=*/entity.initialised,
-      /*runJob=*/async () => {
-        await entity.body();
-      },
+      /*runJob=*/async () => await entity.run(),
       /*stopJob=*/() => entity.stop(),
     );
     return entity;

@@ -109,7 +109,7 @@ class FloatingConvexShape extends BasicEntity {
     return true;
   }
 
-  async body() {
+  async run() {
     while (true) {
       await this.tick();
       this.transform.translate.add(this.velocity);
