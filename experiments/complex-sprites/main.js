@@ -2,45 +2,45 @@ import {Game} from '../../engine/game.js';
 import {BasicScene} from '../../presets/basic-scene.js';
 
 /*
-struct SpriteInstance {
-  spritePack: SpritePack,
-  sprite: Sprite,
-  frameIndex: u32,
-  elapsedFrames: u32,
-  spriteStartTime: f64,
-  transform: Transform,
+interface SpriteInstance {
+  spritePack: SpritePack;
+  sprite: Sprite;
+  frameIndex: u32;
+  elapsedFrames: u32;
+  spriteStartTime: f64;
+  transform: Transform;
 }
 
-struct SpritePack {
-  sprites: Map<String, Sprite>,
-  graphics: Map<String, Graphic>,
+interface SpritePack {
+  sprites: Map<string, Sprite>;
+  graphics: Map<string, Graphic>;
 }
 
-struct Sprite {
-  name: String,
-  frames: Vec<Frame>,
-  framesPerSecond: u32,
-  switchTo: String,
+interface Sprite {
+  name: string;
+  frames: Frame[];
+  framesPerSecond: u32;
+  switchTo: string;
 }
 
-struct Frame {
-  graphicReference: String,
-  frameDelay: u32,
+interface Frame {
+  graphicReference: string;
+  frameDelay: u32;
 }
 
-struct Graphic {
-  name: String,
-  parts: Vec<Part>,
+interface Graphic {
+  name: string;
+  parts: Part[];
 }
 
 enum Part {
   Image {
-    bitmap: Bitmap,
-    transform: Transform,
-  },
+    bitmap: Bitmap;
+    transform: Transform;
+  };
   GraphicReference {
-    name: String,
-    transform: Transform,
+    name: string;
+    transform: Transform;
   },
 }
 */
