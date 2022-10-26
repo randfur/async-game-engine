@@ -1,6 +1,7 @@
 import {Game} from '../../engine/game.js';
 import {BasicScene} from '../../presets/basic-scene.js';
 import {BasicEntity} from '../../presets/basic-entity.js';
+import {BasicEntity} from '../../engine/entity.js';
 
 /*
 interface SpriteInstance {
@@ -12,24 +13,18 @@ interface SpriteInstance {
   transform: Transform;
 }
 
-type SpritePack = Map<string, Sprite>;
+type SpritePack = Record<string, Sprite>;
 
 interface Sprite {
-  name: string;
   frames: Frame[];
   framesPerSecond: u32;
   switchTo: string;
 }
 
 interface Frame {
-  graphic: Graphic;
+  parts: Part[];
   frameDelay: u32;
   convexCollisionPolygon: Vec2[];
-}
-
-interface Graphic {
-  name: string;
-  parts: Part[];
 }
 
 enum Part {
@@ -37,7 +32,7 @@ enum Part {
     src: string;
     transform: Transform;
   },
-  GraphicReference {
+  Reference {
     spriteName: string;
     spriteFrame: u32;
     transform: Transform;
@@ -50,19 +45,33 @@ interface Transform {
   scale: Vec2;
   rotate: Vec2;
   translate: Vec2;
-},
+}
 */
 
 async function main() {
   new Game({
     initialScene: class extends BasicScene {
       async run() {
+        this.spriteRegistry = this.create(SpriteRegistry);
         this.create(Dog);
       }
     },
   });
 }
 main();
+
+class SpriteRegistry extends Entity {
+  async run() {
+
+  }
+
+  async preloadPack(src) {
+    const response = await fetch(src);
+    const spritePack = await response.json();
+    for (const [spriteName, sprite] of Object.entries(spritePack)) {
+    }
+  }
+}
 
 class Dog extends BasicEntity {
   init() {

@@ -1,3 +1,10 @@
+- Architecture refactor ideas 2022-10-26:
+  - Pull out cancellable async interface from Scene and Job.
+  - Make Scene not inherit Job.
+  - Add onFrame() to Scene and remove nextGameTick.
+  - Add onFramePresets() for presets.
+  - Move collision registry into onFramePresets().
+
 - Make ideas
   - Flying through landscape of 3D squares.
   - Hanging vines in 3D.
