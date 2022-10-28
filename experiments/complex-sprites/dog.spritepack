@@ -1,0 +1,33 @@
+{
+  "stand" {
+    "frames": [{
+      "src": "dog-graphics/stand0.png",
+      "transform": {
+        "origin": {"x": 16, "y": 32}
+      },
+      "frameLength": 16,
+      "convexCollisionPolygon": []
+    }, {
+      "src": "dog-graphics/stand1.png",
+      "transform": {
+        "origin": {"x": 16, "y": 32}
+      },
+      "frameLength": 4,
+      "convexCollisionPolygon": []
+    }],
+    "framesPerSecond": 12,
+    "switchTo": null,
+  },
+  "bark": {
+    "frames": [{
+      "src": "dog-graphics/bark0.png",
+      "transform": {
+        "origin": {"x": 16, "y": 32}
+      },
+      "frameLength": 1,
+      "convexCollisionPolygon": []
+    }],
+    "framesPerSecond": 1,
+    "switchTo": "stand"
+  }
+}

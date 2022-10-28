@@ -1,7 +1,7 @@
 import {Game} from '../../engine/game.js';
 import {BasicScene} from '../../presets/basic-scene.js';
 import {BasicEntity} from '../../presets/basic-entity.js';
-import {BasicEntity} from '../../engine/entity.js';
+import {Entity} from '../../engine/entity.js';
 
 /*
 interface SpriteInstance {
@@ -17,26 +17,15 @@ type SpritePack = Record<string, Sprite>;
 
 interface Sprite {
   frames: Frame[];
-  framesPerSecond: u32;
+  framesPerSecond: f64;
   switchTo: string;
 }
 
 interface Frame {
-  parts: Part[];
+  src: string;
+  transform: Transform;
   frameDelay: u32;
   convexCollisionPolygon: Vec2[];
-}
-
-enum Part {
-  Image {
-    src: string;
-    transform: Transform;
-  },
-  Reference {
-    spriteName: string;
-    spriteFrame: u32;
-    transform: Transform;
-  },
 }
 
 interface Transform {
@@ -86,39 +75,18 @@ class Dog extends BasicEntity {
     // - draw(context)
     // - entityTransform
     // - cameraTransform
-    this.spritePack = {
-      default: {
-        name: 'stand',
-        frames: [
-          {
-            graphic: {
-            },
-            frameDelay: 20,
-            convexCollisionPolygon: [],
-          },
-          {
-            graphic: {
-            },
-            frameDelay: 1,
-            convexCollisionPolygon: [],
-          },
-        ],
-        framesPerSecond: 12,
-        switchTo: null,
-      },
-      bark: {
-        name: 'bark',
-        frames: [
-        ],
-        framesPerSecond: 12,
-        switchTo: 'default',
-      },
-    };
+    this.sprite.loadPack('dog.spritepack', 'stand');
   }
 
   async run() {
+    while (true) {
+      await this.tick();
+    }
   }
 
-  onDraw(context, width, height) {
+  onInput(eventName, event) {
+    if (eventName === 'keydown' && event.code === 'Space') {
+      this.sprite.switchTo('bark');
+    }
   }
 }
