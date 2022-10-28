@@ -13,9 +13,15 @@ export class BasicScene extends Scene {
 
     this.drawing2dRegistry = new Drawing2dRegistry(this.cameraTransform);
 
-    this.collision2dRegistry = this.create(Collision2dRegistry);
+    this.collision2dRegistry = new Collision2dRegistry(this.cameraTransform);
 
     this.debugMode = true;//false;
+  }
+
+  onFrame(gameTime) {
+    super.onFrame(gameTime);
+
+    this.collision2dRegistry.onFrame();
   }
 
   centreCamera() {
@@ -39,5 +45,7 @@ export class BasicScene extends Scene {
         job.onDebugDraw?.(context, width, height);
       }
     }
+
+    this.collision2dRegistry.onDebugDraw(context, width, height);
   }
 }

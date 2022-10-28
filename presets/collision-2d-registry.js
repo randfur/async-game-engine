@@ -4,8 +4,9 @@ import {removeItem} from '../utils/array.js';
 import {Vec2} from '../utils/vec2.js';
 import {BoundingBox} from '../utils/bounding-box.js';
 
-export class Collision2dRegistry extends Entity {
-  init() {
+export class Collision2dRegistry {
+  constructor(cameraTransform) {
+    this.cameraTransform = cameraTransform;
     this.colliders = [];
     this.nextId = 0;
     this.collisionTree = null;
@@ -23,15 +24,11 @@ export class Collision2dRegistry extends Entity {
     });
   }
 
-  async run() {
-    while (true) {
-      await this.tick();
+  onFrame() {
+    this.buildCollisionTree();
 
-      this.buildCollisionTree();
-
-      for (const collider of this.colliders) {
-        this.collide(collider, this.collisionTree);
-      }
+    for (const collider of this.colliders) {
+      this.collide(collider, this.collisionTree);
     }
   }
 
@@ -138,7 +135,7 @@ export class Collision2dRegistry extends Entity {
   }
 
   onDebugDraw(context, width, height) {
-    this.scene.cameraTransform.applyToContext(context);
+    this.cameraTransform.applyToContext(context);
     this.debugDrawNode(context, this.collisionTree);
   }
 

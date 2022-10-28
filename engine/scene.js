@@ -33,7 +33,6 @@ export class Scene extends Job {
     this.pausedAtGameTime = null;
     this.#gameTimeAhead = 0;
     this.nextTick = CreateResolveablePromise();
-    this.nextGameTick = CreateResolveablePromise();
     this.#initialisingJobs = [];
     this.jobs = [];
 
@@ -45,22 +44,6 @@ export class Scene extends Job {
       /*runJob=*/() => this.run(),
       /*stopJob=*/() => this.stop(),
     );
-
-    (async () => {
-      while (!this.stopped.resolved) {
-        const gameTime = await this.nextGameTick;
-        if (this.pausedAtGameTime !== null) {
-          this.#gameTimeAhead += gameTime - this.pausedAtGameTime;
-          this.pausedAtGameTime = null;
-        }
-        this.time = gameTime - this.#gameTimeAhead;
-
-        this.nextTick.resolve(this.time);
-        this.nextTick = CreateResolveablePromise();
-
-        removeItems(this.jobs, job => job.stopped.resolved);
-      }
-    })();
   }
 
   initPresetParts() {}
@@ -112,6 +95,19 @@ export class Scene extends Job {
       }
     }
     stopJob?.()
+  }
+
+  onFrame(gameTime) {
+    if (this.pausedAtGameTime !== null) {
+      this.#gameTimeAhead += gameTime - this.pausedAtGameTime;
+      this.pausedAtGameTime = null;
+    }
+    this.time = gameTime - this.#gameTimeAhead;
+
+    this.nextTick.resolve(this.time);
+    this.nextTick = CreateResolveablePromise();
+
+    removeItems(this.jobs, job => job.stopped.resolved);
   }
 
   stop() {

@@ -49,18 +49,12 @@ export class Game {
     }
 
     (async () => {
-      function MaybeTickScene(scene, time) {
-        if (scene) {
-          scene.nextGameTick.resolve(time);
-          scene.nextGameTick = CreateResolveablePromise();
-        }
-      }
       const realStartTime = performance.now() / 1000;
       while (!this.stopped.resolved) {
         const realTime = (await new Promise(requestAnimationFrame)) / 1000;
         this.time = realTime - realStartTime;
-        MaybeTickScene(this.background, this.time);
-        MaybeTickScene(this.active, this.time);
+        this.background?.onFrame(this.time);
+        this.active?.onFrame(this.time);
         this.drawing.draw();
       }
     })();
