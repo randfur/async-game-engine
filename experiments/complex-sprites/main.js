@@ -4,7 +4,7 @@ import {BasicEntity} from '../../presets/basic-entity.js';
 import {Entity} from '../../engine/entity.js';
 
 /*
-interface SpriteInstance {
+interface SpriteHandle {
   spritePack: SpritePack;
   sprite: Sprite;
   frameIndex: u32;
@@ -41,17 +41,30 @@ async function main() {
   new Game({
     initialScene: class extends BasicScene {
       async run() {
-        this.spriteRegistry = this.create(SpriteRegistry);
+        this.spriteRegistry = new SpriteRegistry();
         this.create(Dog);
       }
+
+      onFrame(gameTime) {
+        super.onFrame(gameTime);
+        this.spriteRegistry.onFrame();
     },
   });
 }
 main();
 
-class SpriteRegistry extends Entity {
+class SpriteRegistry {
   async run() {
+    this.spriteHandles = [];
+  }
 
+  register(basicEntity) {
+    const spriteHandle = new SpriteHandle(basicEntity);
+    this.spriteHandles.push(spriteHandle);
+    basicEntity.registerCleanUp(() => {
+      removeItem(this.spriteHandles, spriteHandle);
+    });
+    return spriteHandle;
   }
 
   async preloadPack(src) {
@@ -60,6 +73,19 @@ class SpriteRegistry extends Entity {
     for (const [spriteName, sprite] of Object.entries(spritePack)) {
     }
   }
+}
+
+class SpriteHandle() {
+  constructor(basicEntity) {
+    this.basicEntity = basicEntity;
+    this.spritePack = null;
+    this.spriteName = null;
+    this.frameIndex = null;
+    this.elapsedFrames = null;
+    this.spriteStartTime = null;
+  }
+
+  loadPack
 }
 
 class Dog extends BasicEntity {
@@ -75,7 +101,9 @@ class Dog extends BasicEntity {
     // - draw(context)
     // - entityTransform
     // - cameraTransform
+    this.sprite = this.scene.spriteRegistry.register(this);
     this.sprite.loadPack('dog.spritepack', 'stand');
+    this.transform.position.set(this.game.width / 2, this.game.height * 3 / 4);
   }
 
   async run() {
@@ -87,6 +115,11 @@ class Dog extends BasicEntity {
   onInput(eventName, event) {
     if (eventName === 'keydown' && event.code === 'Space') {
       this.sprite.switchTo('bark');
+    }
+  }
+
+  onDraw(context, width, height) {
+    if (this.sprite) {
     }
   }
 }
