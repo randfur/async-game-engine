@@ -47,21 +47,22 @@ async function main() {
 
       onFrame(gameTime) {
         super.onFrame(gameTime);
-        this.spriteRegistry.onFrame();
+        this.spriteRegistry.onFrame(this.time);
     },
   });
 }
 main();
 
 class SpriteRegistry {
-  async run() {
+  constructor(scene) {
+    this.scene = scene;
     this.spriteHandles = [];
   }
 
-  register(basicEntity) {
-    const spriteHandle = new SpriteHandle(basicEntity);
+  register(job) {
+    const spriteHandle = new SpriteHandle(scene);
     this.spriteHandles.push(spriteHandle);
-    basicEntity.registerCleanUp(() => {
+    job.registerCleanUp(() => {
       removeItem(this.spriteHandles, spriteHandle);
     });
     return spriteHandle;
@@ -73,19 +74,31 @@ class SpriteRegistry {
     for (const [spriteName, sprite] of Object.entries(spritePack)) {
     }
   }
+
+  onFrame() {
+  }
 }
 
 class SpriteHandle() {
-  constructor(basicEntity) {
-    this.basicEntity = basicEntity;
+  constructor(scene) {
+    this.scene = scene;
     this.spritePack = null;
     this.spriteName = null;
     this.frameIndex = null;
     this.elapsedFrames = null;
     this.spriteStartTime = null;
+    this.lastLoad = null;
   }
 
-  loadPack
+  loadPack(packSrc, spriteName) {
+    const startTime = this.scene.time;
+    const currentLoad = this.lastLoad;
+    this.lastLoad = (async () => {
+      await currentLoad;
+      this.spriteName = spriteName;
+      this.spriteStartTime = startTime;
+    })();
+  }
 }
 
 class Dog extends BasicEntity {
