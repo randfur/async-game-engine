@@ -11,56 +11,55 @@ export function preloadSpritePack(spritePackSrc) {
     loadingSpritePacks[spritePackSrc] = (async () => {
       const pendingImageLoads = [];
       const response = await fetch(spritePackSrc);
-      console.log(response);
       const spritePackJson = await response.json();
       const spritePack = {};
 
       for (const [spriteName, spriteJson] of Object.entries(spritePackJson)) {
         const sprite = {
-          frames: [],
+          keyFrames: [],
           framesPerSecond: spriteJson.framesPerSecond,
+          totalFrameDuration: 0,
           switchTo: spriteJson.switchTo,
         };
         spritePack[spriteName] = sprite;
-        for (const frameJson of spriteJson.frames) {
-          const frame = {
+        for (const keyFrameJson of spriteJson.keyFrames) {
+          const keyFrame = {
             image: null,
             transform: new Transform(),
-            frameLength: frameJson.frameLength,
+            frameDuration: keyFrameJson.frameDuration,
             convexCollisionPolygon: [],
           };
-          sprite.frames.push(frame);
+          sprite.keyFrames.push(keyFrame);
+          sprite.totalFrameDuration += keyFrame.frameDuration;
 
-          const imageSrc = frameJson.imageSrc;
+          const imageSrc = keyFrameJson.imageSrc;
           if (!loadingImages[imageSrc]) {
             loadingImages[imageSrc] = new Promise(resolve => {
               const image = new Image();
               image.src = imageSrc;
-              console.log(imageSrc);
               image.addEventListener('load', () => resolve(image));
             });
           }
           pendingImageLoads.push(loadingImages[imageSrc].then(image => {
-            console.log('loaded', imageSrc);
-            frame.image = image;
+            keyFrame.image = image;
           }));
 
-          const transformJson = frameJson.transform;
+          const transformJson = keyFrameJson.transform;
           if (transformJson?.origin) {
-            frame.transform.origin.assign(transformJson.origin);
+            keyFrame.transform.origin.assign(transformJson.origin);
           }
           if (transformJson?.scale) {
-            frame.transform.scale.assign(transformJson.scale);
+            keyFrame.transform.scale.assign(transformJson.scale);
           }
           if (transformJson?.rotate) {
-            frame.transform.rotate.assign(transformJson.rotate);
+            keyFrame.transform.rotate.assign(transformJson.rotate);
           }
           if (transformJson?.translate) {
-            frame.transform.translate.assign(transformJson.translate);
+            keyFrame.transform.translate.assign(transformJson.translate);
           }
 
-          for (const pointJson of frameJson.convexCollisionPolygon) {
-            frame.convexCollisionPolygon.push(new Vec2(pointJson.x, pointJson.y));
+          for (const pointJson of keyFrameJson.convexCollisionPolygon) {
+            keyFrame.convexCollisionPolygon.push(new Vec2(pointJson.x, pointJson.y));
           }
         }
       }
@@ -80,7 +79,7 @@ export class SpriteRegistry {
   }
 
   register(job) {
-    const spriteHandle = new SpriteHandle(this);
+    const spriteHandle = new SpriteHandle(this.scene);
     this.spriteHandles.push(spriteHandle);
     job.registerCleanUp(() => {
       removeItem(this.spriteHandles, spriteHandle);
@@ -89,6 +88,9 @@ export class SpriteRegistry {
   }
 
   onFrame() {
+    for (const spriteHandle of this.spriteHandles) {
+      spriteHandle.onFrame();
+    }
   }
 }
 
@@ -98,20 +100,60 @@ class SpriteHandle {
     // - switchTo(spriteName)
     // - loadPack(src, spriteName)
     // - draw(context) or
-  constructor(spriteRegistry) {
-    this.spriteRegistry = spriteRegistry;
+  constructor(scene) {
+    this.scene = scene;
     this.spritePack = null;
     this.spriteName = null;
-    this.frameIndex = null;
-    this.elapsedFrames = null;
+    this.keyFrameIndex = null;
     this.spriteStartTime = null;
-    this.lastLoad = null;
+    this.keyFrameStartFrame = null;
   }
 
   switchToPack(spritePackSrc, spriteName) {
     this.spritePack = loadedSpritePacks[spritePackSrc];
+    this.switchTo(spriteName);
+  }
+
+  switchTo(spriteName) {
     this.spriteName = spriteName;
-    this.frameIndex = 0;
+    this.keyFrameIndex = 0;
+    this.spriteStartTime = this.scene.time;
+    this.keyFrameStartFrame = 0;
+  }
+
+  getKeyFrame() {
+    if (!this.spriteName) {
+      return null;
+    }
+    return this.spritePack[this.spriteName].keyFrames[this.keyFrameIndex];
+  }
+
+  onFrame() {
+    if (!this.spriteName) {
+      return;
+    }
+    let sprite = this.spritePack[this.spriteName];
+    let unwrappedTargetFrame = (this.scene.time - this.spriteStartTime) * sprite.framesPerSecond;
+    let targetFrame = unwrappedTargetFrame % sprite.totalFrameDuration;
+    if (sprite.switchTo && unwrappedTargetFrame >= sprite.totalFrameDuration) {
+      this.spriteName = sprite.switchTo;
+      sprite = this.spritePack[this.spriteName];
+      this.spriteStartTime = this.scene.time;
+      targetFrame = 0;
+      this.keyFrameIndex = 0;
+      this.keyFrameStartFrame = 0;
+    }
+    if (targetFrame < this.keyFrameStartFrame) {
+      this.keyFrameIndex = 0;
+      this.keyFrameStartFrame = 0;
+    }
+    let keyFrame = sprite.keyFrames[this.keyFrameIndex];
+    while (targetFrame - this.keyFrameStartFrame >= keyFrame.frameDuration) {
+      targetFrame -= keyFrame.frameDuration;
+      this.keyFrameStartFrame += keyFrame.frameDuration;
+      ++this.keyFrameIndex
+      keyFrame = sprite.keyFrames[this.keyFrameIndex];
+    }
   }
 }
 

@@ -4,6 +4,7 @@ import {BasicEntity} from '../../presets/basic-entity.js';
 import {Entity} from '../../engine/entity.js';
 import {random} from '../../utils/random.js';
 import {range} from '../../utils/range.js';
+import {Mat3} from '../../utils/mat3.js';
 import {preloadSpritePack, SpriteRegistry} from './sprite-registry.js';
 
 /*
@@ -66,9 +67,9 @@ class Dog extends BasicEntity {
   }
 
   init() {
-    this.sprite = this.scene.spriteRegistry.register(this);
-    this.sprite.switchToPack('dog.spritepack', 'stand');
-    this.transform.translate.set(this.game.width / 2, this.game.height * 3 / 4);
+    this.spriteHandle = this.scene.spriteRegistry.register(this);
+    this.spriteHandle.switchToPack('dog.spritepack', 'stand');
+    this.transform.translate.set(this.game.width / 2, this.game.height);
   }
 
   async run() {
@@ -79,13 +80,21 @@ class Dog extends BasicEntity {
 
   onInput(eventName, event) {
     if (eventName === 'keydown' && event.code === 'Space') {
-      this.sprite.switchTo('bark');
+      this.spriteHandle.switchTo('bark');
     }
   }
 
+  static #drawSpriteMatrix = new Mat3();
   onDraw(context, width, height) {
-    if (this.sprite.spriteName) {
-      context.drawImage(this.sprite.spritePack[this.sprite.spriteName].frames[this.sprite.frameIndex].image, 0, 0);
+    const keyFrame = this.spriteHandle.getKeyFrame();
+    if (keyFrame) {
+      const matrix = Dog.#drawSpriteMatrix;
+      matrix.setIdentity();
+      keyFrame.transform.applyToMatrix(matrix);
+      this.transform.applyToMatrix(matrix);
+      this.scene.cameraTransform.applyToMatrix(matrix);
+      matrix.applyToContext(context);
+      context.drawImage(keyFrame.image, 0, 0);
     }
   }
 }

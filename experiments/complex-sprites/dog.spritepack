@@ -1,30 +1,30 @@
 {
   "stand": {
-    "frames": [{
+    "keyFrames": [{
       "imageSrc": "stand0.png",
       "transform": {
         "origin": {"x": 16, "y": 32}
       },
-      "frameLength": 16,
+      "frameDuration": 3,
       "convexCollisionPolygon": []
     }, {
       "imageSrc": "stand1.png",
       "transform": {
         "origin": {"x": 16, "y": 32}
       },
-      "frameLength": 4,
+      "frameDuration": 0.2,
       "convexCollisionPolygon": []
     }],
-    "framesPerSecond": 12,
+    "framesPerSecond": 1,
     "switchTo": null
   },
   "bark": {
-    "frames": [{
+    "keyFrames": [{
       "imageSrc": "bark0.png",
       "transform": {
         "origin": {"x": 16, "y": 32}
       },
-      "frameLength": 1,
+      "frameDuration": 0.15,
       "convexCollisionPolygon": []
     }],
     "framesPerSecond": 1,
