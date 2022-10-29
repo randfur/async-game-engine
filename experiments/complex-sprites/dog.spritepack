@@ -1,5 +1,5 @@
 {
-  "stand" {
+  "stand": {
     "frames": [{
       "src": "dog-graphics/stand0.png",
       "transform": {
@@ -16,7 +16,7 @@
       "convexCollisionPolygon": []
     }],
     "framesPerSecond": 12,
-    "switchTo": null,
+    "switchTo": null
   },
   "bark": {
     "frames": [{

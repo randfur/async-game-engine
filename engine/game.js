@@ -1,7 +1,7 @@
 import {Scene} from './scene.js';
 import {Input} from './input.js';
 import {Drawing} from './drawing.js';
-import {CreateResolveablePromise} from '../utils/promise.js';
+import {CreateResolveablePromise, yieldPromises} from '../utils/promise.js';
 
 /*
 interface Game {
@@ -17,6 +17,7 @@ interface Game {
       viewScale: number,
       clearFrames: boolean,
     },
+    preloadResources(waitFor: (Promise) => void): void,
     initialScene?: SceneType,
     backgroundScene?: SceneType,
   }),
@@ -49,15 +50,46 @@ export class Game {
     }
 
     (async () => {
-      const realStartTime = performance.now() / 1000;
-      while (!this.stopped.resolved) {
-        const realTime = (await new Promise(requestAnimationFrame)) / 1000;
-        this.time = realTime - realStartTime;
-        this.background?.onFrame(this.time);
-        this.active?.onFrame(this.time);
-        this.drawing.draw();
-      }
+      await this.#preloadResources(args.preloadResources);
+      await this.#run();
     })();
+  }
+
+  async #preloadResources(preloadResources) {
+    const resourcePromises = [];
+    let loadedResources = 0;
+    preloadResources?.(promise => resourcePromises.push(promise));
+    if (resourcePromises.length === 0) {
+      return;
+    }
+    const context = this.drawing.context;
+    const drawProgressBar = () => {
+      const barWidth = this.width * 3 / 5;
+      const barHeight = 4;
+      const x = this.width / 2 - barWidth / 2;
+      const y = this.height / 2 - barHeight / 2;
+      context.fillStyle = '#840';
+      context.fillRect(x, y, barWidth, barHeight);
+      context.fillStyle = '#f80';
+      context.fillRect(x, y, barWidth * loadedResources / resourcePromises.length, barHeight);
+    };
+    drawProgressBar();
+    for await (const _ of yieldPromises(resourcePromises)) {
+      ++loadedResources;
+      drawProgressBar();
+    }
+    context.clearRect(0, 0, this.width, this.height);
+  }
+
+  async #run() {
+    const realStartTime = performance.now() / 1000;
+    while (!this.stopped.resolved) {
+      const realTime = (await new Promise(requestAnimationFrame)) / 1000;
+      this.time = realTime - realStartTime;
+      this.background?.onFrame(this.time);
+      this.active?.onFrame(this.time);
+      this.drawing.draw();
+    }
   }
 
   activate(SceneType) {

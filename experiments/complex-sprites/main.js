@@ -2,6 +2,8 @@ import {Game} from '../../engine/game.js';
 import {BasicScene} from '../../presets/basic-scene.js';
 import {BasicEntity} from '../../presets/basic-entity.js';
 import {Entity} from '../../engine/entity.js';
+import {random} from '../../utils/random.js';
+import {removeItem} from '../../utils/array.js';
 
 /*
 interface SpriteHandle {
@@ -39,19 +41,22 @@ interface Transform {
 
 async function main() {
   new Game({
+    preloadResources(waitFor) {
+      Dog.preloadResources(waitFor);
+    },
     initialScene: class extends BasicScene {
       async run() {
-        this.spriteRegistry = new SpriteRegistry();
+        this.spriteRegistry = new SpriteRegistry(this);
         this.create(Dog);
       }
 
       onFrame(gameTime) {
         super.onFrame(gameTime);
         this.spriteRegistry.onFrame(this.time);
+      }
     },
   });
 }
-main();
 
 class SpriteRegistry {
   constructor(scene) {
@@ -60,7 +65,7 @@ class SpriteRegistry {
   }
 
   register(job) {
-    const spriteHandle = new SpriteHandle(scene);
+    const spriteHandle = new SpriteHandle(this);
     this.spriteHandles.push(spriteHandle);
     job.registerCleanUp(() => {
       removeItem(this.spriteHandles, spriteHandle);
@@ -68,7 +73,7 @@ class SpriteRegistry {
     return spriteHandle;
   }
 
-  async preloadPack(src) {
+  static async preloadPack(src) {
     const response = await fetch(src);
     const spritePack = await response.json();
     for (const [spriteName, sprite] of Object.entries(spritePack)) {
@@ -79,9 +84,9 @@ class SpriteRegistry {
   }
 }
 
-class SpriteHandle() {
-  constructor(scene) {
-    this.scene = scene;
+class SpriteHandle {
+  constructor(spriteRegistry) {
+    this.spriteRegistry = spriteRegistry;
     this.spritePack = null;
     this.spriteName = null;
     this.frameIndex = null;
@@ -91,9 +96,10 @@ class SpriteHandle() {
   }
 
   loadPack(packSrc, spriteName) {
-    const startTime = this.scene.time;
+    const startTime = this.spriteRegistry.scene.time;
     const currentLoad = this.lastLoad;
     this.lastLoad = (async () => {
+      await SpriteRegistry.preloadPack(packSrc);
       await currentLoad;
       this.spriteName = spriteName;
       this.spriteStartTime = startTime;
@@ -102,6 +108,22 @@ class SpriteHandle() {
 }
 
 class Dog extends BasicEntity {
+  static preloadResources(waitFor) {
+    waitFor(SpriteRegistry.preloadPack('dog.spritepack'));
+    waitFor(new Promise(resolve => setTimeout(resolve, random(1000))));
+    waitFor(new Promise(resolve => setTimeout(resolve, random(1000))));
+    waitFor(new Promise(resolve => setTimeout(resolve, random(1000))));
+    waitFor(new Promise(resolve => setTimeout(resolve, random(1000))));
+    waitFor(new Promise(resolve => setTimeout(resolve, random(1000))));
+    waitFor(new Promise(resolve => setTimeout(resolve, random(1000))));
+    waitFor(new Promise(resolve => setTimeout(resolve, random(1000))));
+    waitFor(new Promise(resolve => setTimeout(resolve, random(1000))));
+    waitFor(new Promise(resolve => setTimeout(resolve, random(1000))));
+    waitFor(new Promise(resolve => setTimeout(resolve, random(1000))));
+    waitFor(new Promise(resolve => setTimeout(resolve, random(1000))));
+    waitFor(new Promise(resolve => setTimeout(resolve, random(1000))));
+  }
+
   init() {
     // SpriteRegistry
     // - preloadPacks(srcs)
@@ -116,7 +138,7 @@ class Dog extends BasicEntity {
     // - cameraTransform
     this.sprite = this.scene.spriteRegistry.register(this);
     this.sprite.loadPack('dog.spritepack', 'stand');
-    this.transform.position.set(this.game.width / 2, this.game.height * 3 / 4);
+    this.transform.translate.set(this.game.width / 2, this.game.height * 3 / 4);
   }
 
   async run() {
@@ -136,3 +158,5 @@ class Dog extends BasicEntity {
     }
   }
 }
+
+main();

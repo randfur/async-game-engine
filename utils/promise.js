@@ -12,16 +12,12 @@ export function CreateResolveablePromise() {
 }
 
 export async function* yieldPromises(promises) {
-  promises = promises.map(promise => {
-    const newPromise = promise.then(result => ({
-      result,
-      promise: newPromise,
-    }));
-    return newPromise;
-  });
-  while (promises.length > 0) {
-    const {result, promise} = await Promise.race(promises);
-    removeItem(promises, promise);
-    yield result;
+  const reorderedPromises = promises.map(CreateResolveablePromise);
+  let nextReorderedPromiseIndex = 0;
+  for (const promise of promises) {
+    promise.then(result => reorderedPromises[nextReorderedPromiseIndex++].resolve(result));
+  }
+  for (const promise of reorderedPromises) {
+    yield await promise;
   }
 }
