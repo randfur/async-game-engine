@@ -42,15 +42,16 @@ export class Game {
     this.background = null;
     this.active = null;
 
-    if (args.backgroundScene) {
-      this.background = new args.backgroundScene(this);
-    }
-    if (args.initialScene) {
-      this.activate(args.initialScene);
-    }
-
     (async () => {
       await this.#preloadResources(args.preloadResources);
+
+      if (args.backgroundScene) {
+        this.background = new args.backgroundScene(this);
+      }
+      if (args.initialScene) {
+        this.activate(args.initialScene);
+      }
+
       await this.#run();
     })();
   }

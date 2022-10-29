@@ -1,14 +1,14 @@
 {
   "stand": {
     "frames": [{
-      "src": "dog-graphics/stand0.png",
+      "imageSrc": "stand0.png",
       "transform": {
         "origin": {"x": 16, "y": 32}
       },
       "frameLength": 16,
       "convexCollisionPolygon": []
     }, {
-      "src": "dog-graphics/stand1.png",
+      "imageSrc": "stand1.png",
       "transform": {
         "origin": {"x": 16, "y": 32}
       },
@@ -20,7 +20,7 @@
   },
   "bark": {
     "frames": [{
-      "src": "dog-graphics/bark0.png",
+      "imageSrc": "bark0.png",
       "transform": {
         "origin": {"x": 16, "y": 32}
       },
