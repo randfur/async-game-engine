@@ -35,12 +35,17 @@ export function preloadSpritePack(spritePackSrc) {
           const imageSrc = keyFrameJson.imageSrc;
           if (!loadingImages[imageSrc]) {
             loadingImages[imageSrc] = new Promise(resolve => {
+              console.log('loading:', imageSrc);
               const image = new Image();
               image.src = imageSrc;
-              image.addEventListener('load', () => resolve(image));
+              image.addEventListener('load', () => {
+                console.log('loaded: ', imageSrc);
+                resolve(image);
+              });
             });
           }
           pendingImageLoads.push(loadingImages[imageSrc].then(image => {
+            console.log(image.src);
             keyFrame.image = image;
           }));
 
@@ -64,9 +69,11 @@ export function preloadSpritePack(spritePackSrc) {
         }
       }
 
+      console.log('images');
       await Promise.all(pendingImageLoads);
 
       loadedSpritePacks[spritePackSrc] = spritePack;
+      console.log('done');
     })();
   }
   return loadingSpritePacks[spritePackSrc];
