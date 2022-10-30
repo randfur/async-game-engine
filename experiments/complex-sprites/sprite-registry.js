@@ -137,6 +137,7 @@ class SpriteHandle {
     let sprite = this.spritePack[this.spriteName];
     let unwrappedTargetFrame = (this.scene.time - this.spriteStartTime) * sprite.framesPerSecond;
     let targetFrame = unwrappedTargetFrame % sprite.totalFrameDuration;
+    // TODO: Handle multiple rounds of switchTo.
     if (sprite.switchTo && unwrappedTargetFrame >= sprite.totalFrameDuration) {
       this.spriteName = sprite.switchTo;
       sprite = this.spritePack[this.spriteName];
