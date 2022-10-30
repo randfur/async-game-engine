@@ -6,9 +6,11 @@ export class Drawing {
 
     if (!container) {
       container = document.body;
+      container.style.position = 'fixed';
       container.style.background = 'black';
       container.style.margin = '0';
-      container.style.height = '100vh';
+      container.style.width = '100%';
+      container.style.height = '100%';
       container.style.touchAction = 'pinch-zoom';
     }
 

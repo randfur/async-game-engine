@@ -69,11 +69,14 @@ class Dog extends BasicEntity {
   init() {
     this.spriteHandle = this.scene.spriteRegistry.register(this);
     this.spriteHandle.switchToPack('dog.spritepack', 'stand');
-    this.transform.translate.set(this.game.width / 2, this.game.height);
   }
 
   async run() {
     while (true) {
+      this.transform.translate.set(
+        this.game.width / 2,
+        this.game.height,
+      );
       await this.tick();
     }
   }
