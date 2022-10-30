@@ -89,15 +89,17 @@ class Dog extends BasicEntity {
 
   static #drawSpriteMatrix = new Mat3();
   onDraw(context, width, height) {
-    const keyFrame = this.spriteHandle.getKeyFrame();
-    if (keyFrame) {
+    if (this.spriteHandle.spriteName) {
+      const sprite = this.spriteHandle.spritePack[this.spriteHandle.spriteName];
+      const keyframe = sprite.keyframes[this.spriteHandle.keyframeIndex];
       const matrix = Dog.#drawSpriteMatrix;
       matrix.setIdentity();
-      keyFrame.transform.applyToMatrix(matrix);
+      keyframe.transform?.applyToMatrix(matrix);
+      sprite.transform?.applyToMatrix(matrix);
       this.transform.applyToMatrix(matrix);
       this.scene.cameraTransform.applyToMatrix(matrix);
       matrix.applyToContext(context);
-      context.drawImage(keyFrame.image, 0, 0);
+      context.drawImage(keyframe.image, 0, 0);
     }
   }
 }

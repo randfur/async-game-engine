@@ -1,33 +1,26 @@
 {
   "stand": {
-    "keyFrames": [{
+    "keyframes": [{
       "imageSrc": "stand0.png",
-      "transform": {
-        "origin": {"x": 16, "y": 32}
-      },
-      "frameDuration": 3,
-      "convexCollisionPolygon": []
+      "frames": 30
     }, {
       "imageSrc": "stand1.png",
-      "transform": {
-        "origin": {"x": 16, "y": 32}
-      },
-      "frameDuration": 0.2,
-      "convexCollisionPolygon": []
+      "frames": 2
     }],
-    "framesPerSecond": 1,
-    "switchTo": null
+    "transform": {
+      "origin": {"x": 16, "y": 32}
+    },
+    "framesPerSecond": 10
   },
   "bark": {
-    "keyFrames": [{
+    "keyframes": [{
       "imageSrc": "bark0.png",
-      "transform": {
-        "origin": {"x": 16, "y": 32}
-      },
-      "frameDuration": 0.15,
-      "convexCollisionPolygon": []
+      "frames": 1
     }],
-    "framesPerSecond": 1,
+    "transform": {
+      "origin": {"x": 16, "y": 32}
+    },
+    "framesPerSecond": 10,
     "switchTo": "stand"
   }
 }

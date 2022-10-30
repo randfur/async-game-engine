@@ -6,6 +6,31 @@ const loadingImages = {};
 const loadingSpritePacks = {};
 const loadedSpritePacks = {};
 
+/*
+type SpritePackJson = Record<string, SpriteJson>;
+
+interface SpriteJson {
+  keyframes: []KeyframeJson,
+  transform?: TransformJson,
+  convexCollisionPolygon?: []Vec2Json,
+  framesPerSecond: number,
+  switchTo?: string,
+}
+
+interface KeyframeJson {
+  imageSrc: string,
+  transform?: TransformJson,
+  frames: number,
+}
+
+interface TransformJson {
+  origin: Vec2Json,
+  scale: Vec2Json,
+  rotate: Vec2Json,
+  translate: Vec2Json,
+}
+*/
+
 export function preloadSpritePack(spritePackSrc) {
   if (!loadingSpritePacks[spritePackSrc]) {
     loadingSpritePacks[spritePackSrc] = (async () => {
@@ -16,23 +41,23 @@ export function preloadSpritePack(spritePackSrc) {
 
       for (const [spriteName, spriteJson] of Object.entries(spritePackJson)) {
         const sprite = {
-          keyFrames: [],
+          keyframes: [],
+          transform: parseTransformJson(spriteJson.transform),
           framesPerSecond: spriteJson.framesPerSecond,
-          totalFrameDuration: 0,
+          totalFrameCount: 0,
           switchTo: spriteJson.switchTo,
         };
         spritePack[spriteName] = sprite;
-        for (const keyFrameJson of spriteJson.keyFrames) {
-          const keyFrame = {
+        for (const keyframeJson of spriteJson.keyframes) {
+          const keyframe = {
             image: null,
-            transform: new Transform(),
-            frameDuration: keyFrameJson.frameDuration,
-            convexCollisionPolygon: [],
+            transform: parseTransformJson(keyframeJson.transform),
+            frames: keyframeJson.frames,
           };
-          sprite.keyFrames.push(keyFrame);
-          sprite.totalFrameDuration += keyFrame.frameDuration;
+          sprite.keyframes.push(keyframe);
+          sprite.totalFrameCount += keyframe.frames;
 
-          const imageSrc = keyFrameJson.imageSrc;
+          const imageSrc = keyframeJson.imageSrc;
           if (!loadingImages[imageSrc]) {
             loadingImages[imageSrc] = new Promise(resolve => {
               const image = new Image();
@@ -43,26 +68,8 @@ export function preloadSpritePack(spritePackSrc) {
             });
           }
           pendingImageLoads.push(loadingImages[imageSrc].then(image => {
-            keyFrame.image = image;
+            keyframe.image = image;
           }));
-
-          const transformJson = keyFrameJson.transform;
-          if (transformJson?.origin) {
-            keyFrame.transform.origin.assign(transformJson.origin);
-          }
-          if (transformJson?.scale) {
-            keyFrame.transform.scale.assign(transformJson.scale);
-          }
-          if (transformJson?.rotate) {
-            keyFrame.transform.rotate.assign(transformJson.rotate);
-          }
-          if (transformJson?.translate) {
-            keyFrame.transform.translate.assign(transformJson.translate);
-          }
-
-          for (const pointJson of keyFrameJson.convexCollisionPolygon) {
-            keyFrame.convexCollisionPolygon.push(new Vec2(pointJson.x, pointJson.y));
-          }
         }
       }
 
@@ -72,6 +79,26 @@ export function preloadSpritePack(spritePackSrc) {
     })();
   }
   return loadingSpritePacks[spritePackSrc];
+}
+
+function parseTransformJson(transformJson) {
+  if (!transformJson) {
+    return null;
+  }
+  const transform = new Transform();
+  if (transformJson?.origin) {
+    transform.origin.assign(transformJson.origin);
+  }
+  if (transformJson?.scale) {
+    transform.scale.assign(transformJson.scale);
+  }
+  if (transformJson?.rotate) {
+    transform.rotate.assign(transformJson.rotate);
+  }
+  if (transformJson?.translate) {
+    transform.translate.assign(transformJson.translate);
+  }
+  return transform;
 }
 
 export class SpriteRegistry {
@@ -106,9 +133,9 @@ class SpriteHandle {
     this.scene = scene;
     this.spritePack = null;
     this.spriteName = null;
-    this.keyFrameIndex = null;
+    this.keyframeIndex = null;
     this.spriteStartTime = null;
-    this.keyFrameStartFrame = null;
+    this.keyframeStartFrame = null;
   }
 
   switchToPack(spritePackSrc, spriteName) {
@@ -118,16 +145,16 @@ class SpriteHandle {
 
   switchTo(spriteName) {
     this.spriteName = spriteName;
-    this.keyFrameIndex = 0;
+    this.keyframeIndex = 0;
     this.spriteStartTime = this.scene.time;
-    this.keyFrameStartFrame = 0;
+    this.keyframeStartFrame = 0;
   }
 
-  getKeyFrame() {
+  getkeyframe() {
     if (!this.spriteName) {
       return null;
     }
-    return this.spritePack[this.spriteName].keyFrames[this.keyFrameIndex];
+    return this.spritePack[this.spriteName].keyframes[this.keyframeIndex];
   }
 
   onFrame() {
@@ -136,26 +163,26 @@ class SpriteHandle {
     }
     let sprite = this.spritePack[this.spriteName];
     let unwrappedTargetFrame = (this.scene.time - this.spriteStartTime) * sprite.framesPerSecond;
-    let targetFrame = unwrappedTargetFrame % sprite.totalFrameDuration;
+    let targetFrame = unwrappedTargetFrame % sprite.totalFrameCount;
     // TODO: Handle multiple rounds of switchTo.
-    if (sprite.switchTo && unwrappedTargetFrame >= sprite.totalFrameDuration) {
+    if (sprite.switchTo && unwrappedTargetFrame >= sprite.totalFrameCount) {
       this.spriteName = sprite.switchTo;
       sprite = this.spritePack[this.spriteName];
       this.spriteStartTime = this.scene.time;
       targetFrame = 0;
-      this.keyFrameIndex = 0;
-      this.keyFrameStartFrame = 0;
+      this.keyframeIndex = 0;
+      this.keyframeStartFrame = 0;
     }
-    if (targetFrame < this.keyFrameStartFrame) {
-      this.keyFrameIndex = 0;
-      this.keyFrameStartFrame = 0;
+    if (targetFrame < this.keyframeStartFrame) {
+      this.keyframeIndex = 0;
+      this.keyframeStartFrame = 0;
     }
-    let keyFrame = sprite.keyFrames[this.keyFrameIndex];
-    while (targetFrame - this.keyFrameStartFrame >= keyFrame.frameDuration) {
-      targetFrame -= keyFrame.frameDuration;
-      this.keyFrameStartFrame += keyFrame.frameDuration;
-      ++this.keyFrameIndex
-      keyFrame = sprite.keyFrames[this.keyFrameIndex];
+    let keyframe = sprite.keyframes[this.keyframeIndex];
+    while (targetFrame - this.keyframeStartFrame >= keyframe.frames) {
+      targetFrame -= keyframe.frames;
+      this.keyframeStartFrame += keyframe.frames;
+      ++this.keyframeIndex
+      keyframe = sprite.keyframes[this.keyframeIndex];
     }
   }
 }
