@@ -6,6 +6,9 @@ export class Drawing {
 
     if (!container) {
       container = document.body;
+      // Use position: fixed and height: 100% to match visual height excluding URL bar on mobile.
+      // 100vh will include the URL bar height.
+      // https://developer.chrome.com/blog/url-bar-resizing/
       container.style.position = 'fixed';
       container.style.background = 'black';
       container.style.margin = '0';

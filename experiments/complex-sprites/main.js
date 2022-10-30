@@ -82,7 +82,7 @@ class Dog extends BasicEntity {
   }
 
   onInput(eventName, event) {
-    if (eventName === 'keydown' && event.code === 'Space') {
+    if (eventName === 'mousedown' || (eventName === 'keydown' && event.code === 'Space')) {
       this.spriteHandle.switchTo('bark');
     }
   }
