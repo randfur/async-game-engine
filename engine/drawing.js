@@ -34,12 +34,16 @@ export class Drawing {
     resize(container.getBoundingClientRect());
   }
 
-  draw() {
+  flushResize() {
     if (this.canvas.width !== this.width || this.canvas.height !== this.height) {
       this.canvas.width = this.width;
       this.canvas.height = this.height;
       this.context.imageSmoothingEnabled = false;
     }
+  }
+
+  draw() {
+    this.flushResize();
 
     if (this.clearFrames) {
       this.context.resetTransform();

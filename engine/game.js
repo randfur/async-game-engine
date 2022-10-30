@@ -65,6 +65,7 @@ export class Game {
     }
     const context = this.drawing.context;
     const drawProgressBar = () => {
+      this.drawing.flushResize();
       const barWidth = this.width * 3 / 5;
       const barHeight = 4;
       const x = this.width / 2 - barWidth / 2;
