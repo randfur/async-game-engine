@@ -44,8 +44,7 @@ export class BasicScene extends Scene {
       for (const job of this.jobs) {
         job.onDebugDraw?.(context, width, height);
       }
+      this.collision2dRegistry.onDebugDraw(context, width, height);
     }
-
-    this.collision2dRegistry.onDebugDraw(context, width, height);
   }
 }
