@@ -74,16 +74,14 @@ class Dog extends BasicEntity {
   async run() {
     while (true) {
       this.transform.translate.set(
-        this.game.width / 2,
+        Math.floor(this.game.width / 2),
         this.game.height,
       );
-      await this.tick();
-    }
-  }
 
-  onInput(eventName, event) {
-    if (eventName === 'mousedown' || (eventName === 'keydown' && event.code === 'Space')) {
-      this.spriteHandle.switchTo('bark');
+      const bark = this.game.input.mouse.down[0] || this.game.input.keyDown['Space'];
+      this.spriteHandle.switchTo(bark ? 'bark' : 'stand');
+
+      await this.tick();
     }
   }
 

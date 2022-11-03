@@ -30,7 +30,7 @@ export class BasicScene extends Scene {
   }
 
   onInput(eventName, event) {
-    if (eventName === 'keydown' && event.shiftKey && event.code === 'F12') {
+    if (eventName === 'keypress' && event.shiftKey && event.code === 'F12') {
       this.debugMode ^= true;
     }
 

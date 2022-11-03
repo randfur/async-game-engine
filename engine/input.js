@@ -7,6 +7,7 @@ export class Input {
     this.arrowKeys = new Vec2(0, 0);
     this.mouse = {
       position: new Vec2(0, 0),
+      down: {},
     };
 
     this.keyDown = {};
@@ -20,20 +21,29 @@ export class Input {
       this.game.drawing.canvas.addEventListener(eventName, event => {
         this.mouse.position.x = event.offsetX / viewScale;
         this.mouse.position.y = event.offsetY / viewScale;
+        switch (eventName) {
+          case 'mousedown':
+            this.mouse.down[event.button] = true;
+            break;
+          case 'mouseup':
+            this.mouse.down[event.button] = false;
+            break;
+        }
         this.onInput(eventName, event);
       });
     }
     const keyEventNames = [
-      'keydown',
+      'keypress',
       'keyup',
     ];
     for (const eventName of keyEventNames) {
       window.addEventListener(eventName, event => {
         switch (eventName) {
-          case 'keydown':
+          case 'keypress':
             if (this.keyDown[event.code]) {
               break;
             }
+            console.log(event.code);
             this.keyDown[event.code] = true;
             switch (event.code) {
               case 'ArrowUp':
