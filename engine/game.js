@@ -17,7 +17,7 @@ interface Game {
       viewScale: number,
       clearFrames: boolean,
     },
-    preloadResources(waitFor: (Promise) => void): void,
+    preloadResources(addPromise: (Promise) => void): void,
     initialScene?: SceneType,
     backgroundScene?: SceneType,
   }),
@@ -35,9 +35,6 @@ export class Game {
     this.time = 0;
     this.drawing = new Drawing(this, args.drawing);
     this.input = new Input(this, this.drawing.viewScale);
-    // TODO: input?
-    // TODO: audio?
-    // TODO: resources?
     this.#inactives = new Map();
     this.background = null;
     this.active = null;
@@ -57,12 +54,17 @@ export class Game {
   }
 
   async #preloadResources(preloadResources) {
+    if (!preloadResources) {
+      return;
+    }
+
     const resourcePromises = [];
-    let loadedResources = 0;
-    preloadResources?.(promise => resourcePromises.push(promise));
+    preloadResources(promise => resourcePromises.push(promise));
     if (resourcePromises.length === 0) {
       return;
     }
+
+    let loadedResources = 0;
     const context = this.drawing.context;
     const drawProgressBar = () => {
       this.drawing.flushResize();
@@ -76,10 +78,12 @@ export class Game {
       context.fillRect(x, y, barWidth * loadedResources / resourcePromises.length, barHeight);
     };
     drawProgressBar();
+
     for await (const _ of yieldPromises(resourcePromises)) {
       ++loadedResources;
       drawProgressBar();
     }
+
     context.clearRect(0, 0, this.width, this.height);
   }
 

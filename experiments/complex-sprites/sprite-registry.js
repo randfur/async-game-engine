@@ -7,6 +7,14 @@ const loadingSpritePacks = {};
 const loadedSpritePacks = {};
 
 /*
+interface SpriteRegistry {
+  constructor(scene: Scene);
+  register(job: Job): dogs;
+  onFrame();
+}
+
+# .spritepack JSON format.
+
 type SpritePackJson = Record<string, SpriteJson>;
 
 interface SpriteJson {
@@ -19,7 +27,6 @@ interface SpriteJson {
 
 interface KeyframeJson {
   imageSrc: string,
-  transform?: TransformJson,
   frames: number,
 }
 
@@ -50,6 +57,7 @@ export function preloadSpritePack(spritePackSrc) {
         spritePack[spriteName] = sprite;
         for (const keyframeJson of spriteJson.keyframes) {
           const keyframe = {
+            sprite,
             image: null,
             transform: parseTransformJson(keyframeJson.transform),
             frames: keyframeJson.frames,
@@ -150,11 +158,15 @@ class SpriteHandle {
     this.keyframeStartFrame = 0;
   }
 
-  getkeyframe() {
+  getSprite() {
     if (!this.spriteName) {
       return null;
     }
-    return this.spritePack[this.spriteName].keyframes[this.keyframeIndex];
+    return this.spritePack[this.spriteName];
+  }
+
+  getKeyframe() {
+    return this.getSprite()?.keyframes[this.keyframeIndex];
   }
 
   onFrame() {

@@ -43,7 +43,6 @@ export class Input {
             if (this.keyDown[event.code]) {
               break;
             }
-            console.log(event.code);
             this.keyDown[event.code] = true;
             switch (event.code) {
               case 'ArrowUp':

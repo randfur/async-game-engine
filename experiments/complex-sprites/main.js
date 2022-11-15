@@ -43,8 +43,8 @@ interface Transform {
 
 async function main() {
   new Game({
-    preloadResources(waitFor) {
-      Dog.preloadResources(waitFor);
+    preloadResources(addPromise) {
+      Dog.preloadResources(addPromise);
     },
     initialScene: class extends BasicScene {
       async run() {
@@ -62,12 +62,11 @@ async function main() {
 }
 
 class Dog extends BasicEntity {
-  static preloadResources(waitFor) {
-    waitFor(preloadSpritePack('dog.spritepack'));
+  static preloadResources(addPromise) {
+    addPromise(preloadSpritePack('dog.spritepack'));
   }
 
   init() {
-    this.spriteHandle = this.scene.spriteRegistry.register(this);
     this.spriteHandle.switchToPack('dog.spritepack', 'stand');
   }
 

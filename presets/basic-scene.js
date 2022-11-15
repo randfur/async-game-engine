@@ -15,7 +15,7 @@ export class BasicScene extends Scene {
 
     this.collision2dRegistry = new Collision2dRegistry(this.cameraTransform);
 
-    this.debugMode = true;//false;
+    this.debugMode = false;
   }
 
   onFrame(gameTime) {

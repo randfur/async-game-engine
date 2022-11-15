@@ -7,6 +7,7 @@ interface Entity extends Job {
   async run(): void,
 }
 */
+
 export class Entity extends Job {
   constructor(scene, parentJob, args) {
     super(scene, parentJob);

@@ -3,8 +3,21 @@ import {Mat3} from '../utils/mat3.js';
 import {Transform} from '../utils/transform.js';
 import {Vec2} from '../utils/vec2.js';
 
+/*
+interface BasicEntity extends Entity {
+  initPresetParts();
+  onInput(eventName: string, event: MouseEvent | KeyboardEvent);
+  enableCollisions();
+  updateBoundingBox(boundingBox: BoundingBox): boolean;
+  onCollision(otherCollider: Collider);
+  onDraw(context: HTMLCanvasContext2D, width: number, height: number);
+  drawSpriteHandle(context: HTMLCanvasContext2D);
+}
+*/
+
 export class BasicEntity extends Entity {
   initPresetParts() {
+    this.spriteHandle = this.scene.spriteRegistry.register(this);
     if (this.onInput !== BasicEntity.prototype.onInput) {
       this.scene.inputRegistry.register(this, this.onInput.bind(this));
     }
@@ -13,7 +26,6 @@ export class BasicEntity extends Entity {
     });
     this.collider = null;
     this.transform = new Transform();
-    this.sprite = null;
   }
 
   onInput(eventName, event) {}
@@ -30,9 +42,10 @@ export class BasicEntity extends Entity {
   static #updateBoundingBoxPoints = [new Vec2(), new Vec2(), new Vec2(), new Vec2()];
   static #updateBoundingBoxMatrix = new Mat3();
   updateBoundingBox(boundingBox) {
-    if (!this.sprite) {
-      return false;
-    }
+    return false;
+    // TODO: Update this to work with this.spriteHandle.
+
+    const sprite = this.spriteHandle.getSprite();
 
     const image = this.sprite.image;
     const points = BasicEntity.#updateBoundingBoxPoints;
@@ -55,23 +68,22 @@ export class BasicEntity extends Entity {
   onCollision(otherCollider) {}
 
   onDraw(context, width, height) {
-    this.drawActiveSprite(context);
+    this.drawSpriteHandle(context);
   }
 
-  drawActiveSprite(context) {
-    if (this.sprite) {
-      this.drawSprite(context, this.sprite);
+  static #drawSpriteHandleMatrix = new Mat3();
+  drawSpriteHandle(context) {
+    if (!this.spriteHandle.spriteName) {
+      return;
     }
-  }
-
-  static #drawSpriteMatrix = new Mat3();
-  drawSprite(context, sprite) {
-    const matrix = BasicEntity.#drawSpriteMatrix;
+    const sprite = this.spriteHandle.spritePack[this.spriteHandle.spriteName];
+    const keyframe = sprite.keyframes[this.spriteHandle.keyframeIndex];
+    const matrix = BasicEntity.#drawSpriteHandleMatrix;
     matrix.setIdentity();
-    sprite.transform.applyToMatrix(matrix);
+    sprite.transform?.applyToMatrix(matrix);
     this.transform.applyToMatrix(matrix);
     this.scene.cameraTransform.applyToMatrix(matrix);
     matrix.applyToContext(context);
-    context.drawImage(sprite.image, 0, 0);
+    context.drawImage(keyframe.image, 0, 0);
   }
 }
