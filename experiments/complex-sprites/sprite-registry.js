@@ -9,105 +9,46 @@ const loadedSpritePacks = {};
 /*
 interface SpriteRegistry {
   constructor(scene: Scene);
-  register(job: Job): dogs;
+  register(job: Job): SpriteHandle;
   onFrame();
 }
 
-# .spritepack JSON format.
+interface SpriteHandle {
+  scene: Scene;
+  spritePack: SpritePack;
+  spriteName: SpriteName | null;
+  keyframeIndex: number;
+  spriteStartTime: number;
+  keyframeStartFrame: number;
 
-type SpritePackJson = Record<string, SpriteJson>;
-
-interface SpriteJson {
-  keyframes: []KeyframeJson,
-  transform?: TransformJson,
-  convexCollisionPolygon?: []Vec2Json,
-  framesPerSecond: number,
-  switchTo?: string,
+  constructor(scene: Scene);
+  switchToPack(spritePackSrc: string, spriteName: SpriteName);
+  switchTo(spriteName: SpriteName);
+  getSprite(): Sprite | null;
+  getKeyframe(): Keyframe | null;
+  onFrame();
 }
 
-interface KeyframeJson {
+type SpriteName = string;
+
+type SpritePack = Record<SpriteName, Sprite>;
+
+interface Sprite {
+  name: SpriteName;
+  keyframes: Array<Keyframe>;
+  transform: Transform | null;
+  framesPerSecond: number;
+  totalFrameCount: number;
+  switchTo: SpriteName | null;
+}
+
+interface Keyframe {
+  sprite: Sprite,
   imageSrc: string,
+  image: Image,
   frames: number,
 }
-
-interface TransformJson {
-  origin: Vec2Json,
-  scale: Vec2Json,
-  rotate: Vec2Json,
-  translate: Vec2Json,
-}
 */
-
-export function preloadSpritePack(spritePackSrc) {
-  if (!loadingSpritePacks[spritePackSrc]) {
-    loadingSpritePacks[spritePackSrc] = (async () => {
-      const pendingImageLoads = [];
-      const response = await fetch(spritePackSrc);
-      const spritePackJson = await response.json();
-      const spritePack = {};
-
-      for (const [spriteName, spriteJson] of Object.entries(spritePackJson)) {
-        const sprite = {
-          keyframes: [],
-          transform: parseTransformJson(spriteJson.transform),
-          framesPerSecond: spriteJson.framesPerSecond,
-          totalFrameCount: 0,
-          switchTo: spriteJson.switchTo,
-        };
-        spritePack[spriteName] = sprite;
-        for (const keyframeJson of spriteJson.keyframes) {
-          const keyframe = {
-            sprite,
-            image: null,
-            transform: parseTransformJson(keyframeJson.transform),
-            frames: keyframeJson.frames,
-          };
-          sprite.keyframes.push(keyframe);
-          sprite.totalFrameCount += keyframe.frames;
-
-          const imageSrc = keyframeJson.imageSrc;
-          if (!loadingImages[imageSrc]) {
-            loadingImages[imageSrc] = new Promise(resolve => {
-              const image = new Image();
-              image.src = imageSrc;
-              image.addEventListener('load', () => {
-                resolve(image);
-              });
-            });
-          }
-          pendingImageLoads.push(loadingImages[imageSrc].then(image => {
-            keyframe.image = image;
-          }));
-        }
-      }
-
-      await Promise.all(pendingImageLoads);
-
-      loadedSpritePacks[spritePackSrc] = spritePack;
-    })();
-  }
-  return loadingSpritePacks[spritePackSrc];
-}
-
-function parseTransformJson(transformJson) {
-  if (!transformJson) {
-    return null;
-  }
-  const transform = new Transform();
-  if (transformJson?.origin) {
-    transform.origin.assign(transformJson.origin);
-  }
-  if (transformJson?.scale) {
-    transform.scale.assign(transformJson.scale);
-  }
-  if (transformJson?.rotate) {
-    transform.rotate.assign(transformJson.rotate);
-  }
-  if (transformJson?.translate) {
-    transform.translate.assign(transformJson.translate);
-  }
-  return transform;
-}
 
 export class SpriteRegistry {
   constructor(scene) {
@@ -132,11 +73,6 @@ export class SpriteRegistry {
 }
 
 class SpriteHandle {
-    // SpriteHandle
-    // - Contains sprite instance.
-    // - switchTo(spriteName)
-    // - loadPack(src, spriteName)
-    // - draw(context) or
   constructor(scene) {
     this.scene = scene;
     this.spritePack = null;
@@ -197,5 +133,116 @@ class SpriteHandle {
       keyframe = sprite.keyframes[this.keyframeIndex];
     }
   }
+}
+
+/*
+function preloadSpritePack(spritePackSrc: string): Promise<SpritePack>;
+
+function parseSpritePackJson(spritePackJson: SpritePackJson): SpritePack;
+
+function loadSpritePackImages(spritePack: SpritePack): Promise<void>;
+
+type SpritePackJson = Record<SpriteName, SpriteJson>;
+
+interface SpriteJson {
+  keyframes: []KeyframeJson,
+  transform?: TransformJson,
+  convexCollisionPolygon?: []Vec2Json,
+  framesPerSecond: number,
+  switchTo?: string,
+}
+
+interface KeyframeJson {
+  imageSrc: string,
+  frames: number,
+}
+
+interface TransformJson {
+  origin: Vec2Json,
+  scale: Vec2Json,
+  rotate: Vec2Json,
+  translate: Vec2Json,
+}
+*/
+
+export function preloadSpritePack(spritePackSrc) {
+  if (!loadingSpritePacks[spritePackSrc]) {
+    loadingSpritePacks[spritePackSrc] = (async () => {
+      const response = await fetch(spritePackSrc);
+      const spritePackJson = await response.json();
+      const spritePack = parseSpritePackJson(spritePackJson);
+      await loadSpritePackImages(spritePack);
+      loadedSpritePacks[spritePackSrc] = spritePack;
+    })();
+  }
+  return loadingSpritePacks[spritePackSrc];
+}
+
+function parseSpritePackJson(spritePackJson) {
+  const spritePack = {};
+  for (const [spriteName, spriteJson] of Object.entries(spritePackJson)) {
+    const sprite = {
+      keyframes: [],
+      transform: parseTransformJson(spriteJson.transform),
+      framesPerSecond: spriteJson.framesPerSecond,
+      totalFrameCount: 0,
+      switchTo: spriteJson.switchTo,
+    };
+    spritePack[spriteName] = sprite;
+    for (const keyframeJson of spriteJson.keyframes) {
+      const keyframe = {
+        sprite,
+        imageSrc: keyframeJson.imageSrc,
+        image: null,
+        frames: keyframeJson.frames,
+      };
+      sprite.keyframes.push(keyframe);
+      sprite.totalFrameCount += keyframe.frames;
+
+    }
+  }
+  return spritePack;
+}
+
+async function loadSpritePackImages(spritePack) {
+  const pendingImageLoads = [];
+  for (const sprite of Object.values(spritePack)) {
+    for (const keyframe of sprite.keyframes) {
+      const imageSrc = keyframe.imageSrc;
+      if (!loadingImages[imageSrc]) {
+        loadingImages[imageSrc] = new Promise(resolve => {
+          const image = new Image();
+          image.src = imageSrc;
+          image.addEventListener('load', () => {
+            resolve(image);
+          });
+        });
+      }
+      pendingImageLoads.push(loadingImages[imageSrc].then(image => {
+        keyframe.image = image;
+      }));
+    }
+  }
+  await Promise.all(pendingImageLoads);
+}
+
+function parseTransformJson(transformJson) {
+  if (!transformJson) {
+    return null;
+  }
+  const transform = new Transform();
+  if (transformJson?.origin) {
+    transform.origin.assign(transformJson.origin);
+  }
+  if (transformJson?.scale) {
+    transform.scale.assign(transformJson.scale);
+  }
+  if (transformJson?.rotate) {
+    transform.rotate.assign(transformJson.rotate);
+  }
+  if (transformJson?.translate) {
+    transform.translate.assign(transformJson.translate);
+  }
+  return transform;
 }
 
