@@ -7,6 +7,26 @@ const loadingSpritePacks = {};
 const loadedSpritePacks = {};
 
 /*
+type SpritePack = Record<SpriteName, Sprite>;
+
+type SpriteName = string;
+
+interface Sprite {
+  name: SpriteName;
+  keyframes: Array<Keyframe>;
+  transform: Transform | null;
+  framesPerSecond: number;
+  totalFrameCount: number;
+  switchTo: SpriteName | null;
+}
+
+interface Keyframe {
+  sprite: Sprite,
+  imageSrc: string,
+  image: Image,
+  frames: number,
+}
+
 interface SpriteRegistry {
   constructor(scene: Scene);
   register(job: Job): SpriteHandle;
@@ -24,29 +44,8 @@ interface SpriteHandle {
   constructor(scene: Scene);
   switchToPack(spritePackSrc: string, spriteName: SpriteName);
   switchTo(spriteName: SpriteName);
-  getSprite(): Sprite | null;
   getKeyframe(): Keyframe | null;
   onFrame();
-}
-
-type SpriteName = string;
-
-type SpritePack = Record<SpriteName, Sprite>;
-
-interface Sprite {
-  name: SpriteName;
-  keyframes: Array<Keyframe>;
-  transform: Transform | null;
-  framesPerSecond: number;
-  totalFrameCount: number;
-  switchTo: SpriteName | null;
-}
-
-interface Keyframe {
-  sprite: Sprite,
-  imageSrc: string,
-  image: Image,
-  frames: number,
 }
 */
 
@@ -94,15 +93,11 @@ class SpriteHandle {
     this.keyframeStartFrame = 0;
   }
 
-  getSprite() {
+  getKeyframe() {
     if (!this.spriteName) {
       return null;
     }
-    return this.spritePack[this.spriteName];
-  }
-
-  getKeyframe() {
-    return this.getSprite()?.keyframes[this.keyframeIndex];
+    return this.spritePack[this.spriteName].keyframes[this.keyframeIndex];
   }
 
   onFrame() {

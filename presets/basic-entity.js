@@ -45,24 +45,24 @@ export class BasicEntity extends Entity {
     return false;
     // TODO: Update this to work with this.spriteHandle.
 
-    const sprite = this.spriteHandle.getSprite();
+    // const sprite = this.spriteHandle.getSprite();
 
-    const image = this.sprite.image;
-    const points = BasicEntity.#updateBoundingBoxPoints;
-    points[0].set(0, 0);
-    points[1].set(image.width, 0);
-    points[2].set(image.width, image.height);
-    points[3].set(0, image.height);
+    // const image = this.sprite.image;
+    // const points = BasicEntity.#updateBoundingBoxPoints;
+    // points[0].set(0, 0);
+    // points[1].set(image.width, 0);
+    // points[2].set(image.width, image.height);
+    // points[3].set(0, image.height);
 
-    const matrix = BasicEntity.#updateBoundingBoxMatrix;
-    matrix.setIdentity();
-    this.sprite.transform.applyToMatrix(matrix);
-    this.transform.applyToMatrix(matrix);
-    for (const point of points) {
-      matrix.applyToVector(point);
-    }
-    boundingBox.setFromPoints(points);
-    return true;
+    // const matrix = BasicEntity.#updateBoundingBoxMatrix;
+    // matrix.setIdentity();
+    // this.sprite.transform.applyToMatrix(matrix);
+    // this.transform.applyToMatrix(matrix);
+    // for (const point of points) {
+    //   matrix.applyToVector(point);
+    // }
+    // boundingBox.setFromPoints(points);
+    // return true;
   }
 
   onCollision(otherCollider) {}
@@ -73,14 +73,13 @@ export class BasicEntity extends Entity {
 
   static #drawSpriteHandleMatrix = new Mat3();
   drawSpriteHandle(context) {
-    if (!this.spriteHandle.spriteName) {
+    const keyframe = this.spriteHandle.getKeyframe();
+    if (!keyframe) {
       return;
     }
-    const sprite = this.spriteHandle.spritePack[this.spriteHandle.spriteName];
-    const keyframe = sprite.keyframes[this.spriteHandle.keyframeIndex];
     const matrix = BasicEntity.#drawSpriteHandleMatrix;
     matrix.setIdentity();
-    sprite.transform?.applyToMatrix(matrix);
+    keyframe.sprite.transform?.applyToMatrix(matrix);
     this.transform.applyToMatrix(matrix);
     this.scene.cameraTransform.applyToMatrix(matrix);
     matrix.applyToContext(context);
