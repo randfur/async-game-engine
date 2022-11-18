@@ -17,7 +17,7 @@ interface Game {
       viewScale: number,
       clearFrames: boolean,
     },
-    preloadResources(addPromise: (Promise) => void): void,
+    resourcesToPreload?(): Array<Promise<any>>,
     initialScene?: SceneType,
     backgroundScene?: SceneType,
   }),
@@ -40,7 +40,7 @@ export class Game {
     this.active = null;
 
     (async () => {
-      await this.#preloadResources(args.preloadResources);
+      await this.#preloadResources(args.resourcesToPreload?.());
 
       if (args.backgroundScene) {
         this.background = new args.backgroundScene(this);
@@ -53,14 +53,8 @@ export class Game {
     })();
   }
 
-  async #preloadResources(preloadResources) {
-    if (!preloadResources) {
-      return;
-    }
-
-    const resourcePromises = [];
-    preloadResources(promise => resourcePromises.push(promise));
-    if (resourcePromises.length === 0) {
+  async #preloadResources(resourcePromises) {
+    if (!resourcePromises || resourcePromises.length === 0) {
       return;
     }
 

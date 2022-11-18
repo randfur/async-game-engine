@@ -1,6 +1,6 @@
-import {removeItem} from '../../utils/array.js';
-import {Transform} from '../../utils/transform.js';
-import {Vec2} from '../../utils/vec2.js';
+import {removeItem} from '../utils/array.js';
+import {Transform} from '../utils/transform.js';
+import {Vec2} from '../utils/vec2.js';
 
 const loadingImages = {};
 const loadingSpritePacks = {};
@@ -35,7 +35,7 @@ interface SpriteRegistry {
 
 interface SpriteHandle {
   scene: Scene;
-  spritePack: SpritePack;
+  spritePack: SpritePack | null;
   spriteName: SpriteName | null;
   keyframeIndex: number;
   spriteStartTime: number;
@@ -81,6 +81,13 @@ class SpriteHandle {
     this.keyframeStartFrame = null;
   }
 
+  async loadPack(spritePackSrc, spriteName=null) {
+    this.spritePack = null;
+    this.spriteName = null;
+    await preloadSpritePack(spritePackSrc);
+    this.switchToPack(spritePackSrc, spriteName);
+  }
+
   switchToPack(spritePackSrc, spriteName) {
     this.spritePack = loadedSpritePacks[spritePackSrc];
     this.switchTo(spriteName);
@@ -94,14 +101,14 @@ class SpriteHandle {
   }
 
   getKeyframe() {
-    if (!this.spriteName) {
+    if (!this.spritePack || !this.spriteName) {
       return null;
     }
     return this.spritePack[this.spriteName].keyframes[this.keyframeIndex];
   }
 
   onFrame() {
-    if (!this.spriteName) {
+    if (!this.spritePack || !this.spriteName) {
       return;
     }
     let sprite = this.spritePack[this.spriteName];
