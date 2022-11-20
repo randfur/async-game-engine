@@ -94,6 +94,13 @@ class SpriteHandle {
   }
 
   switchTo(spriteName) {
+    if (this.spriteName === spriteName) {
+      return;
+    }
+    this.hardSwitchTo(spriteName);
+  }
+
+  hardSwitchTo(spriteName) {
     this.spriteName = spriteName;
     this.keyframeIndex = 0;
     this.spriteStartTime = this.scene.time;
@@ -166,6 +173,23 @@ interface TransformJson {
   translate: Vec2Json,
 }
 */
+
+export function createSpritePackWip(spritePackDefinition) {
+  // TODO: Write.
+  // Syntax testing:
+  createSpritePack({
+    'bark': 'bark.png',
+    'stand': [
+      {
+        imageSrc: 'stand.png',
+        frames: 30,
+      },
+      'blink.png',
+    ],
+  }, {
+    framesPerSecond: 10,
+  });
+}
 
 export function preloadSpritePack(spritePackSrc) {
   if (!loadingSpritePacks[spritePackSrc]) {
