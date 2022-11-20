@@ -185,13 +185,17 @@ interface TransformJson {
 
 interface SpritePackDefinition {
   key: SpritePackKey;
+  origin?: Vec2Json,
+  transform?: TransformJson,
   framesPerSecond?: number;
   sprites: Record<SpriteName; SpriteDefinition>;
 }
 
 type SpriteDefinition = ImageSrc | Array<KeyframeDefinition> | interface SpriteDefinition {
-  keyframes: Array<KeyframeDefinition>;
+  origin?: Vec2Json,
   transform?: TransformJson,
+  framesPerSecond?: number;
+  keyframes: Array<KeyframeDefinition>;
   switchTo?: SpriteName;
 }
 

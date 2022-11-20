@@ -1,0 +1,6 @@
+# 2022-11-20 Sunday
+Keyframes:
+- Allow frame count randomisation.
+  - Should allow for more complex looking scenery without any code.
+  - Add framesDeviate number field.
+    - Adds +/- the value to frames each time that keyframe is activated.
