@@ -7,9 +7,10 @@ const loadingSpritePacks = {};
 const loadedSpritePacks = {};
 
 /*
-type SpritePack = Record<SpriteName, Sprite>;
-
+type SpritePackKey = string;
 type SpriteName = string;
+type SpritePack = Record<SpriteName, Sprite>;
+type ImageSrc = string;
 
 interface Sprite {
   name: SpriteName;
@@ -22,7 +23,7 @@ interface Sprite {
 
 interface Keyframe {
   sprite: Sprite,
-  imageSrc: string,
+  imageSrc: ImageSrc,
   image: Image,
   frames: number,
 }
@@ -47,6 +48,8 @@ interface SpriteHandle {
   getKeyframe(): Keyframe | null;
   onFrame();
 }
+
+const loadedSpritePacks: Record<SpritePackKey, SpritePack>;
 */
 
 export class SpriteRegistry {
@@ -86,6 +89,11 @@ class SpriteHandle {
     this.spriteName = null;
     await preloadSpritePack(spritePackSrc);
     this.switchToPack(spritePackSrc, spriteName);
+  }
+
+  async createPack(spritePackDefinition, spriteName=null) {
+    await precreateSpritePack(spritePackDefinition);
+    this.switchToPack(spritePackDefinition.key, spriteName);
   }
 
   switchToPack(spritePackSrc, spriteName) {
@@ -145,7 +153,7 @@ class SpriteHandle {
 }
 
 /*
-function preloadSpritePack(spritePackSrc: string): Promise<SpritePack>;
+function preloadSpritePack(spritePackSrc: SpritePackKey): Promise<SpritePack>;
 
 function parseSpritePackJson(spritePackJson: SpritePackJson): SpritePack;
 
@@ -154,40 +162,57 @@ function loadSpritePackImages(spritePack: SpritePack): Promise<void>;
 type SpritePackJson = Record<SpriteName, SpriteJson>;
 
 interface SpriteJson {
-  keyframes: []KeyframeJson,
-  transform?: TransformJson,
-  convexCollisionPolygon?: []Vec2Json,
-  framesPerSecond: number,
-  switchTo?: string,
+  keyframes: []KeyframeJson;
+  transform?: TransformJson;
+  convexCollisionPolygon?: []Vec2Json;
+  framesPerSecond: number;
+  switchTo?: string;
 }
 
 interface KeyframeJson {
-  imageSrc: string,
-  frames: number,
+  imageSrc: ImageSrc;
+  frames: number;
 }
 
 interface TransformJson {
-  origin: Vec2Json,
-  scale: Vec2Json,
-  rotate: Vec2Json,
-  translate: Vec2Json,
+  origin: Vec2Json;
+  scale: Vec2Json;
+  rotate: Vec2Json;
+  translate: Vec2Json;
+}
+
+function precreateSpritePack(spritePackDefinition: SpritePackDefinition): Promise<SpritePack>;
+
+interface SpritePackDefinition {
+  key: SpritePackKey;
+  framesPerSecond?: number;
+  sprites: Record<SpriteName; SpriteDefinition>;
+}
+
+type SpriteDefinition = ImageSrc | Array<KeyframeDefinition>;
+
+type KeyframeDefinition = ImageSrc | interface {
+  imageSrc: ImageSrc;
+  frames: number;
 }
 */
 
-export function createSpritePackWip(spritePackDefinition) {
+export function precreateSpritePack(spritePackDefinition) {
   // TODO: Write.
   // Syntax testing:
   createSpritePack({
-    'bark': 'bark.png',
-    'stand': [
-      {
-        imageSrc: 'stand.png',
-        frames: 30,
-      },
-      'blink.png',
-    ],
-  }, {
+    key: 'dog',
     framesPerSecond: 10,
+    sprites: {
+      'bark': 'bark.png',
+      'stand': [
+        {
+          imageSrc: 'stand.png',
+          frames: 30,
+        },
+        'blink.png',
+      ],
+    },
   });
 }
 
