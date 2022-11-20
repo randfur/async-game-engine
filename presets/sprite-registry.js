@@ -159,6 +159,8 @@ function parseSpritePackJson(spritePackJson: SpritePackJson): SpritePack;
 
 function loadSpritePackImages(spritePack: SpritePack): Promise<void>;
 
+function precreateSpritePack(spritePackDefinition: SpritePackDefinition): Promise<SpritePack>;
+
 type SpritePackJson = Record<SpriteName, SpriteJson>;
 
 interface SpriteJson {
@@ -181,15 +183,17 @@ interface TransformJson {
   translate: Vec2Json;
 }
 
-function precreateSpritePack(spritePackDefinition: SpritePackDefinition): Promise<SpritePack>;
-
 interface SpritePackDefinition {
   key: SpritePackKey;
   framesPerSecond?: number;
   sprites: Record<SpriteName; SpriteDefinition>;
 }
 
-type SpriteDefinition = ImageSrc | Array<KeyframeDefinition>;
+type SpriteDefinition = ImageSrc | Array<KeyframeDefinition> | interface SpriteDefinition {
+  keyframes: Array<KeyframeDefinition>;
+  transform?: TransformJson,
+  switchTo?: SpriteName;
+}
 
 type KeyframeDefinition = ImageSrc | interface {
   imageSrc: ImageSrc;
