@@ -1,6 +1,6 @@
 import {BasicEntity} from '../../presets/basic-entity.js';
 
-class Cat extends BasicEntity {
+export class Cat extends BasicEntity {
   async init() {
     await this.spriteHandle.createPack({
       name: 'cat',
