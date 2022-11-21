@@ -1,22 +1,4 @@
-import {Game} from '../../engine/game.js';
-import {BasicScene} from '../../presets/basic-scene.js';
 import {BasicEntity} from '../../presets/basic-entity.js';
-
-async function main() {
-  new Game({
-    initialScene: class extends BasicScene {
-      async run() {
-        this.create(Dog);
-        await this.forever();
-      }
-
-      onFrame(gameTime) {
-        super.onFrame(gameTime);
-        this.spriteRegistry.onFrame(this.time);
-      }
-    },
-  });
-}
 
 class Dog extends BasicEntity {
   async init() {
@@ -37,5 +19,3 @@ class Dog extends BasicEntity {
     }
   }
 }
-
-main();

@@ -23,7 +23,7 @@ export class BasicScene extends Scene {
 
   onFrame(gameTime) {
     super.onFrame(gameTime);
-
+    this.spriteRegistry.onFrame(this.time);
     this.collision2dRegistry.onFrame();
   }
 
