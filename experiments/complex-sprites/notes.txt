@@ -1,6 +1,6 @@
 # 2022-11-23 Wednesday
-Sprite data format idea:
-- Data:
+Sprite sub sprites:
+- Data format:
   - Sprite:
     - Sub sprite list.
     - Keyframe list.
@@ -17,6 +17,9 @@ Sprite data format idea:
     - Maybe reset to time.
 - Should allow for things like dripping animations on characters and reusing animation parts.
 - Basically like a 2D sprite rig.
+- All sub sprites manually placed, no motion tweening.
+- Makes sprite packs make more sense now that they can reference each other.
+- Disallow recursion, sub sprite instantiation checks for cycles.
 - Maybe also expose attachment points e.g. where bullets should come out of.
   - Can they live in sub sprites?
     - What if there are collisions?
@@ -24,6 +27,8 @@ Sprite data format idea:
     - How bad is the look up complexity?
 Maybe ditch the JSON and definition parsers for now.
 - Go with raw data model behaviour implementation and stabilise on that first.
+Maybe focus more on editor.
+- Stick to 32x32 for simplicity for now.
 
 # 2022-11-20 Sunday
 Keyframes:
