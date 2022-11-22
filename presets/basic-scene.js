@@ -1,7 +1,7 @@
 import {Scene} from '../engine/scene.js';
 import {Drawing2dRegistry} from './drawing-2d-registry.js';
 import {InputRegistry} from './input-registry.js';
-import {SpriteRegistry} from './sprite-registry.js';
+import {SpriteRegistry} from './sprites/sprite-registry.js';
 import {Collision2dRegistry} from './collision-2d-registry.js';
 import {Transform} from '../utils/transform.js';
 
