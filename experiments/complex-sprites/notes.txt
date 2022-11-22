@@ -1,3 +1,30 @@
+# 2022-11-23 Wednesday
+Sprite data format idea:
+- Data:
+  - Sprite:
+    - Sub sprite list.
+    - Keyframe list.
+  - Sub sprite:
+    - Name.
+    - Sprite name.
+    - Time skip.
+  - Keyframe:
+    - Optional image src.
+    - Sub sprite placement list.
+  - Sub sprite placement:
+    - Sub sprite name.
+    - Transform.
+    - Maybe reset to time.
+- Should allow for things like dripping animations on characters and reusing animation parts.
+- Basically like a 2D sprite rig.
+- Maybe also expose attachment points e.g. where bullets should come out of.
+  - Can they live in sub sprites?
+    - What if there are collisions?
+    - Which one wins?
+    - How bad is the look up complexity?
+Maybe ditch the JSON and definition parsers for now.
+- Go with raw data model behaviour implementation and stabilise on that first.
+
 # 2022-11-20 Sunday
 Keyframes:
 - Allow frame count randomisation.
