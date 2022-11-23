@@ -4,6 +4,7 @@ Sprite sub sprites:
   - Sprite:
     - Sub sprite list.
     - Keyframe list.
+    - Optional transform.
   - Sub sprite:
     - Name.
     - Sprite name.
@@ -11,6 +12,9 @@ Sprite sub sprites:
   - Keyframe:
     - Optional image src.
     - Sub sprite placement list.
+    - Frames.
+    - Frames deviation.
+    - Optional transform.
   - Sub sprite placement:
     - Sub sprite name.
     - Transform.

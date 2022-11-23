@@ -2,7 +2,7 @@ import {BasicEntity} from '../../presets/basic-entity.js';
 
 export class Dog extends BasicEntity {
   async init() {
-    await this.spriteHandle.loadPack('dog.spritepack');
+    await this.spriteHandle.loadPackFile('dog.spritepack');
   }
 
   async run() {

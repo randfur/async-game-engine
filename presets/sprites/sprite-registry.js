@@ -4,6 +4,12 @@ import {SpriteHandle} from './sprite-handle.js';
 
 /*
 interface SpriteRegistry {
+  static loadedSpritePacks: Record<SpritePackName, SpritePack>;
+  static loadingSpritePacks: Record<SpritePackName, Promise<SpritePack>>;
+  static loadingImage: Record<ImageSrc, Promise<Image>>;
+
+  static async loadSpritePack(spritePack);
+
   constructor(scene: Scene);
   register(job: Job): SpriteHandle;
   onFrame();
@@ -15,6 +21,14 @@ interface SpriteRegistry {
 // export const loadedSpritePacks = {};
 
 export class SpriteRegistry {
+  static loadedSpritePacks = {};
+  static #loadingSpritePacks = {};
+  static #loadingImages = {};
+
+  static async loadPack(spritePack) {
+    await this.loadImages(spritePack);
+  }
+
   constructor(scene) {
     this.scene = scene;
     this.spriteHandles = [];

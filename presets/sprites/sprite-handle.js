@@ -9,8 +9,7 @@ interface SpriteHandle {
 
   constructor(scene: Scene);
 
-  async loadPack(spritePackSrc: string, spriteName: SpriteName);
-  async createPack(spritePackDefinition: SpritePackDefinition, spriteName: SpriteName);
+  async loadPack(spritePack: SpritePack, spriteName: SpriteName | null);
 
   switchToPack(spritePackSrc: string, spriteName: SpriteName);
   switchTo(spriteName: SpriteName);
@@ -30,16 +29,9 @@ export class SpriteHandle {
     this.keyframeStartFrame = null;
   }
 
-  async loadPack(spritePackSrc, spriteName=null) {
-    this.spritePack = null;
-    this.spriteName = null;
-    await preloadSpritePack(spritePackSrc);
-    this.switchToPack(spritePackSrc, spriteName);
-  }
-
-  async createPack(spritePackDefinition, spriteName=null) {
-    await precreateSpritePack(spritePackDefinition);
-    this.switchToPack(spritePackDefinition.key, spriteName);
+  async loadPack(spritePack, spriteName) {
+    await SpriteRegistry.loadPack(spritePack);
+    this.switchToPack(spritePack.name, spriteName);
   }
 
   switchToPack(spritePackSrc, spriteName) {
